@@ -1,0 +1,9 @@
+{
+  "extends": "tsconfig-kodefox",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "noEmit": false
+    // "typeRoots": ["node_modules/@types", "custom_types"] /* List of folders to include type definitions from. */
+  },
+  "types": ["react", "react-native"]
+}

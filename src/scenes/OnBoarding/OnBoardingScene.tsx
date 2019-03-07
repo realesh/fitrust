@@ -1,22 +1,32 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Swiper} from '../../generals/components';
-import {SCREEN_WIDTH} from '../../generals/constants/size';
-import {Text} from '../../generals/core-ui';
+import OnBoardingItem from './OnBoardingItem';
+import {
+  fitnessTracker,
+  heartRate,
+  personalTrainer,
+} from '../../assets/images/onBoarding';
 
 export default function OnBoardingScene() {
   return (
     <View style={styles.root}>
       <Swiper>
-        <View style={{width: SCREEN_WIDTH}}>
-          <Text>Screen 1</Text>
-        </View>
-        <View style={{width: SCREEN_WIDTH}}>
-          <Text>Screen 2</Text>
-        </View>
-        <View style={{width: SCREEN_WIDTH}}>
-          <Text>Screen 3</Text>
-        </View>
+        <OnBoardingItem
+          title="Fitness Tracker"
+          content="Lorem ipsum"
+          image={fitnessTracker}
+        />
+        <OnBoardingItem
+          title="Max Heart Rate"
+          content="Lorem ipsum"
+          image={heartRate}
+        />
+        <OnBoardingItem
+          title="Personal Trainer"
+          content="Lorem ipsum"
+          image={personalTrainer}
+        />
       </Swiper>
     </View>
   );

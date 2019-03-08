@@ -9,7 +9,6 @@ import {
   TextInputProps,
 } from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
-
 import {
   GREY,
   LIGHT_GREY,
@@ -25,7 +24,7 @@ import {
 import {
   DEFAULT_ICON_SIZE,
   MEDIUM_FONT_SIZE,
-  LABEL_FONT_SIZE,
+  SMALL_FONT_SIZE,
 } from '../constants/size';
 
 type State = {
@@ -35,15 +34,45 @@ type State = {
 };
 
 type Props = TextInputProps & {
-  containerStyle?: StyleProp<TextStyle>;
-  disabled?: boolean;
-  inputStyle?: StyleProp<TextStyle>;
-  inputType?: INPUT_TYPE;
+  /**
+   * Text input label (REQUIRED)
+   */
   label: string;
-  iconName?: string;
-  iconRightName?: string;
+
+  /**
+   * Controlled value of the text input (REQUIRED)
+   */
   value: string;
+
+  /**
+   * Controller to change input value (REQUIRED)
+   */
   onChangeText: (text: string) => void;
+
+  /**
+   * Style for the TextInput Container
+   */
+  containerStyle?: StyleProp<TextStyle>;
+
+  /**
+   * If true, text input will be disabled
+   */
+  disabled?: boolean;
+
+  /**
+   * Style for the TextInput
+   */
+  inputStyle?: StyleProp<TextStyle>;
+
+  /**
+   * Type of text inputted
+   */
+  inputType?: INPUT_TYPE;
+
+  /**
+   * Icon name for input
+   */
+  iconName?: string;
 };
 
 type INPUT_TYPE = 'password' | 'email' | 'username' | 'text';
@@ -59,14 +88,21 @@ type INPUT_TYPE = 'password' | 'email' | 'username' | 'text';
  * Props
  * ---
  *
- * containerStyle: style for the TextInput Container
- * disabled: if true, text input will be disabled
- * inputStyle: style for the TextInput
- * inputType: type of text inputted
- * label: text input title (REQUIRED)
- * iconName: icon name for input
- * value: controlled value of the text input (REQUIRED)
- * onChangeText: controller to change input value (REQUIRED)
+ * __label__: text input label (REQUIRED)
+ *
+ * __value__: controlled value of the text input (REQUIRED)
+ *
+ * __onChangeText__: controller to change input value (REQUIRED)
+ *
+ * __containerStyle__: style for the TextInput Container
+ *
+ * __disabled__: if true, text input will be disabled
+ *
+ * __inputStyle__: style for the TextInput
+ *
+ * __inputType__: type of text inputted
+ *
+ * __iconName__: icon name for input
  *
  * ---
  * Notes
@@ -92,7 +128,6 @@ export default class TextInput extends Component<Props, State> {
       inputStyle,
       label,
       iconName,
-      iconRightName,
       onChangeText,
       value,
       inputType,
@@ -131,19 +166,13 @@ export default class TextInput extends Component<Props, State> {
       return valid;
     };
 
-    let icon = iconName
-      ? checkValid && checkValid(value)
-        ? 'ios-checkmark-circle-outline'
-        : iconName
-      : null;
-
     let labelStyle = {
       position: 'absolute',
       fontSize: filled
-        ? LABEL_FONT_SIZE
+        ? SMALL_FONT_SIZE
         : focusAnimateValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [MEDIUM_FONT_SIZE, LABEL_FONT_SIZE],
+            outputRange: [MEDIUM_FONT_SIZE, SMALL_FONT_SIZE],
           }),
       top:
         filled || this.props.value !== ''
@@ -179,21 +208,6 @@ export default class TextInput extends Component<Props, State> {
         <View style={styles.container}>
           <Animated.Text style={labelStyle}>{label}</Animated.Text>
           <Animated.View style={textInputStyle}>
-            {icon && (
-              <Icon
-                name={icon}
-                size={DEFAULT_ICON_SIZE}
-                color={
-                  !filled
-                    ? SUCCESS_THEME_COLOR
-                    : !checkValid(value)
-                    ? LIGHT_GREY
-                    : SUCCESS_THEME_COLOR
-                }
-                style={styles.iconStyle}
-              />
-            )}
-
             <BaseTextInput
               {...otherProps}
               style={[styles.textInput, inputStyle]}
@@ -203,14 +217,15 @@ export default class TextInput extends Component<Props, State> {
               value={value}
               editable={!disabled}
               secureTextEntry={inputType === 'password'}
+              selectionColor={LIGHT_GREY}
             />
-            {iconRightName && (
+            {iconName && (
               <Icon
                 name={
                   !filled
-                    ? iconRightName
+                    ? iconName
                     : !checkValid(value)
-                    ? iconRightName
+                    ? iconName
                     : 'check-circle'
                 }
                 size={DEFAULT_ICON_SIZE}

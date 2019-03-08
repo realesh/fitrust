@@ -5,7 +5,6 @@ const {width: SCREEN_WIDTH} = Dimensions.get('screen');
 
 const DEFAULT_ICON_SIZE = 20;
 
-const LABEL_FONT_SIZE = 10;
 const SMALL_FONT_SIZE = 12;
 const DEFAULT_FONT_SIZE = 14;
 const MEDIUM_FONT_SIZE = 16;
@@ -19,7 +18,6 @@ export {
   SCREEN_WIDTH,
   DEFAULT_ICON_SIZE,
   DEFAULT_FONT_SIZE,
-  LABEL_FONT_SIZE,
   SMALL_FONT_SIZE,
   MEDIUM_FONT_SIZE,
   LARGE_FONT_SIZE,

@@ -5,7 +5,7 @@ export function validateEmail(email: string) {
 
 export function validateUsername(username: string) {
   // TODO: fetch api and check if username already exist
-  return username !== '';
+  return username !== '' && username.length >= 6;
 }
 
 export function validatePassword(password: string) {

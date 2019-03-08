@@ -2,7 +2,7 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text} from '../../generals/core-ui';
 import {MEDIUM_FONT_SIZE, LARGE_FONT_SIZE} from '../../generals/constants/size';
-import {RED} from '../../generals/constants/colors';
+import {BLUE} from '../../generals/constants/colors';
 
 export default function DashboardScene() {
   return (
@@ -20,7 +20,7 @@ export default function DashboardScene() {
           <Text
             fontWeight="light"
             fontSize={MEDIUM_FONT_SIZE}
-            style={{color: RED}}
+            style={{color: BLUE}}
           >
             504 cals
           </Text>{' '}

@@ -8,8 +8,27 @@ import {
 } from 'react-navigation';
 import {Feather as Icon} from '@expo/vector-icons';
 import {Toolbar} from '../components';
-import {DashboardScene, OnBoardingScene} from '../../scenes';
-import {GREY, RED} from '../constants/colors';
+import {DashboardScene, LoginScene, OnBoardingScene} from '../../scenes';
+import {GREY, BLUE} from '../constants/colors';
+
+let AuthStack = createStackNavigator({
+  OnBoard: {
+    screen: OnBoardingScene,
+    navigationOptions: () => ({
+      header: null,
+    }),
+  },
+  Login: {
+    screen: LoginScene,
+    navigationOptions: ({
+      navigation,
+    }: {
+      navigation: NavigationScreenProp<any>;
+    }) => ({
+      header: <Toolbar navigation={navigation} />,
+    }),
+  },
+});
 
 let DashboardStack = createStackNavigator({
   Home: {
@@ -40,7 +59,7 @@ let BottomTab = createBottomTabNavigator(
       showLabel: false,
       showIcon: true,
       inactiveTintColor: GREY,
-      activeTintColor: RED,
+      activeTintColor: BLUE,
       style: {
         backgroundColor: 'transparent',
         borderTopWidth: 0,
@@ -51,7 +70,7 @@ let BottomTab = createBottomTabNavigator(
 );
 
 let MainSwitch = createSwitchNavigator({
-  OnBoarding: OnBoardingScene,
+  OnBoarding: AuthStack,
   Main: BottomTab,
   Auth: DashboardStack,
 });

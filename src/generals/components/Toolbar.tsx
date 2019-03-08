@@ -49,17 +49,17 @@ function Toolbar(props: Props) {
     titleStyle,
     navigation,
   } = props;
-  let canGoBack: Boolean =
-    (navigation.state.params && navigation.state.params.previous_screen) ||
+  let canGoBack: boolean =
+    (navigation.state.params && navigation.state.params.previous_scene) ||
     false;
 
-  let toggleDrawer = () => navigation.toggleDrawer();
+  let goBack = () => navigation.goBack();
   return (
     <View style={[styles.toolbarContainer, containerStyle]}>
       {leftComponent ? (
         leftComponent
       ) : canGoBack ? (
-        <TouchableOpacity onPress={toggleDrawer}>
+        <TouchableOpacity onPress={goBack}>
           <Icon name="arrow-left" size={24} />
         </TouchableOpacity>
       ) : null}

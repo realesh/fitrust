@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 import {BLUE, BLUE30, WHITE} from '../constants/colors';
-import {SCREEN_WIDTH, MEDIUM_FONT_SIZE} from '../constants/size';
+import {SCREEN_WIDTH, DEFAULT_FONT_SIZE} from '../constants/size';
 import {Text} from '../core-ui';
 
 /**
@@ -86,20 +86,15 @@ export default class Swiper extends Component<Props, State> {
                     inputRange: [0, 1],
                     outputRange: [10, 30],
                   }),
+                  backgroundColor: dotAnimateValue[index].interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [BLUE30, BLUE],
+                  }),
                 };
 
                 return (
                   <TouchableOpacity onPress={onPress}>
-                    <Animated.View
-                      style={[
-                        styles.dot,
-                        {
-                          backgroundColor:
-                            index === activeIndex ? BLUE : BLUE30,
-                        },
-                        dotAnimateStyle,
-                      ]}
-                    />
+                    <Animated.View style={[styles.dot, dotAnimateStyle]} />
                   </TouchableOpacity>
                 );
               })}
@@ -114,7 +109,7 @@ export default class Swiper extends Component<Props, State> {
           <TouchableOpacity onPress={onFinish} style={styles.clickableArea}>
             <Text
               fontWeight="bold"
-              fontSize={MEDIUM_FONT_SIZE}
+              fontSize={DEFAULT_FONT_SIZE}
               style={{color: WHITE}}
             >
               Get Started

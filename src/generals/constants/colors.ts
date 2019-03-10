@@ -8,10 +8,12 @@ export const DARK_GREY50 = 'rgba(45, 45, 45, 0.5)';
 export const BLUE = '#445EE8';
 export const BLUE30 = 'rgba(68, 94, 232, 0.3)';
 export const GREEN = '#1ED75F';
+export const RED = '#e5446a';
 
 export const DEFAULT_TEXT_COLOR = BLACK;
 export const LIGHT_TEXT_COLOR = LIGHT_GREY;
 export const SUCCESS_THEME_COLOR = GREEN;
+export const ERROR_THEME_COLOR = RED;
 export const DEFAULT_ICON_COLOR = LIGHT_GREY;
 export const DEFAULT_BORDER_COLOR = LIGHT_GREY;
 export const DEFAULT_BACKGROUND_COLOR = WHITE;

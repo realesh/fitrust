@@ -7,6 +7,8 @@ import {
   TextStyle,
   Animated,
   TextInputProps,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
 import {
@@ -14,6 +16,7 @@ import {
   LIGHT_GREY,
   BLACK,
   SUCCESS_THEME_COLOR,
+  ERROR_THEME_COLOR,
 } from '../constants/colors';
 import {
   validateEmail,
@@ -73,6 +76,11 @@ type Props = TextInputProps & {
    * Icon name for input
    */
   iconName?: string;
+
+  /**
+   * if true, display error with message
+   */
+  error?: boolean;
 };
 
 type INPUT_TYPE = 'password' | 'email' | 'username' | 'text';
@@ -104,6 +112,8 @@ type INPUT_TYPE = 'password' | 'email' | 'username' | 'text';
  *
  * __iconName__: icon name for input
  *
+ * __error__: if true, display error with message
+ *
  * ---
  * Notes
  * ---
@@ -131,6 +141,7 @@ export default class TextInput extends Component<Props, State> {
       onChangeText,
       value,
       inputType,
+      error,
       ...otherProps
     } = this.props;
 
@@ -197,10 +208,12 @@ export default class TextInput extends Component<Props, State> {
       width: '100%',
       paddingBottom: 5,
       borderBottomWidth: 2,
-      borderBottomColor: validAnimateValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [LIGHT_GREY, SUCCESS_THEME_COLOR],
-      }),
+      borderBottomColor: error
+        ? ERROR_THEME_COLOR
+        : validAnimateValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [LIGHT_GREY, SUCCESS_THEME_COLOR],
+          }),
     };
 
     return (
@@ -230,7 +243,9 @@ export default class TextInput extends Component<Props, State> {
                 }
                 size={DEFAULT_ICON_SIZE}
                 color={
-                  !filled || !checkValid(value)
+                  error
+                    ? ERROR_THEME_COLOR
+                    : !filled || !checkValid(value)
                     ? LIGHT_GREY
                     : SUCCESS_THEME_COLOR
                 }
@@ -261,7 +276,9 @@ export default class TextInput extends Component<Props, State> {
     }
   }
 
-  _handleFocus = () => {
+  _handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    let {onFocus} = this.props;
+    onFocus && onFocus(e);
     this.setState({focus: true});
   };
 

@@ -1,21 +1,24 @@
-import React, {ReactNode, Component} from 'react';
+import React, {ReactNode} from 'react';
 import {
-  StyleSheet,
-  View,
   TouchableOpacity,
   ViewProps,
   GestureResponderEvent,
-  Animated,
+  StyleSheet,
 } from 'react-native';
 import {DEFAULT_FONT_SIZE} from '../constants/size';
 import Text from './Text';
 import {WHITE, BLUE} from '../constants/colors';
+import {Feather as Icon} from '@expo/vector-icons';
 
 type Props = ViewProps & {
   /**
    * Size of the button's font. Defaults to 14.
    */
   fontSize?: number;
+
+  fontColor?: string;
+
+  iconName?: string;
 
   /**
    * Text children to be displayed.
@@ -26,97 +29,38 @@ type Props = ViewProps & {
    * Function to invoke when button pressed.
    */
   onPress?: (event: GestureResponderEvent) => void;
-
-  loading?: boolean;
 };
 
-type State = {
-  buttonAnimateValue: Animated.Value;
+const AnimatedButton = (props: Props) => {
+  let {
+    fontSize = DEFAULT_FONT_SIZE,
+    fontColor = WHITE,
+    iconName,
+    children,
+    style,
+    onPress,
+    ...otherProps
+  } = props;
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.clickableArea, style]}
+      {...otherProps}
+    >
+      {iconName && <Icon name={iconName} size={fontSize} color={fontColor} />}
+      <Text
+        fontWeight="bold"
+        fontSize={fontSize}
+        style={{color: fontColor, marginLeft: 5}}
+      >
+        {children}
+      </Text>
+    </TouchableOpacity>
+  );
 };
 
-export default class Button extends Component<Props, State> {
-  state = {
-    buttonAnimateValue: new Animated.Value(0),
-  };
-
-  render() {
-    let {buttonAnimateValue} = this.state;
-    let {
-      fontSize = DEFAULT_FONT_SIZE,
-      children,
-      style,
-      onPress,
-      loading,
-      ...otherProps
-    } = this.props;
-
-    let animateStyle = {
-      width: buttonAnimateValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [20, 30],
-      }),
-      height: buttonAnimateValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [20, 30],
-      }),
-      borderRadius: buttonAnimateValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [10, 15],
-      }),
-    };
-
-    return loading ? (
-      <View style={styles.container}>
-        <Animated.View
-          style={[styles.loadingBar, animateStyle]}
-          {...otherProps}
-        />
-      </View>
-    ) : (
-      <View style={styles.container}>
-        <Animated.View style={[styles.button, style]} {...otherProps}>
-          <TouchableOpacity onPress={onPress} style={styles.clickableArea}>
-            <Text fontWeight="bold" fontSize={fontSize} style={{color: WHITE}}>
-              {children}
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    );
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    let {loading} = this.props;
-    let {buttonAnimateValue} = this.state;
-    if (prevProps.loading != loading && loading) {
-      this._animateProgress(buttonAnimateValue);
-    } else if (prevProps.loading != loading && !loading) {
-      Animated.timing(buttonAnimateValue, {
-        toValue: 0,
-        duration: 300,
-      }).start();
-    }
-  }
-
-  _animateProgress = (progressAnimateValue: Animated.Value) => {
-    let {loading} = this.props;
-    if (loading) {
-      let toZero = () => {
-        Animated.timing(progressAnimateValue, {
-          toValue: 0,
-          duration: 300,
-        }).start(() => this._animateProgress(progressAnimateValue));
-      };
-
-      Animated.timing(progressAnimateValue, {
-        toValue: 1,
-        duration: 300,
-      }).start(toZero);
-    } else {
-      progressAnimateValue.stopAnimation();
-    }
-  };
-}
+export default AnimatedButton;
 
 const styles = StyleSheet.create({
   container: {
@@ -126,28 +70,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
   },
-  button: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 50,
-    width: '100%',
-    borderRadius: 10,
-    backgroundColor: BLUE,
-    alignSelf: 'center',
-  },
-  loadingBar: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    backgroundColor: BLUE,
-    alignSelf: 'center',
-  },
   clickableArea: {
-    width: '100%',
-    flex: 1,
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: BLUE,
+    borderRadius: 10,
   },
 });

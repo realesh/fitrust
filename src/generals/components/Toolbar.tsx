@@ -2,7 +2,6 @@ import React, {ReactNode} from 'react';
 import {
   StyleSheet,
   View,
-  Text,
   StyleProp,
   TextStyle,
   ViewStyle,
@@ -10,8 +9,9 @@ import {
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Feather as Icon} from '@expo/vector-icons';
-import {DEFAULT_TEXT_COLOR, WHITE} from '../constants/colors';
-import {HEADER_FONT_SIZE} from '../constants/size';
+import {DEFAULT_TEXT_COLOR, WHITE, BLUE} from '../constants/colors';
+import {HEADER_FONT_SIZE, MEDIUM_FONT_SIZE} from '../constants/size';
+import {Text} from '../core-ui';
 
 type Props = NavigationScreenProps & {
   /**
@@ -23,11 +23,7 @@ type Props = NavigationScreenProps & {
    * ReactNode (Icon) to display on left side of toolbar
    */
   leftComponent?: ReactNode;
-
-  /**
-   * ReactNode (Icon) to display on right side of toolbar
-   */
-  rightComponent?: ReactNode;
+  pointsInfo?: boolean;
 
   /**
    * optional style for the title
@@ -44,7 +40,7 @@ function Toolbar(props: Props) {
   let {
     containerStyle,
     leftComponent,
-    rightComponent,
+    pointsInfo = true,
     title,
     titleStyle,
     navigation,
@@ -63,10 +59,25 @@ function Toolbar(props: Props) {
           <Icon name="arrow-left" size={24} />
         </TouchableOpacity>
       ) : null}
+
       {title ? (
         <Text style={[styles.headerText, titleStyle]}>{title}</Text>
       ) : null}
-      {rightComponent ? rightComponent : null}
+
+      {pointsInfo ? (
+        <View style={styles.rightComponent}>
+          <TouchableOpacity style={styles.levelPointsContainer}>
+            <View style={styles.levelInfoContainer}>
+              <Icon name="zap" size={MEDIUM_FONT_SIZE} color={WHITE} />
+            </View>
+            <View style={styles.pointsInfoContainer}>
+              <Text fontWeight="bold" style={{color: BLUE}}>
+                2,500
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -85,5 +96,28 @@ const styles = StyleSheet.create({
     color: DEFAULT_TEXT_COLOR,
     fontSize: HEADER_FONT_SIZE,
     fontFamily: 'Lato-Bold',
+  },
+  rightComponent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  levelPointsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  levelInfoContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: BLUE,
+  },
+  pointsInfoContainer: {
+    marginLeft: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

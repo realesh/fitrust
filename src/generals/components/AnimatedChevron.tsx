@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, ViewProps, Animated} from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
-import {BLUE} from '../constants/colors';
+import {GREY} from '../constants/colors';
 
 type Props = ViewProps & {
   /**
@@ -20,7 +20,7 @@ export default class AnimatedChevron extends Component<Props> {
     translateValue: new Animated.Value(0),
   };
   render() {
-    let {size = 30, color = BLUE, style} = this.props;
+    let {size = 30, color = GREY, style} = this.props;
     let {translateValue} = this.state;
 
     let translateStyle = {

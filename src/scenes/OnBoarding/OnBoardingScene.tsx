@@ -15,14 +15,9 @@ type Props = {
 
 export default class OnBoardingScene extends Component<Props, {}> {
   render() {
-    let {navigation} = this.props;
     return (
       <View style={styles.root}>
-        <Swiper
-          onFinish={() =>
-            navigation.navigate('Login', {previous_scene: 'OnBoarding'})
-          }
-        >
+        <Swiper onFinish={this._navigateToAuth}>
           <OnBoardingItem
             title="Fitness Tracker"
             content="Lorem ipsum"
@@ -42,6 +37,11 @@ export default class OnBoardingScene extends Component<Props, {}> {
       </View>
     );
   }
+
+  _navigateToAuth = () => {
+    let {navigation} = this.props;
+    navigation.navigate('Auth', {previous_scene: 'OnBoarding'});
+  };
 }
 
 const styles = StyleSheet.create({

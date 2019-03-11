@@ -8,8 +8,8 @@ import {
 } from 'react-navigation';
 import {Feather as Icon} from '@expo/vector-icons';
 import {Toolbar} from '../components';
-import {DashboardScene, LoginScene, OnBoardingScene} from '../../scenes';
-import {GREY, BLUE} from '../constants/colors';
+import {DashboardScene, AuthScene, OnBoardingScene} from '../../scenes';
+import {GREY, BLUE, LIGHT_GREY} from '../constants/colors';
 
 let AuthStack = createStackNavigator({
   OnBoard: {
@@ -18,8 +18,8 @@ let AuthStack = createStackNavigator({
       header: null,
     }),
   },
-  Login: {
-    screen: LoginScene,
+  Auth: {
+    screen: AuthScene,
     navigationOptions: ({
       navigation,
     }: {
@@ -33,12 +33,8 @@ let AuthStack = createStackNavigator({
 let DashboardStack = createStackNavigator({
   Home: {
     screen: DashboardScene,
-    navigationOptions: ({
-      navigation,
-    }: {
-      navigation: NavigationScreenProp<any>;
-    }) => ({
-      header: <Toolbar navigation={navigation} />,
+    navigationOptions: () => ({
+      header: null,
     }),
   },
 });
@@ -55,25 +51,31 @@ let BottomTab = createBottomTabNavigator(
     },
   },
   {
+    animationEnabled: true,
     tabBarOptions: {
       showLabel: false,
       showIcon: true,
       inactiveTintColor: GREY,
       activeTintColor: BLUE,
       style: {
-        backgroundColor: 'transparent',
-        borderTopWidth: 0,
-        paddingBottom: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0)',
+        borderTopColor: LIGHT_GREY,
+        borderTopWidth: 1,
+        height: 45,
       },
     },
   },
 );
 
-let MainSwitch = createSwitchNavigator({
-  OnBoarding: AuthStack,
-  Main: BottomTab,
-  Auth: DashboardStack,
-});
+let MainSwitch = createSwitchNavigator(
+  {
+    Auth: AuthStack,
+    Main: BottomTab,
+  },
+  {
+    initialRouteName: 'Main',
+  },
+);
 
 const Main = createAppContainer(MainSwitch);
 

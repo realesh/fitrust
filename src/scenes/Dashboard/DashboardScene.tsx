@@ -1,42 +1,136 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
+import {NavigationScreenProps} from 'react-navigation';
 import {Text} from '../../generals/core-ui';
-import {MEDIUM_FONT_SIZE, LARGE_FONT_SIZE} from '../../generals/constants/size';
-import {BLUE} from '../../generals/constants/colors';
+import {
+  MEDIUM_FONT_SIZE,
+  HEADER_FONT_SIZE,
+  SCREEN_HEIGHT,
+} from '../../generals/constants/size';
+import {
+  BLUE,
+  LIGHTER_GREY,
+  LIGHT_GREY,
+  WHITE,
+} from '../../generals/constants/colors';
+import {ProgressWithLabel, Toolbar} from '../../generals/components';
+import {food, fire} from '../../assets/images/dashboard';
+import CaloriesInfo from './CaloriesInfo';
+import AnimatedChevron from '../../generals/components/AnimatedChevron';
 
-export default function DashboardScene() {
+type Props = NavigationScreenProps;
+
+export default function DashboardScene(props: Props) {
   return (
-    <View style={styles.root}>
-      <View style={styles.paddedContainer}>
-        <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-          Hello, Sandro.
-        </Text>
-        <Text
-          fontWeight="light"
-          fontSize={MEDIUM_FONT_SIZE}
-          style={{marginTop: 5}}
-        >
-          You've burned{' '}
+    <ScrollView
+      contentContainerStyle={styles.root}
+      showsVerticalScrollIndicator={false}
+      pagingEnabled={true}
+    >
+      <View style={styles.scrollHeight}>
+        <Toolbar navigation={props.navigation} />
+        <View style={styles.paddedContainer}>
+          <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
+            Hello, Sandro.
+          </Text>
           <Text
-            fontWeight="light"
-            fontSize={MEDIUM_FONT_SIZE}
-            style={{color: BLUE}}
+            fontWeight="bold"
+            fontSize={HEADER_FONT_SIZE}
+            style={{marginBottom: 15}}
           >
-            504 cals
-          </Text>{' '}
-          today
-        </Text>
+            Today's looking
+            <Text
+              fontWeight="bold"
+              fontSize={HEADER_FONT_SIZE}
+              style={{color: BLUE}}
+            >
+              {' '}
+              great!
+            </Text>
+          </Text>
+        </View>
+        <View style={[styles.paddedContainer, styles.contentContainer]}>
+          <View style={styles.boxShadow}>
+            <Text fontWeight="bold" style={{marginBottom: 20}}>
+              Daily Goals.
+            </Text>
+            <ProgressWithLabel
+              label="Steps"
+              currentValue={3000}
+              maxValue={5000}
+              unit="steps"
+              containerStyle={{marginBottom: 25}}
+            />
+            <ProgressWithLabel
+              label="Drink water"
+              currentValue={450}
+              maxValue={3000}
+              unit="mL"
+              editable={true}
+            />
+          </View>
+
+          <View style={styles.boxShadow}>
+            <View style={styles.calLabelContainer}>
+              <Text fontWeight="bold">Calories.</Text>
+            </View>
+
+            <View style={{flexDirection: 'row'}}>
+              <CaloriesInfo
+                image={food}
+                currentValue={1700}
+                maxValue={2324}
+                buttonTitle="INTAKE"
+              />
+              <CaloriesInfo
+                image={fire}
+                currentValue={130}
+                maxValue={430}
+                buttonTitle="WORKOUT"
+              />
+            </View>
+          </View>
+        </View>
+        <AnimatedChevron />
       </View>
-    </View>
+      <View style={styles.scrollHeight} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
+    flexGrow: 1,
   },
   paddedContainer: {
     paddingHorizontal: 20,
+    backgroundColor: WHITE,
   },
-  image: {marginBottom: 10, width: 180, height: 48},
+  contentContainer: {
+    flex: 1,
+    paddingVertical: 20,
+    backgroundColor: LIGHTER_GREY,
+    borderTopWidth: 1,
+    borderColor: LIGHT_GREY,
+  },
+  boxShadow: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    marginBottom: 20,
+    padding: 20,
+    shadowColor: '#ccc',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 4},
+    elevation: 5,
+  },
+  calLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  scrollHeight: {
+    height: SCREEN_HEIGHT - 70,
+    backgroundColor: LIGHTER_GREY,
+  },
 });

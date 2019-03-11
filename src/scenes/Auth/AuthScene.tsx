@@ -281,9 +281,9 @@ export default class AuthScene extends Component<Props, State> {
     this.setState({loading: true});
 
     if (username.toLowerCase() === 'realesh' && password === 'Testing123') {
-      setTimeout(this._navigateToMain, 2000);
+      setTimeout(this._navigateToMain, 1800);
     } else {
-      setTimeout(setErrorState, 2000);
+      setTimeout(setErrorState, 1800);
     }
   };
 
@@ -299,9 +299,9 @@ export default class AuthScene extends Component<Props, State> {
     this.setState({loading: true});
 
     if (username && password) {
-      setTimeout(this._navigateToMain, 2000);
+      setTimeout(this._navigateToMain, 1800);
     } else {
-      setTimeout(setErrorState, 2000);
+      setTimeout(setErrorState, 1800);
     }
   };
 
@@ -326,7 +326,7 @@ export default class AuthScene extends Component<Props, State> {
     setTimeout(setTo3, 1500);
 
     let navigate = () => navigation.navigate('Main');
-    setTimeout(navigate, 2000);
+    setTimeout(navigate, 1800);
   };
 }
 

@@ -4,7 +4,7 @@ import {Swiper} from '../../generals/components';
 import OnBoardingItem from './OnBoardingItem';
 import {
   fitnessTracker,
-  heartRate,
+  heartRateDoctor,
   personalTrainer,
 } from '../../assets/images/onBoarding';
 import {NavigationScreenProp} from 'react-navigation';
@@ -26,7 +26,7 @@ export default class OnBoardingScene extends Component<Props, {}> {
           <OnBoardingItem
             title="Max Heart Rate"
             content="Lorem ipsum"
-            image={heartRate}
+            image={heartRateDoctor}
           />
           <OnBoardingItem
             title="Personal Trainer"

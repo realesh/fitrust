@@ -40,7 +40,7 @@ function Toolbar(props: Props) {
   let {
     containerStyle,
     leftComponent,
-    pointsInfo = true,
+    pointsInfo = false,
     title,
     titleStyle,
     navigation,

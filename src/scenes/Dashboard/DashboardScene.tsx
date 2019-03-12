@@ -60,7 +60,7 @@ export default class DashboardScene extends Component<Props> {
         <Animated.View style={overlayStyle} pointerEvents="none" />
 
         <View style={styles.scrollHeight}>
-          <Toolbar navigation={navigation} />
+          <Toolbar navigation={navigation} pointsInfo={true} />
           <View style={styles.paddedContainer}>
             <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
               Hello, Sandro.

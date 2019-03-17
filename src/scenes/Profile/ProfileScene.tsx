@@ -16,11 +16,20 @@ import {
   LIGHT_GREY,
 } from '../../generals/constants/colors';
 import {trophyCopper, heartRate} from '../../assets/images/profile';
+import PopupDialog from '../../generals/components/PopupDialog';
+import {infoBMI, infoMHR} from './data/profileData';
 
 type Props = NavigationScreenProps;
 
 export default class ProfileScene extends Component<Props> {
+  state = {
+    bmiModalVisible: false,
+    mhrModalVisible: false,
+  };
+
   render() {
+    let {bmiModalVisible, mhrModalVisible} = this.state;
+
     return (
       <ScrollView
         contentContainerStyle={styles.root}
@@ -33,7 +42,7 @@ export default class ProfileScene extends Component<Props> {
             <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
               Samuel Sandro
             </Text>
-            <Text style={{color: GREY, marginTop: 5, marginBottom: 20}}>
+            <Text style={{color: GREY, marginTop: 5, marginBottom: 30}}>
               Health Trainee
             </Text>
 
@@ -116,6 +125,7 @@ export default class ProfileScene extends Component<Props> {
                 style={styles.optionsButton}
                 fontColor={GREY}
                 fontSize={LARGE_FONT_SIZE}
+                onPress={this._toggleBMIModal}
               />
             </View>
             <View style={{flexDirection: 'row'}}>
@@ -143,25 +153,57 @@ export default class ProfileScene extends Component<Props> {
                     fontSize={SMALL_FONT_SIZE}
                     style={{color: 'rgba(255,255,255,0.5)'}}
                   >
-                    Your Current MHR
+                    Current MHR
                   </Text>
                 </View>
+
+                <Button
+                  iconName="more-horizontal"
+                  style={styles.optionsButton}
+                  fontColor={'rgba(255,255,255,0.5)'}
+                  fontSize={LARGE_FONT_SIZE}
+                  onPress={this._toggleMHRModal}
+                />
               </View>
 
               <View style={[styles.boxShadow, {flex: 1, marginLeft: 10}]}>
                 <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-                  Lorem{' '}
+                  92{' '}
                   <Text fontWeight="bold" style={{color: GREY}}>
-                    Ipsum
+                    Kg
                   </Text>
+                </Text>
+
+                <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
+                  Weight
                 </Text>
               </View>
             </View>
           </View>
         </View>
+        <PopupDialog
+          visible={bmiModalVisible}
+          title={infoBMI.title}
+          message={infoBMI.message}
+          onRequestClose={this._toggleBMIModal}
+          buttonTitle="Recalculate"
+        />
+        <PopupDialog
+          visible={mhrModalVisible}
+          title={infoMHR.title}
+          message={infoMHR.message}
+          onRequestClose={this._toggleMHRModal}
+        />
       </ScrollView>
     );
   }
+
+  _toggleBMIModal = () => {
+    this.setState({bmiModalVisible: !this.state.bmiModalVisible});
+  };
+  _toggleMHRModal = () => {
+    this.setState({mhrModalVisible: !this.state.mhrModalVisible});
+  };
 }
 
 const styles = StyleSheet.create({
@@ -171,7 +213,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   scrollHeight: {
-    height: SCREEN_HEIGHT - 70,
+    height: SCREEN_HEIGHT - 65,
     backgroundColor: WHITE,
   },
   paddedContainer: {
@@ -256,11 +298,12 @@ const styles = StyleSheet.create({
   },
   optionsButton: {
     position: 'absolute',
+    alignItems: 'center',
     right: 15,
-    top: 20,
+    top: 10,
     paddingHorizontal: 0,
     paddingVertical: 0,
-    backgroundColor: WHITE,
+    backgroundColor: 'transparent',
   },
   mhrContainer: {
     flex: 2,

@@ -12,7 +12,7 @@ const LARGE_FONT_SIZE = 24;
 const HEADER_FONT_SIZE = 28;
 const BIG_FONT_SIZE = 48;
 
-const AVATAR_SIZE_BIG = 128;
+const AVATAR_SIZE_BIG = 108;
 const AVATAR_SIZE_SMALL = 64;
 
 export {

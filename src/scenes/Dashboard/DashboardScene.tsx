@@ -92,13 +92,14 @@ export default class DashboardScene extends Component<Props> {
                 maxValue={5000}
                 unit="steps"
                 containerStyle={{marginBottom: 25}}
+                iconName="refresh-cw"
               />
               <ProgressWithLabel
                 label="Drink water"
                 currentValue={450}
                 maxValue={3000}
                 unit="mL"
-                editable={true}
+                iconName="plus-square"
               />
             </View>
 
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   scrollHeight: {
-    height: SCREEN_HEIGHT - 70,
+    height: SCREEN_HEIGHT - 65,
     backgroundColor: LIGHTER_GREY,
   },
 });

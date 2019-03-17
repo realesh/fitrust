@@ -24,7 +24,7 @@ type Props = ViewProps & {
 
   containerStyle?: ViewStyle;
 
-  editable?: boolean;
+  iconName?: string;
 };
 
 function ProgressBarWithLabel(props: Props) {
@@ -34,7 +34,7 @@ function ProgressBarWithLabel(props: Props) {
     maxValue,
     unit,
     containerStyle,
-    editable = false,
+    iconName = '',
     ...otherProps
   } = props;
   let percentage = (currentValue / maxValue) * 100;
@@ -48,10 +48,10 @@ function ProgressBarWithLabel(props: Props) {
             / {maxValue} {unit}
           </Text>
         </Text>
-        {editable && (
+        {iconName && (
           <TouchableOpacity>
             <Icon
-              name="plus-square"
+              name={iconName}
               size={20}
               color={GREEN}
               style={{

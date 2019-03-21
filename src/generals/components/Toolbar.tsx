@@ -10,7 +10,11 @@ import {
 import {NavigationScreenProps} from 'react-navigation';
 import {Feather as Icon} from '@expo/vector-icons';
 import {DEFAULT_TEXT_COLOR, WHITE, BLUE} from '../constants/colors';
-import {HEADER_FONT_SIZE, MEDIUM_FONT_SIZE} from '../constants/size';
+import {
+  HEADER_FONT_SIZE,
+  MEDIUM_FONT_SIZE,
+  LARGE_FONT_SIZE,
+} from '../constants/size';
 import {Text} from '../core-ui';
 
 type Props = NavigationScreenProps & {
@@ -72,7 +76,7 @@ function Toolbar(props: Props) {
             </View>
             <View style={styles.pointsInfoContainer}>
               <Text fontWeight="bold" style={{color: BLUE}}>
-                2,500
+                2,517
               </Text>
             </View>
           </TouchableOpacity>
@@ -94,8 +98,9 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: DEFAULT_TEXT_COLOR,
-    fontSize: HEADER_FONT_SIZE,
+    fontSize: LARGE_FONT_SIZE,
     fontFamily: 'Lato-Bold',
+    marginLeft: 10,
   },
   rightComponent: {
     flex: 1,

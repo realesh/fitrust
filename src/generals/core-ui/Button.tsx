@@ -31,7 +31,7 @@ type Props = ViewProps & {
   onPress?: (event: GestureResponderEvent) => void;
 };
 
-const AnimatedButton = (props: Props) => {
+const Button = (props: Props) => {
   let {
     fontSize = DEFAULT_FONT_SIZE,
     fontColor = WHITE,
@@ -60,7 +60,7 @@ const AnimatedButton = (props: Props) => {
   );
 };
 
-export default AnimatedButton;
+export default Button;
 
 const styles = StyleSheet.create({
   container: {

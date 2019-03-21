@@ -16,6 +16,7 @@ import {
   LeaderboardScene,
 } from '../../scenes';
 import {GREY, BLUE, LIGHT_GREY} from '../constants/colors';
+import BMRCalculatorScene from '../../scenes/BMR/BMRCalculatorScene';
 
 let AuthStack = createStackNavigator({
   OnBoard: {
@@ -48,6 +49,12 @@ let DashboardStack = createStackNavigator({
 let ProfileStack = createStackNavigator({
   Home: {
     screen: ProfileScene,
+    navigationOptions: () => ({
+      header: null,
+    }),
+  },
+  BMRCalculator: {
+    screen: BMRCalculatorScene,
     navigationOptions: () => ({
       header: null,
     }),

@@ -1,34 +1,38 @@
 import React, {Component} from 'react';
 import {View, StyleSheet, ScrollView, Image} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
-import {Text, Avatar, Button} from '../../generals/core-ui';
-import {
-  SCREEN_HEIGHT,
-  LARGE_FONT_SIZE,
-  SMALL_FONT_SIZE,
-} from '../../generals/constants/size';
+import {Text, Avatar} from '../../generals/core-ui';
+import {SCREEN_HEIGHT, LARGE_FONT_SIZE} from '../../generals/constants/size';
 import {
   WHITE,
   GREY,
-  RED,
-  GREEN,
   LIGHTER_GREY,
   LIGHT_GREY,
 } from '../../generals/constants/colors';
-import {trophyCopper, heartRate} from '../../assets/images/profile';
+import {trophyCopper} from '../../assets/images/profile';
 import PopupDialog from '../../generals/components/PopupDialog';
-import {infoBMI, infoMHR} from './data/profileData';
+import {infoBMI, infoMHR, infoMission} from './data/profileData';
+import BMIInsight from './components/BMIInsight';
+import MHRInsight from './components/MHRInsight';
+import MissionInsight from './components/MissionInsight';
 
 type Props = NavigationScreenProps;
 
-export default class ProfileScene extends Component<Props> {
+type State = {
+  bmiModalVisible: boolean;
+  mhrModalVisible: boolean;
+  missionModalVisible: boolean;
+};
+
+export default class ProfileScene extends Component<Props, State> {
   state = {
     bmiModalVisible: false,
     mhrModalVisible: false,
+    missionModalVisible: false,
   };
 
   render() {
-    let {bmiModalVisible, mhrModalVisible} = this.state;
+    let {bmiModalVisible, mhrModalVisible, missionModalVisible} = this.state;
 
     return (
       <ScrollView
@@ -59,9 +63,11 @@ export default class ProfileScene extends Component<Props> {
                 </View>
                 <Text style={{color: GREY, marginTop: 5}}>Ranking</Text>
               </View>
-              <View style={styles.insightItemContainer}>
+              <View
+                style={[styles.insightItemContainer, styles.insightItemMiddle]}
+              >
                 <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-                  250,000
+                  2,517
                 </Text>
                 <Text style={{color: GREY, marginTop: 5}}>Points</Text>
               </View>
@@ -74,110 +80,10 @@ export default class ProfileScene extends Component<Props> {
             </View>
           </View>
           <View style={[styles.paddedContainer, styles.contentContainer]}>
-            <View style={styles.boxShadow}>
-              <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-                32.2{' '}
-                <Text fontWeight="bold" style={{color: RED}}>
-                  Obese
-                </Text>
-              </Text>
-              <Text
-                fontSize={SMALL_FONT_SIZE}
-                style={{color: GREY, marginBottom: 15}}
-              >
-                Your Current BMI
-              </Text>
-
-              <View style={styles.bmiBarContainer}>
-                <View style={styles.underBar} />
-                <View style={styles.normalBar} />
-                <View style={styles.overBar} />
-                <View style={styles.obeseBar} />
-              </View>
-              <View style={{flexDirection: 'row', width: '100%'}}>
-                <View style={styles.underContainer}>
-                  <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
-                    15
-                  </Text>
-                </View>
-                <View style={styles.normalContainer}>
-                  <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
-                    18.5
-                  </Text>
-                </View>
-                <View style={styles.overContainer}>
-                  <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
-                    25
-                  </Text>
-                </View>
-                <View style={styles.obeseContainer}>
-                  <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
-                    30
-                  </Text>
-                  <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
-                    40
-                  </Text>
-                </View>
-              </View>
-
-              <Button
-                iconName="more-horizontal"
-                style={styles.optionsButton}
-                fontColor={GREY}
-                fontSize={LARGE_FONT_SIZE}
-                onPress={this._toggleBMIModal}
-              />
-            </View>
-            <View style={{flexDirection: 'row'}}>
-              <View style={[styles.boxShadow, styles.mhrContainer]}>
-                <Image
-                  source={heartRate}
-                  style={{width: 30, height: 30, marginRight: 5}}
-                />
-                <View style={styles.flexColumn}>
-                  <Text
-                    fontWeight="bold"
-                    fontSize={LARGE_FONT_SIZE}
-                    style={{color: WHITE}}
-                  >
-                    198{' '}
-                    <Text
-                      fontWeight="bold"
-                      style={{color: 'rgba(255,255,255,0.5)'}}
-                    >
-                      BPM
-                    </Text>
-                  </Text>
-
-                  <Text
-                    fontSize={SMALL_FONT_SIZE}
-                    style={{color: 'rgba(255,255,255,0.5)'}}
-                  >
-                    Current MHR
-                  </Text>
-                </View>
-
-                <Button
-                  iconName="more-horizontal"
-                  style={styles.optionsButton}
-                  fontColor={'rgba(255,255,255,0.5)'}
-                  fontSize={LARGE_FONT_SIZE}
-                  onPress={this._toggleMHRModal}
-                />
-              </View>
-
-              <View style={[styles.boxShadow, {flex: 1, marginLeft: 10}]}>
-                <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-                  92{' '}
-                  <Text fontWeight="bold" style={{color: GREY}}>
-                    Kg
-                  </Text>
-                </Text>
-
-                <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
-                  Weight
-                </Text>
-              </View>
+            <BMIInsight onPress={this._toggleBMIModal} />
+            <View style={styles.flexRow}>
+              <MHRInsight onPress={this._toggleMHRModal} />
+              <MissionInsight onPress={this._toggleMissionModal} />
             </View>
           </View>
         </View>
@@ -187,6 +93,7 @@ export default class ProfileScene extends Component<Props> {
           message={infoBMI.message}
           onRequestClose={this._toggleBMIModal}
           buttonTitle="Recalculate"
+          buttonOnPress={this._goToBMI}
         />
         <PopupDialog
           visible={mhrModalVisible}
@@ -194,9 +101,21 @@ export default class ProfileScene extends Component<Props> {
           message={infoMHR.message}
           onRequestClose={this._toggleMHRModal}
         />
+        <PopupDialog
+          visible={missionModalVisible}
+          title={infoMission.title}
+          message={infoMission.message}
+          onRequestClose={this._toggleMissionModal}
+        />
       </ScrollView>
     );
   }
+
+  _goToBMI = () => {
+    let {navigation} = this.props;
+    this.setState({bmiModalVisible: false});
+    navigation.navigate('BMRCalculator', {previous_scene: 'Profile'});
+  };
 
   _toggleBMIModal = () => {
     this.setState({bmiModalVisible: !this.state.bmiModalVisible});
@@ -204,11 +123,13 @@ export default class ProfileScene extends Component<Props> {
   _toggleMHRModal = () => {
     this.setState({mhrModalVisible: !this.state.mhrModalVisible});
   };
+  _toggleMissionModal = () => {
+    this.setState({missionModalVisible: !this.state.missionModalVisible});
+  };
 }
 
 const styles = StyleSheet.create({
   flexRow: {flexDirection: 'row'},
-  flexColumn: {flexDirection: 'column'},
   root: {
     flexGrow: 1,
   },
@@ -224,7 +145,7 @@ const styles = StyleSheet.create({
   },
   insightContainer: {
     flexDirection: 'row',
-    width: '90%',
+    width: '100%',
     marginBottom: 20,
   },
   insightItemContainer: {
@@ -232,84 +153,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  insightItemMiddle: {
+    borderLeftWidth: 2,
+    borderRightWidth: 2,
+    borderColor: LIGHTER_GREY,
+  },
   contentContainer: {
     flex: 1,
     paddingVertical: 20,
     backgroundColor: LIGHTER_GREY,
     borderTopWidth: 1,
     borderColor: LIGHT_GREY,
-  },
-  boxShadow: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    marginBottom: 20,
-    padding: 20,
-    shadowColor: '#ccc',
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: {width: 0, height: 4},
-    elevation: 5,
-  },
-  bmiBarContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    height: 4,
-    marginBottom: 3,
-  },
-  underBar: {
-    flex: 3.5,
-    backgroundColor: '#4DD2D3',
-    borderRadius: 2,
-    marginRight: 5,
-  },
-  normalBar: {
-    flex: 6.5,
-    backgroundColor: GREEN,
-    borderRadius: 2,
-    marginRight: 5,
-  },
-  overBar: {
-    flex: 5,
-    backgroundColor: '#EFD422',
-    borderRadius: 2,
-    marginRight: 5,
-  },
-  obeseBar: {
-    flex: 10,
-    backgroundColor: RED,
-    borderRadius: 4,
-  },
-  underContainer: {
-    flex: 3.5,
-    marginRight: 5,
-  },
-  normalContainer: {
-    flex: 6.5,
-    marginRight: 5,
-  },
-  overContainer: {
-    flex: 5,
-    marginRight: 5,
-  },
-  obeseContainer: {
-    flex: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  optionsButton: {
-    position: 'absolute',
-    alignItems: 'center',
-    right: 15,
-    top: 10,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    backgroundColor: 'transparent',
-  },
-  mhrContainer: {
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 10,
-    backgroundColor: RED,
   },
 });

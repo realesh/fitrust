@@ -10,7 +10,7 @@ import {Text, Button} from '../../generals/core-ui';
 import {SMALL_FONT_SIZE} from '../../generals/constants/size';
 import {GREY, BLUE, WHITE} from '../../generals/constants/colors';
 
-type OnBoardingItemProps = ViewProps & {
+type CaloriesInfoProps = ViewProps & {
   image: any;
   currentValue: number;
   maxValue: number;
@@ -18,7 +18,7 @@ type OnBoardingItemProps = ViewProps & {
   onPress?: (event: GestureResponderEvent) => void;
 };
 
-export default function CaloriesInfo(props: OnBoardingItemProps) {
+export default function CaloriesInfo(props: CaloriesInfoProps) {
   let {image, currentValue, maxValue, buttonTitle, onPress = () => {}} = props;
   return (
     <View style={{flex: 1, paddingHorizontal: 5, alignItems: 'center'}}>

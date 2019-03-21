@@ -9,3 +9,8 @@ export const infoMHR = {
   message:
     'Max Heart Rate (MHR) is a person’s maximum heart rate. It is used to determine your heart rate zones to make your exercise much more effective to achieve personalized goal',
 };
+
+export const infoMission = {
+  title: 'Mission',
+  message: 'Coming Soon!',
+};

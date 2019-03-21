@@ -19,7 +19,7 @@ import {
   DARK_GREY70,
   LIGHT_GREY,
 } from '../constants/colors';
-import {LinearGradient} from 'expo';
+import {LinearGradient, BlurView} from 'expo';
 import {Text, Button} from '../core-ui';
 import {LARGE_FONT_SIZE} from '../constants/size';
 
@@ -85,7 +85,7 @@ type Props = ModalProps & {
  *
  */
 
-class PopupInfoDialog extends Component<Props> {
+class PopupDialog extends Component<Props> {
   state = {
     spinValue: new Animated.Value(0),
   };
@@ -144,7 +144,12 @@ class PopupInfoDialog extends Component<Props> {
         {...otherProps}
       >
         <TouchableWithoutFeedback onPress={onRequestClose}>
-          <View style={styles.root}>
+          {/* <View style={styles.root}> */}
+          <BlurView
+            tint="dark"
+            intensity={100}
+            style={[StyleSheet.absoluteFill, styles.root]}
+          >
             <TouchableWithoutFeedback>
               <View style={styles.content}>
                 <LinearGradient
@@ -175,19 +180,20 @@ class PopupInfoDialog extends Component<Props> {
                 )}
               </View>
             </TouchableWithoutFeedback>
-          </View>
+            {/* </View> */}
+          </BlurView>
         </TouchableWithoutFeedback>
       </Modal>
     ) : null;
   }
 }
 
-export default PopupInfoDialog;
+export default PopupDialog;
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: DARK_GREY70,
+    // backgroundColor: DARK_GREY70,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,

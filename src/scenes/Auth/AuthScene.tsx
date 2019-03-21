@@ -4,7 +4,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   LayoutAnimation,
-  NativeModules,
 } from 'react-native';
 import {
   Text,
@@ -29,10 +28,6 @@ import {
   linearEasingLong,
   linearEasingShort,
 } from '../../generals/constants/animationConfig';
-
-const {UIManager} = NativeModules;
-UIManager.setLayoutAnimationEnabledExperimental &&
-  UIManager.setLayoutAnimationEnabledExperimental(true);
 
 type Props = {
   navigation: NavigationScreenProp<any>;

@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, NativeModules} from 'react-native';
 import {SafeAreaView} from 'react-navigation';
 import {Font, AppLoading} from 'expo';
 
 import {WHITE} from './generals/constants/colors';
 import Main from './generals/routes/Main';
+
+const {UIManager} = NativeModules;
+UIManager.setLayoutAnimationEnabledExperimental &&
+  UIManager.setLayoutAnimationEnabledExperimental(true);
 
 type State = {
   fontLoaded: boolean;

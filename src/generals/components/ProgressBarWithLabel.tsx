@@ -41,7 +41,7 @@ function ProgressBarWithLabel(props: Props) {
   return (
     <View style={containerStyle} {...otherProps}>
       <View style={styles.labelContainer}>
-        <Text style={styles.leftLabel}>{label}</Text>
+        <Text>{label}</Text>
         <Text style={styles.rightLabel}>
           {currentValue}{' '}
           <Text style={{color: GREY}}>
@@ -112,9 +112,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     marginBottom: 8,
-  },
-  leftLabel: {
-    flex: 1,
   },
   rightLabel: {
     flex: 1,

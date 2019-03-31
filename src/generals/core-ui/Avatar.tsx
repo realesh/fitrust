@@ -31,6 +31,11 @@ type Props = {
    * style for the Avatar
    */
   style?: StyleProp<ViewStyle>;
+
+  /**
+   * shadow for the Avatar, default to true
+   */
+  shadow?: boolean;
 };
 
 /**
@@ -55,7 +60,7 @@ type Props = {
  */
 
 export default function Avatar(props: Props) {
-  let {source, size, style, onPress} = props;
+  let {source, size, style, onPress, shadow = true} = props;
   return onPress ? (
     <TouchableOpacity
       style={[styles[size], styles.shadow, style]}
@@ -68,7 +73,7 @@ export default function Avatar(props: Props) {
       />
     </TouchableOpacity>
   ) : (
-    <View style={[styles[size], styles.shadow, style]}>
+    <View style={[styles[size], shadow && styles.shadow, style]}>
       <Image
         source={source ? {uri: source} : MALE_AVATAR}
         style={styles[size]}

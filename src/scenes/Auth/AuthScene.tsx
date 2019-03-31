@@ -13,7 +13,7 @@ import {
 } from '../../generals/core-ui';
 import {
   HEADER_FONT_SIZE,
-  SMALL_FONT_SIZE,
+  TINY_FONT_SIZE,
   LARGE_FONT_SIZE,
   MEDIUM_FONT_SIZE,
 } from '../../generals/constants/size';
@@ -109,7 +109,7 @@ export default class AuthScene extends Component<Props, State> {
 
           {inputError && login ? (
             <Text
-              fontSize={SMALL_FONT_SIZE}
+              fontSize={TINY_FONT_SIZE}
               fontWeight="bold"
               style={{
                 width: '80%',
@@ -124,7 +124,7 @@ export default class AuthScene extends Component<Props, State> {
           ) : (
             inputError && (
               <Text
-                fontSize={SMALL_FONT_SIZE}
+                fontSize={TINY_FONT_SIZE}
                 fontWeight="bold"
                 style={{
                   width: '80%',
@@ -198,17 +198,13 @@ export default class AuthScene extends Component<Props, State> {
 
     return (
       <Text
-        fontSize={SMALL_FONT_SIZE}
+        fontSize={TINY_FONT_SIZE}
         fontWeight="bold"
         style={{color: GREY, marginTop: 10, alignSelf: 'center'}}
         onPress={this._toggleLoginState}
       >
         {login ? 'New user?' : 'Existing user?'}
-        <Text
-          fontSize={SMALL_FONT_SIZE}
-          fontWeight="bold"
-          style={{color: BLUE}}
-        >
+        <Text fontSize={TINY_FONT_SIZE} fontWeight="bold" style={{color: BLUE}}>
           {login ? ' Sign up' : ' Login'}
         </Text>
       </Text>
@@ -320,7 +316,7 @@ export default class AuthScene extends Component<Props, State> {
     setTimeout(setTo2, 300);
     setTimeout(setTo3, 1500);
 
-    let navigate = () => navigation.navigate('Main');
+    let navigate = () => navigation.navigate('main');
     setTimeout(navigate, 1800);
   };
 }

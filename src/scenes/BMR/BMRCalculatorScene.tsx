@@ -58,7 +58,7 @@ export default class BMRCalculatorScene extends Component<Props, State> {
 
     return (
       <View style={styles.root}>
-        <Toolbar navigation={navigation} title="BMR Calculator" />
+        <Toolbar navigation={navigation} title="BMR" subtitle="Calculator" />
         <View style={styles.paddedContainer}>
           <View style={styles.rowContainer}>
             <GenderItem

@@ -7,7 +7,7 @@ import {
   GestureResponderEvent,
 } from 'react-native';
 import {Text, Button} from '../../generals/core-ui';
-import {SMALL_FONT_SIZE} from '../../generals/constants/size';
+import {TINY_FONT_SIZE} from '../../generals/constants/size';
 import {GREY, BLUE, WHITE} from '../../generals/constants/colors';
 
 type CaloriesInfoProps = ViewProps & {
@@ -26,7 +26,7 @@ export default function CaloriesInfo(props: CaloriesInfoProps) {
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Text fontSize={20} fontWeight="bold">
           {currentValue}
-          <Text style={{color: GREY}} fontSize={SMALL_FONT_SIZE}>
+          <Text style={{color: GREY}} fontSize={TINY_FONT_SIZE}>
             {' '}
             / {maxValue} cals
           </Text>
@@ -35,7 +35,7 @@ export default function CaloriesInfo(props: CaloriesInfoProps) {
       <Button
         onPress={onPress}
         style={styles.recordButton}
-        fontSize={SMALL_FONT_SIZE}
+        fontSize={TINY_FONT_SIZE}
         fontColor={BLUE}
       >
         + {buttonTitle}

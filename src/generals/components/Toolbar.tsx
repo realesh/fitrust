@@ -9,12 +9,14 @@ import {
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Feather as Icon} from '@expo/vector-icons';
-import {DEFAULT_TEXT_COLOR, WHITE, BLUE} from '../constants/colors';
 import {
-  HEADER_FONT_SIZE,
-  MEDIUM_FONT_SIZE,
-  LARGE_FONT_SIZE,
-} from '../constants/size';
+  DEFAULT_TEXT_COLOR,
+  WHITE,
+  BLUE,
+  LIGHT_GREY,
+  GREY,
+} from '../constants/colors';
+import {MEDIUM_FONT_SIZE, LARGE_FONT_SIZE} from '../constants/size';
 import {Text} from '../core-ui';
 
 type Props = NavigationScreenProps & {
@@ -22,6 +24,7 @@ type Props = NavigationScreenProps & {
    * header text to be displayed on toolbar
    */
   title?: string;
+  subtitle?: string;
 
   /**
    * ReactNode (Icon) to display on left side of toolbar
@@ -46,6 +49,7 @@ function Toolbar(props: Props) {
     leftComponent,
     pointsInfo = false,
     title,
+    subtitle,
     titleStyle,
     navigation,
   } = props;
@@ -59,13 +63,18 @@ function Toolbar(props: Props) {
       {leftComponent ? (
         leftComponent
       ) : canGoBack ? (
-        <TouchableOpacity onPress={goBack}>
-          <Icon name="arrow-left" size={24} />
-        </TouchableOpacity>
+        <View style={styles.leftComponent}>
+          <TouchableOpacity onPress={goBack}>
+            <Icon name="arrow-left" size={24} />
+          </TouchableOpacity>
+        </View>
       ) : null}
 
       {title ? (
-        <Text style={[styles.headerText, titleStyle]}>{title}</Text>
+        <Text style={[styles.headerText, titleStyle]}>
+          {title}
+          <Text style={styles.subtitleText}> {subtitle}</Text>
+        </Text>
       ) : null}
 
       {pointsInfo ? (
@@ -81,7 +90,9 @@ function Toolbar(props: Props) {
             </View>
           </TouchableOpacity>
         </View>
-      ) : null}
+      ) : (
+        <View style={styles.rightComponent} />
+      )}
     </View>
   );
 }
@@ -100,7 +111,17 @@ const styles = StyleSheet.create({
     color: DEFAULT_TEXT_COLOR,
     fontSize: LARGE_FONT_SIZE,
     fontFamily: 'Lato-Bold',
-    marginLeft: 10,
+    flex: 6,
+  },
+  subtitleText: {
+    color: GREY,
+    fontSize: MEDIUM_FONT_SIZE,
+    fontFamily: 'Lato-Bold',
+    marginLeft: 5,
+  },
+  leftComponent: {
+    flex: 1,
+    flexDirection: 'row',
   },
   rightComponent: {
     flex: 1,

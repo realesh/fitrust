@@ -5,6 +5,7 @@ import {
   NavigationScreenProp,
   createBottomTabNavigator,
   createSwitchNavigator,
+  StackNavigatorConfig,
 } from 'react-navigation';
 import {Feather as Icon} from '@expo/vector-icons';
 import {Toolbar} from '../components';
@@ -17,15 +18,16 @@ import {
 } from '../../scenes';
 import {GREY, BLUE, LIGHT_GREY} from '../constants/colors';
 import BMRCalculatorScene from '../../scenes/BMR/BMRCalculatorScene';
+import ExerciseModeScene from '../../scenes/ExerciseMode/ExerciseModeScene';
 
-let AuthStack = createStackNavigator({
-  OnBoard: {
+let authStack = createStackNavigator({
+  onBoard: {
     screen: OnBoardingScene,
     navigationOptions: () => ({
       header: null,
     }),
   },
-  Auth: {
+  auth: {
     screen: AuthScene,
     navigationOptions: ({
       navigation,
@@ -37,8 +39,8 @@ let AuthStack = createStackNavigator({
   },
 });
 
-let DashboardStack = createStackNavigator({
-  Home: {
+let dashboardStack = createStackNavigator({
+  home: {
     screen: DashboardScene,
     navigationOptions: () => ({
       header: null,
@@ -46,8 +48,8 @@ let DashboardStack = createStackNavigator({
   },
 });
 
-let ProfileStack = createStackNavigator({
-  Home: {
+let profileStack = createStackNavigator({
+  home: {
     screen: ProfileScene,
     navigationOptions: () => ({
       header: null,
@@ -61,8 +63,8 @@ let ProfileStack = createStackNavigator({
   },
 });
 
-let LeaderboardStack = createStackNavigator({
-  Home: {
+let leaderboardStack = createStackNavigator({
+  home: {
     screen: LeaderboardScene,
     navigationOptions: () => ({
       header: null,
@@ -70,26 +72,26 @@ let LeaderboardStack = createStackNavigator({
   },
 });
 
-let BottomTab = createBottomTabNavigator(
+let bottomTab = createBottomTabNavigator(
   {
-    Leaderboard: {
-      screen: LeaderboardStack,
+    leaderboard: {
+      screen: leaderboardStack,
       navigationOptions: {
         tabBarIcon: ({tintColor}: {tintColor: string}) => (
           <Icon name="star" size={24} color={tintColor} />
         ),
       },
     },
-    Dashboard: {
-      screen: DashboardStack,
+    dashboard: {
+      screen: dashboardStack,
       navigationOptions: {
         tabBarIcon: ({tintColor}: {tintColor: string}) => (
           <Icon name="activity" size={24} color={tintColor} />
         ),
       },
     },
-    Profile: {
-      screen: ProfileStack,
+    profile: {
+      screen: profileStack,
       navigationOptions: {
         tabBarIcon: ({tintColor}: {tintColor: string}) => (
           <Icon name="user" size={24} color={tintColor} />
@@ -98,7 +100,7 @@ let BottomTab = createBottomTabNavigator(
     },
   },
   {
-    initialRouteName: 'Dashboard',
+    initialRouteName: 'dashboard',
     animationEnabled: true,
     tabBarOptions: {
       showLabel: false,
@@ -115,16 +117,31 @@ let BottomTab = createBottomTabNavigator(
   },
 );
 
-let MainSwitch = createSwitchNavigator(
+let exerciseModeStack = {
+  exerciseModeMain: ExerciseModeScene,
+};
+
+let defaultStackConfig: StackNavigatorConfig = {
+  headerMode: 'none',
+};
+
+let routeConfig = {
+  bottomTab,
+  ...exerciseModeStack,
+};
+
+let appStack = createStackNavigator(routeConfig, defaultStackConfig);
+
+let mainSwitch = createSwitchNavigator(
   {
-    Auth: AuthStack,
-    Main: BottomTab,
+    auth: authStack,
+    main: appStack,
   },
   {
-    initialRouteName: 'Main',
+    initialRouteName: 'main',
   },
 );
 
-const Main = createAppContainer(MainSwitch);
+const Main = createAppContainer(mainSwitch);
 
 export default Main;

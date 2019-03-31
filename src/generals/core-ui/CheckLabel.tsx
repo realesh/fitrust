@@ -6,7 +6,7 @@ import {
   GestureResponderEvent,
 } from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
-import {SMALL_FONT_SIZE} from '../constants/size';
+import {TINY_FONT_SIZE} from '../constants/size';
 import Text from './Text';
 import {LIGHT_GREY, BLUE} from '../constants/colors';
 
@@ -36,7 +36,7 @@ const CheckLabel = (props: Props) => {
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container, style]}>
       <Icon name={iconName} size={14} color={color} style={{marginRight: 5}} />
-      <Text fontSize={SMALL_FONT_SIZE} style={{color}}>
+      <Text fontSize={TINY_FONT_SIZE} style={{color}}>
         {children}
       </Text>
     </TouchableOpacity>

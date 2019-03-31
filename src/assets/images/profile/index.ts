@@ -3,5 +3,13 @@ import trophySilver from './trophy-silver.png';
 import trophyGold from './trophy-gold.png';
 import trophyUltimate from './trophy-ultimate.png';
 import heartRate from './heart-rate.png';
+import fitbitWhite from './fitbit-white.png';
 
-export {trophyCopper, trophySilver, trophyGold, trophyUltimate, heartRate};
+export {
+  trophyCopper,
+  trophySilver,
+  trophyGold,
+  trophyUltimate,
+  heartRate,
+  fitbitWhite,
+};

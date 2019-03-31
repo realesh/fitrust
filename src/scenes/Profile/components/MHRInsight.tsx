@@ -4,7 +4,7 @@ import {Text, Button} from '../../../generals/core-ui';
 import {RED, WHITE} from '../../../generals/constants/colors';
 import {
   LARGE_FONT_SIZE,
-  SMALL_FONT_SIZE,
+  TINY_FONT_SIZE,
 } from '../../../generals/constants/size';
 import {heartRate} from '../../../assets/images/profile';
 
@@ -36,7 +36,7 @@ export default function MHRInsight(props: Props) {
         </Text>
 
         <Text
-          fontSize={SMALL_FONT_SIZE}
+          fontSize={TINY_FONT_SIZE}
           style={{color: 'rgba(255,255,255,0.5)'}}
         >
           Current MHR
@@ -59,25 +59,24 @@ const styles = StyleSheet.create({
   boxShadow: {
     backgroundColor: 'white',
     borderRadius: 10,
-    marginBottom: 20,
     padding: 20,
     shadowColor: '#ccc',
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.8,
     shadowRadius: 10,
     shadowOffset: {width: 0, height: 4},
     elevation: 5,
   },
   mhrContainer: {
-    flex: 2,
+    flex: 1.2,
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: 20,
     backgroundColor: RED,
   },
   optionsButton: {
     position: 'absolute',
     alignItems: 'center',
-    right: 15,
+    right: 20,
     top: 10,
     paddingHorizontal: 0,
     paddingVertical: 0,

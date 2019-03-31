@@ -88,9 +88,9 @@ export default class AnimatedButton extends Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     let {loading} = this.props;
     let {buttonAnimateValue} = this.state;
-    if (prevProps.loading != loading && loading) {
+    if (prevProps.loading !== loading && loading) {
       this._animateProgress(buttonAnimateValue);
-    } else if (prevProps.loading != loading && !loading) {
+    } else if (prevProps.loading !== loading && !loading) {
       Animated.timing(buttonAnimateValue, {
         toValue: 0,
         duration: 300,

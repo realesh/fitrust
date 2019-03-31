@@ -5,7 +5,8 @@ const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('screen');
 
 const DEFAULT_ICON_SIZE = 20;
 
-const SMALL_FONT_SIZE = 12;
+const TINY_FONT_SIZE = 12;
+const SMALL_FONT_SIZE = 14;
 const DEFAULT_FONT_SIZE = 16;
 const MEDIUM_FONT_SIZE = 18;
 const LARGE_FONT_SIZE = 24;
@@ -13,7 +14,7 @@ const HEADER_FONT_SIZE = 28;
 const BIG_FONT_SIZE = 40;
 
 const AVATAR_SIZE_BIG = 108;
-const AVATAR_SIZE_SMALL = 64;
+const AVATAR_SIZE_SMALL = 48;
 
 export {
   WINDOW_WIDTH,
@@ -22,6 +23,7 @@ export {
   SCREEN_WIDTH,
   DEFAULT_ICON_SIZE,
   DEFAULT_FONT_SIZE,
+  TINY_FONT_SIZE,
   SMALL_FONT_SIZE,
   MEDIUM_FONT_SIZE,
   LARGE_FONT_SIZE,

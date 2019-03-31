@@ -27,7 +27,7 @@ import {
 import {
   DEFAULT_ICON_SIZE,
   MEDIUM_FONT_SIZE,
-  SMALL_FONT_SIZE,
+  TINY_FONT_SIZE,
 } from '../constants/size';
 
 type State = {
@@ -180,10 +180,10 @@ export default class TextInput extends Component<Props, State> {
     let labelStyle = {
       position: 'absolute',
       fontSize: filled
-        ? SMALL_FONT_SIZE
+        ? TINY_FONT_SIZE
         : focusAnimateValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [MEDIUM_FONT_SIZE, SMALL_FONT_SIZE],
+            outputRange: [MEDIUM_FONT_SIZE, TINY_FONT_SIZE],
           }),
       top:
         filled || this.props.value !== ''
@@ -271,8 +271,11 @@ export default class TextInput extends Component<Props, State> {
     }
     if (prevProps.value !== value) {
       // Change filled to true if input isn't empty
-      if (value !== '') this.setState({filled: true});
-      else this.setState({filled: false});
+      if (value !== '') {
+        this.setState({filled: true});
+      } else {
+        this.setState({filled: false});
+      }
     }
   }
 

@@ -4,7 +4,7 @@ import {Text, Button} from '../../../generals/core-ui';
 import {GREEN, RED, GREY} from '../../../generals/constants/colors';
 import {
   LARGE_FONT_SIZE,
-  SMALL_FONT_SIZE,
+  TINY_FONT_SIZE,
 } from '../../../generals/constants/size';
 
 type Props = {
@@ -24,7 +24,7 @@ export default function BMIInsight(props: Props) {
           Obese
         </Text>
       </Text>
-      <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY, marginBottom: 15}}>
+      <Text fontSize={TINY_FONT_SIZE} style={{color: GREY, marginBottom: 15}}>
         Your Current BMI
       </Text>
 
@@ -36,25 +36,25 @@ export default function BMIInsight(props: Props) {
       </View>
       <View style={{flexDirection: 'row', width: '100%'}}>
         <View style={styles.underContainer}>
-          <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
+          <Text fontSize={TINY_FONT_SIZE} style={{color: GREY}}>
             15
           </Text>
         </View>
         <View style={styles.normalContainer}>
-          <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
+          <Text fontSize={TINY_FONT_SIZE} style={{color: GREY}}>
             18.5
           </Text>
         </View>
         <View style={styles.overContainer}>
-          <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
+          <Text fontSize={TINY_FONT_SIZE} style={{color: GREY}}>
             25
           </Text>
         </View>
         <View style={styles.obeseContainer}>
-          <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
+          <Text fontSize={TINY_FONT_SIZE} style={{color: GREY}}>
             30
           </Text>
-          <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY}}>
+          <Text fontSize={TINY_FONT_SIZE} style={{color: GREY}}>
             40
           </Text>
         </View>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   optionsButton: {
     position: 'absolute',
     alignItems: 'center',
-    right: 15,
+    right: 20,
     top: 10,
     paddingHorizontal: 0,
     paddingVertical: 0,

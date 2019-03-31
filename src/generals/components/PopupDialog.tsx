@@ -8,17 +8,9 @@ import {
   StyleProp,
   ViewStyle,
   Animated,
-  TouchableOpacity,
 } from 'react-native';
 
-import {
-  WHITE,
-  GREY,
-  BLUE,
-  LIGHT_BLUE,
-  DARK_GREY70,
-  LIGHT_GREY,
-} from '../constants/colors';
+import {WHITE, GREY, BLUE, LIGHT_BLUE, LIGHT_GREY} from '../constants/colors';
 import {LinearGradient, BlurView} from 'expo';
 import {Text, Button} from '../core-ui';
 import {LARGE_FONT_SIZE} from '../constants/size';
@@ -193,7 +185,6 @@ export default PopupDialog;
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    // backgroundColor: DARK_GREY70,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 30,

@@ -49,13 +49,15 @@ const Button = (props: Props) => {
       {...otherProps}
     >
       {iconName && <Icon name={iconName} size={fontSize} color={fontColor} />}
-      <Text
-        fontWeight="bold"
-        fontSize={fontSize}
-        style={{color: fontColor, marginLeft: 5}}
-      >
-        {children}
-      </Text>
+      {children && (
+        <Text
+          fontWeight="bold"
+          fontSize={fontSize}
+          style={{color: fontColor, marginLeft: 5}}
+        >
+          {children}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

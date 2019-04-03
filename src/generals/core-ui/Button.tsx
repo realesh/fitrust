@@ -44,6 +44,7 @@ const Button = (props: Props) => {
 
   return (
     <TouchableOpacity
+      activeOpacity={0.6}
       onPress={onPress}
       style={[styles.clickableArea, style]}
       {...otherProps}

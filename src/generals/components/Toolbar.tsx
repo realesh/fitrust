@@ -3,19 +3,12 @@ import {
   StyleSheet,
   View,
   StyleProp,
-  TextStyle,
   ViewStyle,
   TouchableOpacity,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Feather as Icon} from '@expo/vector-icons';
-import {
-  DEFAULT_TEXT_COLOR,
-  WHITE,
-  BLUE,
-  LIGHT_GREY,
-  GREY,
-} from '../constants/colors';
+import {DEFAULT_TEXT_COLOR, WHITE, BLUE, GREY} from '../constants/colors';
 import {MEDIUM_FONT_SIZE, LARGE_FONT_SIZE} from '../constants/size';
 import {Text} from '../core-ui';
 
@@ -33,9 +26,9 @@ type Props = NavigationScreenProps & {
   pointsInfo?: boolean;
 
   /**
-   * optional style for the title
+   * optional color style for the title's font
    */
-  titleStyle?: StyleProp<TextStyle>;
+  fontColor?: string;
 
   /**
    * optional style for the toolbar container
@@ -50,14 +43,19 @@ function Toolbar(props: Props) {
     pointsInfo = false,
     title,
     subtitle,
-    titleStyle,
     navigation,
+    fontColor = DEFAULT_TEXT_COLOR,
   } = props;
   let canGoBack: boolean =
     (navigation.state.params && navigation.state.params.previous_scene) ||
     false;
 
   let goBack = () => navigation.goBack();
+
+  let titleColorStyle = {
+    color: fontColor,
+  };
+
   return (
     <View style={[styles.toolbarContainer, containerStyle]}>
       {leftComponent ? (
@@ -65,13 +63,13 @@ function Toolbar(props: Props) {
       ) : canGoBack ? (
         <View style={styles.leftComponent}>
           <TouchableOpacity onPress={goBack}>
-            <Icon name="arrow-left" size={24} />
+            <Icon name="arrow-left" size={24} color={fontColor} />
           </TouchableOpacity>
         </View>
       ) : null}
 
       {title ? (
-        <Text style={[styles.headerText, titleStyle]}>
+        <Text style={[styles.headerText, titleColorStyle]}>
           {title}
           <Text style={styles.subtitleText}> {subtitle}</Text>
         </Text>

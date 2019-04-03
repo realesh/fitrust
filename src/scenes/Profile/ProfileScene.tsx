@@ -2,11 +2,7 @@ import React, {Component} from 'react';
 import {View, StyleSheet, Image, ScrollView} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Text, Avatar} from '../../generals/core-ui';
-import {
-  LARGE_FONT_SIZE,
-  SCREEN_WIDTH,
-  HEADER_FONT_SIZE,
-} from '../../generals/constants/size';
+import {LARGE_FONT_SIZE, SCREEN_WIDTH} from '../../generals/constants/size';
 import {
   WHITE,
   GREY,
@@ -14,7 +10,7 @@ import {
   LIGHT_GREY,
   BLUE,
 } from '../../generals/constants/colors';
-import {trophyCopper, fitbitWhite} from '../../assets/images/profile';
+import {trophyCopper} from '../../assets/images/profile';
 import PopupDialog from '../../generals/components/PopupDialog';
 import {infoBMI, infoMHR} from './data/profileData';
 import BMIInsight from './components/BMIInsight';

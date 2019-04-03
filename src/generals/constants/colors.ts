@@ -3,6 +3,7 @@ export const LIGHT_GREY = '#E8E8E8';
 export const LIGHTER_GREY = '#F5F5F5';
 export const BLACK = '#000';
 export const WHITE = '#FFF';
+export const WHITE60 = 'rgba(255, 255, 255, 0.6)';
 export const BLACK60 = 'rgba(0, 0, 0, 0.6)';
 export const DARK_GREY70 = 'rgba(45, 45, 45, 0.3)';
 export const BLUE = '#445EE8';

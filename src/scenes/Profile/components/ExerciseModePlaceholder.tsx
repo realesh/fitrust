@@ -10,7 +10,8 @@ type Props = NavigationScreenProps;
 export default function ExerciseModePlaceholder(props: Props) {
   let {navigation} = props;
 
-  let navigate = () => navigation.navigate('exerciseModeMain');
+  let navigate = () =>
+    navigation.navigate('exerciseModeSetting', {previous_scene: 'Placeholder'});
 
   return (
     <View style={styles.container}>

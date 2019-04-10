@@ -134,8 +134,8 @@ let styles = StyleSheet.create({
     maxHeight: 128,
   },
   durationRoot: {
-    width: 128,
-    height: 128,
+    width: 120,
+    height: 120,
     borderRadius: 64,
     justifyContent: 'center',
     alignItems: 'center',
@@ -160,8 +160,6 @@ let styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     borderRadius: 17.5,
-    borderWidth: 3,
     backgroundColor: WHITE,
-    borderColor: WHITE,
   },
 });

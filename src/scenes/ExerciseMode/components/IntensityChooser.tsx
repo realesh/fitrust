@@ -170,6 +170,6 @@ let styles = StyleSheet.create({
   titleStyle: {
     color: GREY,
   },
-  intensityContainer: {flexDirection: 'row', marginTop: 5},
-  image: {width: 20, height: 20, marginBottom: 0, marginRight: 3},
+  intensityContainer: {flexDirection: 'row', marginBottom: 5},
+  image: {width: 18, height: 18, marginBottom: 0, marginRight: 3},
 });

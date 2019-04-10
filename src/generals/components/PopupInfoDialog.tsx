@@ -77,7 +77,7 @@ type Props = ModalProps & {
  *
  */
 
-class PopupDialog extends Component<Props> {
+class PopupInfoDialog extends Component<Props> {
   state = {
     spinValue: new Animated.Value(0),
   };
@@ -180,7 +180,7 @@ class PopupDialog extends Component<Props> {
   }
 }
 
-export default PopupDialog;
+export default PopupInfoDialog;
 
 const styles = StyleSheet.create({
   root: {

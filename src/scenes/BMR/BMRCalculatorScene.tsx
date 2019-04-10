@@ -23,7 +23,7 @@ import GenderItem from './GenderItem';
 import ScalableItem from './ScalableItem';
 import AnimatedButton from '../../generals/core-ui/AnimatedButton';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
-import PopupDialog from '../../generals/components/PopupDialog';
+import PopupInfoDialog from '../../generals/components/PopupInfoDialog';
 
 type Props = NavigationScreenProps;
 
@@ -130,7 +130,7 @@ export default class BMRCalculatorScene extends Component<Props, State> {
           </AnimatedButton>
         </View>
 
-        <PopupDialog
+        <PopupInfoDialog
           visible={resultModalVisible}
           title="Your BMR"
           message="Lorem Ipsum"

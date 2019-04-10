@@ -26,3 +26,5 @@ export let intensitiesData: Intensities = [
       'For top performance training. Very exhausting for breathing and muscles. For top athletes and only in short intervals.',
   },
 ];
+
+export let durationData: Array<number> = [15, 30, 45, 60, 75, 90, 105, 120];

@@ -11,23 +11,32 @@ import IntensityChooser, {
   IntensityIndexEnum,
 } from './components/IntensityChooser';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
-import {intensitiesData} from './data/ExerciseModeDataFixtures';
+import {intensitiesData, durationData} from './data/ExerciseModeDataFixtures';
+import PopupInfoDialog from '../../generals/components/PopupInfoDialog';
 
 type Props = NavigationScreenProps;
 
 type State = {
   durationIndex: number;
   intensityIndex: 0 | 1 | 2 | 3;
+  startModalVisible: boolean;
 };
 
 export default class ExerciseModeSettingScene extends Component<Props, State> {
   state: State = {
     durationIndex: 0,
     intensityIndex: 0,
+    startModalVisible: false,
   };
 
   render() {
-    let {durationIndex, intensityIndex} = this.state;
+    let {durationIndex, intensityIndex, startModalVisible} = this.state;
+
+    let modalContent = `You are about to enter Exercise Mode with ${intensitiesData[
+      intensityIndex
+    ].title.toUpperCase()} intensity for ${
+      durationData[durationIndex]
+    } MINS. Are you ready?`;
 
     return (
       <View style={styles.container}>
@@ -52,10 +61,10 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
           </Text>
 
           <DurationChooser
-            durations={[15, 30, 45, 60, 75, 90, 105, 120]}
+            durations={durationData}
             selectedDurationIndex={durationIndex}
             onDurationChange={this._onDurationChange}
-            containerStyle={{marginTop: 15, marginBottom: 25}}
+            containerStyle={{marginTop: 10, marginBottom: 25}}
           />
         </LinearGradient>
 
@@ -67,8 +76,17 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
           />
         </View>
         <View style={styles.footerContainer}>
-          <Button onPress={() => {}}>Start</Button>
+          <Button onPress={this._toggleStartModalVisible}>Start</Button>
         </View>
+
+        <PopupInfoDialog
+          visible={startModalVisible}
+          onRequestClose={this._toggleStartModalVisible}
+          title="Ready?"
+          message={modalContent}
+          buttonTitle="I'm Ready!"
+          buttonOnPress={this._navToCountdown}
+        />
       </View>
     );
   }
@@ -80,6 +98,15 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
   _onIntensityChange = (index: IntensityIndexEnum) => {
     LayoutAnimation.configureNext(linearEasingShort);
     this.setState({intensityIndex: index});
+  };
+
+  _toggleStartModalVisible = () => {
+    this.setState({startModalVisible: !this.state.startModalVisible});
+  };
+
+  _navToCountdown = () => {
+    this._toggleStartModalVisible();
+    this.props.navigation.navigate('exerciseModeCountdown');
   };
 }
 

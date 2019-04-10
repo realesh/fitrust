@@ -11,7 +11,7 @@ import {
   BLUE,
 } from '../../generals/constants/colors';
 import {trophyCopper} from '../../assets/images/profile';
-import PopupDialog from '../../generals/components/PopupDialog';
+import PopupInfoDialog from '../../generals/components/PopupInfoDialog';
 import {infoBMI, infoMHR} from './data/profileData';
 import BMIInsight from './components/BMIInsight';
 import MHRInsight from './components/MHRInsight';
@@ -129,7 +129,7 @@ export default class ProfileScene extends Component<Props, State> {
           <ExerciseModePlaceholder navigation={this.props.navigation} />
         </View>
 
-        <PopupDialog
+        <PopupInfoDialog
           visible={bmiModalVisible}
           title={infoBMI.title}
           message={infoBMI.message}
@@ -137,7 +137,7 @@ export default class ProfileScene extends Component<Props, State> {
           buttonOnPress={this._goToBMI}
           buttonTitle="Recalculate"
         />
-        <PopupDialog
+        <PopupInfoDialog
           visible={mhrModalVisible}
           title={infoMHR.title}
           message={infoMHR.message}

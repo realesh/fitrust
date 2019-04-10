@@ -209,7 +209,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     alignItems: 'center',
   },
-  button: {paddingHorizontal: 17, paddingVertical: 15, alignSelf: 'flex-end'},
   messageText: {marginBottom: 8, color: GREY},
   titleText: {marginBottom: 12},
   attributeContainer: {

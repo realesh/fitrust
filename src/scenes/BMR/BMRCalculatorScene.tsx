@@ -1,16 +1,22 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, Slider, LayoutAnimation} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Slider,
+  LayoutAnimation,
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 
-import {Text} from '../../generals/core-ui';
-import {BIG_FONT_SIZE, MEDIUM_FONT_SIZE} from '../../generals/constants/size';
+import {Text, Button} from '../../generals/core-ui';
 import {
-  maleActive,
-  femaleActive,
-  maleInactive,
-  femaleInactive,
-  sliderThumb,
-} from '../../assets/images/bmr';
+  BIG_FONT_SIZE,
+  MEDIUM_FONT_SIZE,
+  SCREEN_WIDTH,
+} from '../../generals/constants/size';
+import {sliderThumb} from '../../assets/images/bmr';
 import {
   WHITE,
   LIGHT_GREY,
@@ -19,21 +25,25 @@ import {
   LIGHTER_GREY,
 } from '../../generals/constants/colors';
 import {Toolbar} from '../../generals/components';
-import GenderItem from './GenderItem';
-import ScalableItem from './ScalableItem';
+import ScalableItem from './components/ScalableItem';
 import AnimatedButton from '../../generals/core-ui/AnimatedButton';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
 import PopupInfoDialog from '../../generals/components/PopupInfoDialog';
+import GenderSelector, {
+  GenderOnPressFn,
+  GenderType,
+} from './components/GenderSelector';
 
 type Props = NavigationScreenProps;
 
 type State = {
-  selectedGender: 'male' | 'female';
+  selectedGender: GenderType;
   heightValue: number;
   weightValue: number;
   ageValue: number;
   loading: boolean;
   resultModalVisible: boolean;
+  activeIndex: number;
 };
 
 export default class BMRCalculatorScene extends Component<Props, State> {
@@ -44,7 +54,10 @@ export default class BMRCalculatorScene extends Component<Props, State> {
     ageValue: 22,
     loading: false,
     resultModalVisible: false,
+    activeIndex: 0,
   };
+
+  _scrollView?: ScrollView;
 
   render() {
     let {navigation} = this.props;
@@ -54,118 +67,104 @@ export default class BMRCalculatorScene extends Component<Props, State> {
       ageValue,
       loading,
       resultModalVisible,
+      activeIndex,
+      selectedGender,
     } = this.state;
 
     return (
       <View style={styles.root}>
         <Toolbar navigation={navigation} title="BMR" subtitle="Calculator" />
-        <View style={styles.paddedContainer}>
-          <View style={styles.rowContainer}>
-            <GenderItem
-              onPress={this._setGenderToMale}
-              style={[
-                this._checkActive('male', 'container'),
-                {marginRight: 10},
-              ]}
-              imageSource={this._checkActive('male', 'image')}
-              text="Male"
-            />
-            <GenderItem
-              onPress={this._setGenderToFemale}
-              style={[
-                this._checkActive('female', 'container'),
-                {marginLeft: 10},
-              ]}
-              imageSource={this._checkActive('female', 'image')}
-              text="Female"
-            />
+        <ScrollView
+          ref={this._setScrollViewRef}
+          horizontal={true}
+          pagingEnabled={true}
+          onMomentumScrollEnd={this._onScrollEnd}
+          showsHorizontalScrollIndicator={false}
+          scrollEnabled={false}
+        >
+          <View style={styles.screenWidth}>
+            <View style={styles.paddedContainer}>
+              <GenderSelector
+                selectedGender={selectedGender}
+                onItemPress={this._onGenderChange}
+              />
+
+              <View style={styles.heightContainer}>
+                <Text style={{marginBottom: 5}}>Height</Text>
+                <Text fontWeight="bold" fontSize={BIG_FONT_SIZE}>
+                  {heightValue}{' '}
+                  <Text
+                    fontWeight="bold"
+                    fontSize={MEDIUM_FONT_SIZE}
+                    style={{color: GREY, marginBottom: 5}}
+                  >
+                    cm
+                  </Text>
+                </Text>
+                <Slider
+                  minimumValue={100}
+                  maximumValue={250}
+                  value={heightValue}
+                  minimumTrackTintColor={BLUE}
+                  maximumTrackTintColor={LIGHT_GREY}
+                  step={1}
+                  thumbImage={sliderThumb}
+                  thumbTintColor={BLUE}
+                  onValueChange={this._onHeightChange}
+                  style={{width: '100%'}}
+                />
+              </View>
+
+              <View style={styles.rowContainer}>
+                <ScalableItem
+                  title="Weight"
+                  value={weightValue}
+                  onMinusPress={this._onWeightMinus}
+                  onPlusPress={this._onWeightPlus}
+                  style={styles.rowItemFirst}
+                />
+                <ScalableItem
+                  title="Age"
+                  value={ageValue}
+                  onMinusPress={this._onAgeMinus}
+                  onPlusPress={this._onAgePlus}
+                  style={styles.rowItemLast}
+                />
+              </View>
+            </View>
           </View>
 
-          <View style={styles.heightContainer}>
-            <Text style={{marginBottom: 5}}>Height</Text>
-            <Text fontWeight="bold" fontSize={BIG_FONT_SIZE}>
-              {heightValue}{' '}
-              <Text
-                fontWeight="bold"
-                fontSize={MEDIUM_FONT_SIZE}
-                style={{color: GREY, marginBottom: 5}}
-              >
-                cm
-              </Text>
-            </Text>
-            <Slider
-              minimumValue={100}
-              maximumValue={250}
-              value={heightValue}
-              minimumTrackTintColor={BLUE}
-              maximumTrackTintColor={LIGHT_GREY}
-              step={1}
-              thumbImage={sliderThumb}
-              thumbTintColor={BLUE}
-              onValueChange={this._onHeightChange}
-              style={{width: '100%'}}
-            />
-          </View>
+          <View style={styles.screenWidth} />
 
-          <View style={styles.rowContainer}>
-            <ScalableItem
-              title="Weight"
-              value={weightValue}
-              onMinusPress={this._onWeightMinus}
-              onPlusPress={this._onWeightPlus}
-              style={styles.rowItemFirst}
-            />
-            <ScalableItem
-              title="Age"
-              value={ageValue}
-              onMinusPress={this._onAgeMinus}
-              onPlusPress={this._onAgePlus}
-              style={styles.rowItemLast}
-            />
-          </View>
-        </View>
+          <PopupInfoDialog
+            visible={resultModalVisible}
+            title="Your BMR"
+            message="Lorem Ipsum"
+            onRequestClose={this._toggleResultModal}
+            buttonTitle="Got it"
+            buttonOnPress={this._toggleResultModal}
+          />
+        </ScrollView>
+
+        {/* NAV BUTTON */}
         <View style={styles.footerContainer}>
-          <AnimatedButton onPress={this._onCalcPress} loading={loading}>
-            Calculate
-          </AnimatedButton>
+          {activeIndex === 0 ? (
+            <Button onPress={this._nextPage} style={styles.navButton}>
+              Next
+            </Button>
+          ) : (
+            <AnimatedButton onPress={this._onCalcPress} loading={loading}>
+              Calculate
+            </AnimatedButton>
+          )}
         </View>
-
-        <PopupInfoDialog
-          visible={resultModalVisible}
-          title="Your BMR"
-          message="Lorem Ipsum"
-          onRequestClose={this._toggleResultModal}
-          buttonTitle="Got it"
-          buttonOnPress={this._toggleResultModal}
-        />
       </View>
     );
   }
 
-  _checkActive = (gender: 'male' | 'female', type: 'image' | 'container') => {
-    if (gender === 'male') {
-      if (type === 'image') {
-        return this.state.selectedGender === 'male' ? maleActive : maleInactive;
-      } else if (type === 'container') {
-        return this.state.selectedGender === 'male'
-          ? styles.activeGenderContainerStyle
-          : styles.inactiveGenderContainerStyle;
-      }
-    } else if (gender === 'female') {
-      if (type === 'image') {
-        return this.state.selectedGender === 'female'
-          ? femaleActive
-          : femaleInactive;
-      } else if (type === 'container') {
-        return this.state.selectedGender === 'female'
-          ? styles.activeGenderContainerStyle
-          : styles.inactiveGenderContainerStyle;
-      }
-    }
+  _onGenderChange: GenderOnPressFn = (gender) => {
+    this.setState({selectedGender: gender});
   };
-
-  _setGenderToMale = () => this.setState({selectedGender: 'male'});
-  _setGenderToFemale = () => this.setState({selectedGender: 'female'});
 
   _onHeightChange = (value: number) =>
     this.setState({heightValue: Math.floor(value)});
@@ -174,6 +173,7 @@ export default class BMRCalculatorScene extends Component<Props, State> {
     this.setState({weightValue: this.state.weightValue + 1});
   _onWeightMinus = () =>
     this.setState({weightValue: this.state.weightValue - 1});
+
   _onAgePlus = () => this.setState({ageValue: this.state.ageValue + 1});
   _onAgeMinus = () => this.setState({ageValue: this.state.ageValue - 1});
 
@@ -190,11 +190,37 @@ export default class BMRCalculatorScene extends Component<Props, State> {
       loading: false,
     });
   };
+
+  _setScrollViewRef = (scrollView: ScrollView) =>
+    (this._scrollView = scrollView);
+  _onScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    let screenWidth = SCREEN_WIDTH;
+    this.setState({
+      activeIndex: e.nativeEvent.contentOffset.x / screenWidth,
+    });
+  };
+  _goToPage = (index: number) => {
+    this.setState({activeIndex: index});
+    this._scrollView &&
+      this._scrollView.scrollTo({
+        x: index * SCREEN_WIDTH,
+        animated: true,
+      });
+  };
+  _nextPage = () => {
+    this._goToPage(1);
+  };
+  _prevPage = () => {
+    this._goToPage(0);
+  };
 }
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+  },
+  screenWidth: {
+    width: SCREEN_WIDTH,
   },
   paddedContainer: {
     flex: 1,
@@ -224,6 +250,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   footerContainer: {
+    alignItems: 'flex-end',
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
@@ -234,5 +261,9 @@ const styles = StyleSheet.create({
   rowItemLast: {
     borderLeftWidth: 1,
     borderLeftColor: LIGHTER_GREY,
+  },
+  navButton: {
+    height: 50,
+    // width: '50%',
   },
 });

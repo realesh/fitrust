@@ -40,7 +40,6 @@ export default function CaloriesInfo(props: CaloriesInfoProps) {
       >
         + {buttonTitle}
       </Button>
-      <Button iconName="info" style={styles.infoButton} fontColor={GREY} />
     </View>
   );
 }
@@ -57,13 +56,5 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: {width: 0, height: 2},
     elevation: 5,
-  },
-  infoButton: {
-    position: 'absolute',
-    right: 10,
-    top: 0,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    backgroundColor: WHITE,
   },
 });

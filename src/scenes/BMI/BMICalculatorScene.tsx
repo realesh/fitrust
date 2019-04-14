@@ -9,7 +9,7 @@ import {WHITE, LIGHT_GREY, GREY, BLUE} from '../../generals/constants/colors';
 import {Toolbar} from '../../generals/components';
 import AnimatedButton from '../../generals/core-ui/AnimatedButton';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
-import ScalableItem from '../BMR/ScalableItem';
+import ScalableItem from '../BMR/components/ScalableItem';
 import {bmiCalc} from '../../assets/images/bmi';
 import {bmiScaleList} from './data/BMIData';
 import BMIResultModal from './components/BMIResultModal';

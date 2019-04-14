@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ImageSourcePropType,
 } from 'react-native';
-import {Text} from '../../generals/core-ui';
+import {Text} from '../../../generals/core-ui';
 
 type GenderItemProps = ViewProps & {
   imageSource: ImageSourcePropType;
@@ -21,6 +21,7 @@ export default function GenderItem(props: GenderItemProps) {
     <TouchableOpacity
       onPress={onPress}
       style={[styles.genderItemContainer, style]}
+      activeOpacity={0.6}
     >
       <Image source={imageSource} style={styles.image} resizeMethod="scale" />
       <Text>{text}</Text>

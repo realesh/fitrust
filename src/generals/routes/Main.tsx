@@ -49,17 +49,17 @@ let dashboardStack = createStackNavigator({
       header: null,
     }),
   },
+  BMRCalculator: {
+    screen: BMRCalculatorScene,
+    navigationOptions: () => ({
+      header: null,
+    }),
+  },
 });
 
 let profileStack = createStackNavigator({
   home: {
     screen: ProfileScene,
-    navigationOptions: () => ({
-      header: null,
-    }),
-  },
-  BMRCalculator: {
-    screen: BMRCalculatorScene,
     navigationOptions: () => ({
       header: null,
     }),

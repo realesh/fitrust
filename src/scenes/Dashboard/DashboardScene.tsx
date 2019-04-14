@@ -1,29 +1,41 @@
 import React, {Component} from 'react';
 import {View, StyleSheet, ScrollView, Animated} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
-import {Text} from '../../generals/core-ui';
+import {Text, Button} from '../../generals/core-ui';
 import {
   MEDIUM_FONT_SIZE,
   HEADER_FONT_SIZE,
   SCREEN_HEIGHT,
   SCREEN_WIDTH,
+  LARGE_FONT_SIZE,
 } from '../../generals/constants/size';
 import {
   BLUE,
   LIGHTER_GREY,
   LIGHT_GREY,
   WHITE,
+  GREY,
 } from '../../generals/constants/colors';
-import {ProgressWithLabel, Toolbar} from '../../generals/components';
+import {
+  ProgressWithLabel,
+  Toolbar,
+  PopupInfoDialog,
+} from '../../generals/components';
 import {food, fire} from '../../assets/images/dashboard';
 import CaloriesInfo from './CaloriesInfo';
 import AnimatedChevron from '../../generals/components/AnimatedChevron';
 
 type Props = NavigationScreenProps;
 
-export default class DashboardScene extends Component<Props> {
+type State = {
+  fadeInAnimatedValue: Animated.Value;
+  bmrModalVisible: boolean;
+};
+
+export default class DashboardScene extends Component<Props, State> {
   state = {
     fadeInAnimatedValue: new Animated.Value(0),
+    bmrModalVisible: false,
   };
 
   componentDidMount() {
@@ -35,7 +47,7 @@ export default class DashboardScene extends Component<Props> {
   }
 
   render() {
-    let {fadeInAnimatedValue} = this.state;
+    let {fadeInAnimatedValue, bmrModalVisible} = this.state;
     let {navigation} = this.props;
 
     let overlayStyle = {
@@ -50,6 +62,12 @@ export default class DashboardScene extends Component<Props> {
       top: 80,
       backgroundColor: WHITE,
     };
+
+    const BMRMessage =
+      'Basal Metabolic Rate (BMR) is the specific amount of cals burned ' +
+      'by your body just by existing. Your Activity Level will also be taken into ' +
+      'consideration and be multiplied to your BMR to produce the number of cals you ' +
+      'should TAKE and BURN to reach your goal';
 
     return (
       <ScrollView
@@ -122,6 +140,23 @@ export default class DashboardScene extends Component<Props> {
                   buttonTitle="WORKOUT"
                 />
               </View>
+
+              <Button
+                iconName="more-horizontal"
+                style={styles.optionsButton}
+                fontColor={GREY}
+                fontSize={LARGE_FONT_SIZE}
+                onPress={this._toggleBMRModal}
+              />
+
+              <PopupInfoDialog
+                visible={bmrModalVisible}
+                title="BMR"
+                message={BMRMessage}
+                onRequestClose={this._toggleBMRModal}
+                buttonTitle="Recalculate"
+                buttonOnPress={this._goToBMR}
+              />
             </View>
           </View>
           <AnimatedChevron />
@@ -130,6 +165,15 @@ export default class DashboardScene extends Component<Props> {
       </ScrollView>
     );
   }
+
+  _toggleBMRModal = () => {
+    this.setState({bmrModalVisible: !this.state.bmrModalVisible});
+  };
+  _goToBMR = () => {
+    let {navigation} = this.props;
+    this.setState({bmrModalVisible: false});
+    navigation.navigate('BMRCalculator', {previous_scene: 'Home'});
+  };
 }
 
 const styles = StyleSheet.create({
@@ -166,5 +210,14 @@ const styles = StyleSheet.create({
   scrollHeight: {
     height: SCREEN_HEIGHT - 65,
     backgroundColor: LIGHTER_GREY,
+  },
+  optionsButton: {
+    position: 'absolute',
+    alignItems: 'center',
+    right: 20,
+    top: 10,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    backgroundColor: 'transparent',
   },
 });

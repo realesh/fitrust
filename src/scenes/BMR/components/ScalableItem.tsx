@@ -7,9 +7,9 @@ import {
   View,
 } from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
-import {Text} from '../../generals/core-ui';
-import {BLUE} from '../../generals/constants/colors';
-import {BIG_FONT_SIZE} from '../../generals/constants/size';
+import {Text} from '../../../generals/core-ui';
+import {BLUE} from '../../../generals/constants/colors';
+import {BIG_FONT_SIZE} from '../../../generals/constants/size';
 
 type ScalableItemProps = ViewProps & {
   title: string;

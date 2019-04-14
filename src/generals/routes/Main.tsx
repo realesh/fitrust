@@ -19,6 +19,7 @@ import {
 import {GREY, BLUE, LIGHT_GREY} from '../constants/colors';
 import BMRCalculatorScene from '../../scenes/BMR/BMRCalculatorScene';
 import ExerciseModeSettingScene from '../../scenes/ExerciseMode/ExerciseModeSettingScene';
+import ExerciseModeCountdownScene from '../../scenes/ExerciseMode/ExerciseModeCountdownScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -119,6 +120,7 @@ let bottomTab = createBottomTabNavigator(
 
 let exerciseModeStack = {
   exerciseModeSetting: ExerciseModeSettingScene,
+  exerciseModeCountdown: ExerciseModeCountdownScene,
 };
 
 let defaultStackConfig: StackNavigatorConfig = {

@@ -1,18 +1,19 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, LayoutAnimation} from 'react-native';
+import {View, StyleSheet, LayoutAnimation, Image} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Text, Button} from '../../generals/core-ui';
 import {BLUE, WHITE, LIGHTER_GREY} from '../../generals/constants/colors';
 import DurationChooser from './components/DurationChooser';
 import {LinearGradient} from 'expo';
 import {SCREEN_WIDTH, LARGE_FONT_SIZE} from '../../generals/constants/size';
-import {Toolbar} from '../../generals/components';
+import {Toolbar, PopupDialog} from '../../generals/components';
 import IntensityChooser, {
   IntensityIndexEnum,
+  Intensity,
 } from './components/IntensityChooser';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
 import {intensitiesData, durationData} from './data/ExerciseModeDataFixtures';
-import PopupInfoDialog from '../../generals/components/PopupInfoDialog';
+import {exerciseReady} from '../../assets/images/exerciseMode';
 
 type Props = NavigationScreenProps;
 
@@ -20,6 +21,11 @@ type State = {
   durationIndex: number;
   intensityIndex: 0 | 1 | 2 | 3;
   startModalVisible: boolean;
+};
+
+export type ExerciseSetting = {
+  duration: number;
+  intensity: Intensity;
 };
 
 export default class ExerciseModeSettingScene extends Component<Props, State> {
@@ -32,11 +38,11 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
   render() {
     let {durationIndex, intensityIndex, startModalVisible} = this.state;
 
-    let modalContent = `You are about to enter Exercise Mode with ${intensitiesData[
+    let modalContent = `You are about to enter Exercise Mode in ${intensitiesData[
       intensityIndex
-    ].title.toUpperCase()} intensity for ${
+    ].title.toUpperCase()} zone for ${
       durationData[durationIndex]
-    } MINS. Are you ready?`;
+    } MINS. Press start anytime once you're done doing your warm-up!`;
 
     return (
       <View style={styles.container}>
@@ -79,14 +85,29 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
           <Button onPress={this._toggleStartModalVisible}>Start</Button>
         </View>
 
-        <PopupInfoDialog
+        <PopupDialog
           visible={startModalVisible}
           onRequestClose={this._toggleStartModalVisible}
-          title="Ready?"
-          message={modalContent}
-          buttonTitle="I'm Ready!"
-          buttonOnPress={this._navToCountdown}
-        />
+        >
+          <Image
+            source={exerciseReady}
+            style={styles.image}
+            resizeMode="contain"
+          />
+          <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
+            Your exercise is ready!
+          </Text>
+          <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
+            {modalContent}
+          </Text>
+          <Button
+            onPress={this._navToCountdown}
+            style={styles.interactButton}
+            fontColor={BLUE}
+          >
+            START
+          </Button>
+        </PopupDialog>
       </View>
     );
   }
@@ -105,8 +126,13 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
   };
 
   _navToCountdown = () => {
+    let {durationIndex, intensityIndex} = this.state;
+    let exerciseSetting: ExerciseSetting = {
+      duration: durationData[durationIndex],
+      intensity: intensitiesData[intensityIndex],
+    };
     this._toggleStartModalVisible();
-    this.props.navigation.navigate('exerciseModeCountdown');
+    this.props.navigation.navigate('exerciseModeCountdown', {exerciseSetting});
   };
 }
 
@@ -138,5 +164,18 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     paddingHorizontal: 20,
+  },
+  image: {
+    height: 250,
+    width: '100%',
+  },
+  interactButton: {
+    backgroundColor: WHITE,
+    marginTop: 20,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: BLUE,
+    width: '90%',
   },
 });

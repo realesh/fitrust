@@ -20,10 +20,12 @@ import {
 } from '../../../generals/constants/colors';
 import {fire, fireGrey} from '../../../assets/images/dashboard';
 
-type Intensity = {
+export type Intensity = {
   title: string;
   level: IntensityIndexEnum;
   desc: string;
+  min: number;
+  max: number;
 };
 
 export type IntensityIndexEnum = 0 | 1 | 2 | 3;
@@ -57,11 +59,6 @@ export default class IntensityChooser extends Component<Props> {
             onItemPress={onValueChange}
             isSelected={selectedIndex === 0}
           />
-          <IntensityItem
-            intensity={intensities[2]}
-            onItemPress={onValueChange}
-            isSelected={selectedIndex === 2}
-          />
         </View>
         <View style={styles.zonesColumnContainer}>
           <IntensityItem
@@ -70,10 +67,15 @@ export default class IntensityChooser extends Component<Props> {
             isSelected={selectedIndex === 1}
           />
           <IntensityItem
+            intensity={intensities[2]}
+            onItemPress={onValueChange}
+            isSelected={selectedIndex === 2}
+          />
+          {/* <IntensityItem
             intensity={intensities[3]}
             onItemPress={onValueChange}
             isSelected={selectedIndex === 3}
-          />
+          /> */}
         </View>
       </View>
     );
@@ -87,8 +89,8 @@ class IntensityItem extends Component<IntensityItemProps> {
     let fireImage = [
       intensity.level >= 0 ? true : false,
       intensity.level >= 1 ? true : false,
-      intensity.level >= 2 ? true : false,
-      intensity.level === 3 ? true : false,
+      intensity.level === 2 ? true : false,
+      // intensity.level === 3 ? true : false,
     ];
 
     let selectedContainerStyle = {

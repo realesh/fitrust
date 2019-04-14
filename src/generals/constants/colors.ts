@@ -21,3 +21,10 @@ export const DEFAULT_ICON_COLOR = LIGHT_GREY;
 export const DEFAULT_BORDER_COLOR = LIGHT_GREY;
 export const DEFAULT_BACKGROUND_COLOR = WHITE;
 export const DEFAULT_THEME_COLOR = BLUE;
+
+export const bmiScaleColor = {
+  under: '#4DD2D3',
+  healthy: GREEN,
+  over: '#EFD422',
+  obese: RED,
+};

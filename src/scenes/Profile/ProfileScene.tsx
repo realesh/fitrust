@@ -164,7 +164,7 @@ export default class ProfileScene extends Component<Props, State> {
   _goToBMI = () => {
     let {navigation} = this.props;
     this.setState({bmiModalVisible: false});
-    navigation.navigate('BMRCalculator', {previous_scene: 'Profile'});
+    navigation.navigate('BMICalculator', {previous_scene: 'Profile'});
   };
 
   _goToBadges = () => {

@@ -54,7 +54,7 @@ const Button = (props: Props) => {
         <Text
           fontWeight="bold"
           fontSize={fontSize}
-          style={{color: fontColor, marginLeft: 5}}
+          style={{color: fontColor, marginLeft: iconName ? 5 : 0}}
         >
           {children}
         </Text>

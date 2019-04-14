@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {View, StyleSheet, FlatList, ListRenderItemInfo} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Toolbar} from '../../generals/components';
-import {WHITE, LIGHT_GREY} from '../../generals/constants/colors';
+import {WHITE} from '../../generals/constants/colors';
 import Separator from '../../generals/core-ui/Separator';
 import BadgeRowItem from './components/BadgeRowItem';
 import {BadgeItem, badgesList} from './data/BadgeDataFixtures';
@@ -13,7 +13,7 @@ type State = {
   minimizeHeader: boolean;
 };
 
-export default class BagdesListScene extends Component<Props, State> {
+export default class BadgesListScene extends Component<Props, State> {
   state: State = {
     minimizeHeader: false,
   };

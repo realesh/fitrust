@@ -20,6 +20,7 @@ import {GREY, BLUE, LIGHT_GREY} from '../constants/colors';
 import BMRCalculatorScene from '../../scenes/BMR/BMRCalculatorScene';
 import ExerciseModeSettingScene from '../../scenes/ExerciseMode/ExerciseModeSettingScene';
 import ExerciseModeCountdownScene from '../../scenes/ExerciseMode/ExerciseModeCountdownScene';
+import BagdesListScene from '../../scenes/Badges/BagdesListScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -58,6 +59,12 @@ let profileStack = createStackNavigator({
   },
   BMRCalculator: {
     screen: BMRCalculatorScene,
+    navigationOptions: () => ({
+      header: null,
+    }),
+  },
+  badgesList: {
+    screen: BagdesListScene,
     navigationOptions: () => ({
       header: null,
     }),

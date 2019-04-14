@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, Image, ScrollView} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Text, Avatar} from '../../generals/core-ui';
 import {LARGE_FONT_SIZE, SCREEN_WIDTH} from '../../generals/constants/size';
@@ -57,7 +63,11 @@ export default class ProfileScene extends Component<Props, State> {
           />
           <View style={styles.scrollHeight}>
             <View style={styles.paddedContainer}>
-              <Avatar size="big" style={{marginBottom: 10}} />
+              <Avatar
+                size="big"
+                source="https://pbs.twimg.com/profile_images/378800000500168907/7cba3b0f55df5a1a5458c18ba4a5d4a9_400x400.jpeg"
+                style={{marginBottom: 10}}
+              />
               <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
                 Samuel Sandro
               </Text>
@@ -89,12 +99,16 @@ export default class ProfileScene extends Component<Props, State> {
                   </Text>
                   <Text style={{color: GREY, marginTop: 5}}>Points</Text>
                 </View>
-                <View style={styles.insightItemContainer}>
+                <TouchableOpacity
+                  style={styles.insightItemContainer}
+                  activeOpacity={0.6}
+                  onPress={this._goToBadges}
+                >
                   <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
                     2
                   </Text>
                   <Text style={{color: GREY, marginTop: 5}}>Badges</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -151,6 +165,11 @@ export default class ProfileScene extends Component<Props, State> {
     let {navigation} = this.props;
     this.setState({bmiModalVisible: false});
     navigation.navigate('BMRCalculator', {previous_scene: 'Profile'});
+  };
+
+  _goToBadges = () => {
+    let {navigation} = this.props;
+    navigation.navigate('badgesList', {previous_scene: 'Profile'});
   };
 
   _toggleBMIModal = () => {

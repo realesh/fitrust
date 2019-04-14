@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, StyleSheet, GestureResponderEvent} from 'react-native';
 import {Text, Button} from '../../../generals/core-ui';
-import {GREEN, RED, GREY} from '../../../generals/constants/colors';
+import {RED, GREY, bmiScaleColor} from '../../../generals/constants/colors';
 import {
   LARGE_FONT_SIZE,
   TINY_FONT_SIZE,
@@ -30,7 +30,7 @@ export default function BMIInsight(props: Props) {
 
       <View style={styles.bmiBarContainer}>
         <View style={styles.underBar} />
-        <View style={styles.normalBar} />
+        <View style={styles.healthyBar} />
         <View style={styles.overBar} />
         <View style={styles.obeseBar} />
       </View>
@@ -91,25 +91,25 @@ const styles = StyleSheet.create({
   },
   underBar: {
     flex: 3.5,
-    backgroundColor: '#4DD2D3',
+    backgroundColor: bmiScaleColor.under,
     borderRadius: 2,
     marginRight: 5,
   },
-  normalBar: {
+  healthyBar: {
     flex: 6.5,
-    backgroundColor: GREEN,
+    backgroundColor: bmiScaleColor.healthy,
     borderRadius: 2,
     marginRight: 5,
   },
   overBar: {
     flex: 5,
-    backgroundColor: '#EFD422',
+    backgroundColor: bmiScaleColor.over,
     borderRadius: 2,
     marginRight: 5,
   },
   obeseBar: {
     flex: 10,
-    backgroundColor: RED,
+    backgroundColor: bmiScaleColor.obese,
     borderRadius: 4,
   },
   underContainer: {

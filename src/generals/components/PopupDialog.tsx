@@ -77,7 +77,7 @@ function PopupDialog(props: Props) {
           style={[StyleSheet.absoluteFill, styles.root]}
         >
           <TouchableWithoutFeedback>
-            <View style={styles.content}>{children}</View>
+            <View style={[styles.content, containerStyle]}>{children}</View>
           </TouchableWithoutFeedback>
           {/* </View> */}
         </BlurView>
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxHeight: '80%',
     alignItems: 'center',
-    overflow: 'visible',
+    overflow: 'hidden',
     padding: 20,
   },
   modalPage: {

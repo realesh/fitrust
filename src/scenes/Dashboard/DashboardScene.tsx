@@ -64,10 +64,9 @@ export default class DashboardScene extends Component<Props, State> {
     };
 
     const BMRMessage =
-      'Basal Metabolic Rate (BMR) is the specific amount of cals burned ' +
-      'by your body just by existing. Your Activity Level will also be taken into ' +
-      'consideration and be multiplied to your BMR to produce the number of cals you ' +
-      'should TAKE and BURN to reach your goal';
+      'These numbers are the amount of cals that is determined by your ' +
+      'BMR and TDEE, and is reccommended for you to fulfill.  ' +
+      'Recalculate your BMR and TDEE every month to maintain the accuracy.';
 
     return (
       <ScrollView
@@ -151,7 +150,7 @@ export default class DashboardScene extends Component<Props, State> {
 
               <PopupInfoDialog
                 visible={bmrModalVisible}
-                title="BMR"
+                title="Calories"
                 message={BMRMessage}
                 onRequestClose={this._toggleBMRModal}
                 buttonTitle="Recalculate"

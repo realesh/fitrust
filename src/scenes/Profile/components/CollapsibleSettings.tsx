@@ -8,16 +8,13 @@ import {
   LayoutAnimation,
 } from 'react-native';
 import {Text, Button} from '../../../generals/core-ui';
+import {Feather as Icon} from '@expo/vector-icons';
 import {
   GREY,
   LIGHT_GREY,
   LIGHTER_GREY,
 } from '../../../generals/constants/colors';
-import {
-  LARGE_FONT_SIZE,
-  SMALL_FONT_SIZE,
-  SCREEN_HEIGHT,
-} from '../../../generals/constants/size';
+import {LARGE_FONT_SIZE, SCREEN_HEIGHT} from '../../../generals/constants/size';
 import {linearEasingShort} from '../../../generals/constants/animationConfig';
 import {SettingsItem} from '../data/settingsDataFixtures';
 import {NavigationScreenProps} from 'react-navigation';
@@ -72,20 +69,14 @@ export default class CollapsibleSettings extends Component<Props, State> {
   _renderOptionsItem = ({item}: ListRenderItemInfo<SettingsItem>) => {
     let goToPage = () => {
       this.props.navigation.navigate(item.goTo, {previous_scene: 'Profile'});
+      this._toggleCollapsible();
     };
     return (
       <TouchableOpacity style={styles.paddedItem} onPress={goToPage}>
         <View style={{flex: 1, paddingRight: 20}}>
           <Text>{item.title}</Text>
-          <Text fontSize={SMALL_FONT_SIZE} style={{color: GREY, marginTop: 5}}>
-            {item.subtitle}
-          </Text>
         </View>
-        <Button
-          iconName="chevron-right"
-          fontColor={GREY}
-          style={styles.iconButton}
-        />
+        <Icon name="chevron-right" color={GREY} style={styles.iconButton} />
       </TouchableOpacity>
     );
   };

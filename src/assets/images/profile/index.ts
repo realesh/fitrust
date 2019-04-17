@@ -5,6 +5,7 @@ import trophyUltimate from './trophy-ultimate.png';
 import heartRate from './heart-rate.png';
 import fitbitWhite from './fitbit-white.png';
 import editProfile from '././edit-profile.png';
+import changePassword from './change-password.png';
 
 export {
   trophyCopper,
@@ -14,4 +15,5 @@ export {
   heartRate,
   fitbitWhite,
   editProfile,
+  changePassword,
 };

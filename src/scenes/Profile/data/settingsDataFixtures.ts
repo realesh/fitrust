@@ -10,6 +10,6 @@ export const settingsItems: Array<SettingsItem> = [
   },
   {
     title: 'Change Password',
-    goTo: 'BMRCalculator',
+    goTo: 'changePassword',
   },
 ];

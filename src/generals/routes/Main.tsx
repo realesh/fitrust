@@ -22,6 +22,7 @@ import ExerciseModeSettingScene from '../../scenes/ExerciseMode/ExerciseModeSett
 import ExerciseModeCountdownScene from '../../scenes/ExerciseMode/ExerciseModeCountdownScene';
 import BadgesListScene from '../../scenes/Badges/BadgesListScene';
 import BMICalculatorScene from '../../scenes/BMI/BMICalculatorScene';
+import EditProfileScene from '../../scenes/EditProfile/EditProfileScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -72,6 +73,12 @@ let profileStack = createStackNavigator({
   },
   badgesList: {
     screen: BadgesListScene,
+    navigationOptions: () => ({
+      header: null,
+    }),
+  },
+  editProfile: {
+    screen: EditProfileScene,
     navigationOptions: () => ({
       header: null,
     }),

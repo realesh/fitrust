@@ -199,7 +199,12 @@ export default class TextInput extends Component<Props, State> {
               inputRange: [0, 1],
               outputRange: [2.5, 0],
             }),
-      color: GREY,
+      color: filled
+        ? GREY
+        : focusAnimateValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [BLACK, GREY],
+          }),
       fontFamily: 'Lato-Regular',
     };
 

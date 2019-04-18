@@ -24,6 +24,7 @@ import {
 import {food, fire} from '../../assets/images/dashboard';
 import CaloriesInfo from './CaloriesInfo';
 import AnimatedChevron from '../../generals/components/AnimatedChevron';
+import StepsChartPage from './StepsChartPage';
 
 type Props = NavigationScreenProps;
 
@@ -73,6 +74,7 @@ export default class DashboardScene extends Component<Props, State> {
         contentContainerStyle={styles.root}
         showsVerticalScrollIndicator={false}
         pagingEnabled={true}
+        bounces={false}
       >
         <Animated.View style={overlayStyle} pointerEvents="none" />
 
@@ -160,7 +162,9 @@ export default class DashboardScene extends Component<Props, State> {
           </View>
           <AnimatedChevron />
         </View>
-        <View style={styles.scrollHeight} />
+        <View style={styles.scrollHeight}>
+          <StepsChartPage />
+        </View>
       </ScrollView>
     );
   }

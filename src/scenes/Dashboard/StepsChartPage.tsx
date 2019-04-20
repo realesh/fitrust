@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Text} from '../../generals/core-ui';
-import {
-  HEADER_FONT_SIZE,
-  BIG_FONT_SIZE,
-  LARGE_FONT_SIZE,
-} from '../../generals/constants/size';
+import {Feather as Icon} from '@expo/vector-icons';
 import {AreaChart} from 'react-native-svg-charts';
 import {Path, Circle} from 'react-native-svg';
 import * as shape from 'd3-shape';
+import {Text} from '../../generals/core-ui';
+import {
+  MEDIUM_FONT_SIZE,
+  SMALL_FONT_SIZE,
+  BIG_FONT_SIZE,
+} from '../../generals/constants/size';
 import {
   BLUE,
   LIGHT_GREY,
@@ -16,6 +17,7 @@ import {
   WHITE,
   DARK_GREY70,
   LIGHTER_GREY,
+  GREEN,
 } from '../../generals/constants/colors';
 import SummaryInsights from './components/SummaryInsights';
 
@@ -132,13 +134,29 @@ export default class StepsChartPage extends Component<Props, State> {
         <View style={styles.paddedContainer}>
           <Text
             fontWeight="bold"
-            fontSize={LARGE_FONT_SIZE}
-            style={{marginBottom: 20}}
+            fontSize={MEDIUM_FONT_SIZE}
+            style={{marginBottom: 20, alignSelf: 'center'}}
           >
             Today's Summary
           </Text>
 
           <SummaryInsights steps={12210} distance={3.34} floors={16} />
+
+          <View style={styles.comparisonContainer}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Icon name="chevrons-up" size={30} color={GREEN} />
+              <Text
+                fontWeight="bold"
+                fontSize={BIG_FONT_SIZE}
+                style={{color: GREEN}}
+              >
+                30%
+              </Text>
+            </View>
+            <Text fontSize={SMALL_FONT_SIZE} style={{marginBottom: 10}}>
+              than last week
+            </Text>
+          </View>
         </View>
         <View style={styles.chartsContainer}>
           <AreaChart
@@ -252,5 +270,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderWidth: 2.5,
     borderColor: BLUE,
+  },
+  comparisonContainer: {
+    paddingTop: 20,
+    flex: 1,
+    alignItems: 'center',
   },
 });

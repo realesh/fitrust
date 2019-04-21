@@ -7,24 +7,19 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
-import {LIGHTER_GREY, BLUE, GREY, GREEN} from '../constants/colors';
-import {Text} from '../core-ui';
+import {LIGHTER_GREY, BLUE, GREY, GREEN, WHITE} from '../constants/colors';
+import {Text, Button} from '../core-ui';
 
 type Props = ViewProps & {
-  /**
-   * label text to be displayed above progress bar
-   */
   label: string;
-
   currentValue: number;
-
   maxValue: number;
-
   unit: string;
-
   containerStyle?: ViewStyle;
-
   iconName?: string;
+  onIconPress: () => void;
+  isClaimed: boolean;
+  onClaimPress: () => void;
 };
 
 function ProgressBarWithLabel(props: Props) {
@@ -35,11 +30,20 @@ function ProgressBarWithLabel(props: Props) {
     unit,
     containerStyle,
     iconName = '',
+    onIconPress,
+    isClaimed,
+    onClaimPress,
     ...otherProps
   } = props;
   let percentage = (currentValue / maxValue) * 100;
-  return (
-    <View style={containerStyle} {...otherProps}>
+
+  let _onClaimPress = () => {
+    !isClaimed && onClaimPress();
+    return;
+  };
+
+  return percentage < 100 ? (
+    <View style={[styles.root, containerStyle]} {...otherProps}>
       <View style={styles.labelContainer}>
         <Text>{label}</Text>
         <Text style={styles.rightLabel}>
@@ -49,7 +53,7 @@ function ProgressBarWithLabel(props: Props) {
           </Text>
         </Text>
         {iconName && (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onIconPress}>
             <Icon
               name={iconName}
               size={20}
@@ -74,12 +78,35 @@ function ProgressBarWithLabel(props: Props) {
         </View>
       </View>
     </View>
+  ) : !isClaimed ? (
+    <View style={[styles.root, styles.goalCompleteContainer, containerStyle]}>
+      <Text style={{flex: 1, marginRight: 20}}>{label}</Text>
+      <Button
+        onPress={_onClaimPress}
+        style={styles.interactButton}
+        fontColor={GREEN}
+      >
+        CLAIM
+      </Button>
+    </View>
+  ) : (
+    <View style={[styles.root, styles.goalCompleteContainer, containerStyle]}>
+      <Text style={{flex: 1, marginRight: 20}}>{label}</Text>
+      <View style={styles.disabledButton}>
+        <Text fontWeight="bold" style={{color: GREY}}>
+          COMPLETED
+        </Text>
+      </View>
+    </View>
   );
 }
 
 export default ProgressBarWithLabel;
 
 const styles = StyleSheet.create({
+  root: {
+    height: 40,
+  },
   outerProgressBar: {
     height: 4,
     borderRadius: 2,
@@ -116,5 +143,29 @@ const styles = StyleSheet.create({
   rightLabel: {
     flex: 1,
     textAlign: 'right',
+  },
+  interactButton: {
+    flex: 1,
+    backgroundColor: WHITE,
+    height: '100%',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: GREEN,
+  },
+  disabledButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    backgroundColor: WHITE,
+    height: '100%',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: GREY,
+  },
+  goalCompleteContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

@@ -25,18 +25,27 @@ import {food, fire} from '../../assets/images/dashboard';
 import CaloriesInfo from './CaloriesInfo';
 import AnimatedChevron from '../../generals/components/AnimatedChevron';
 import StepsChartPage from './StepsChartPage';
+import DrinkWaterModal from './components/DrinkWaterModal';
 
 type Props = NavigationScreenProps;
 
 type State = {
   fadeInAnimatedValue: Animated.Value;
   bmrModalVisible: boolean;
+  waterModalVisible: boolean;
+  waterValue: number;
+  stepGoalClaimed: boolean;
+  waterGoalClaimed: boolean;
 };
 
 export default class DashboardScene extends Component<Props, State> {
   state = {
     fadeInAnimatedValue: new Animated.Value(0),
     bmrModalVisible: false,
+    waterModalVisible: false,
+    waterValue: 0,
+    stepGoalClaimed: false,
+    waterGoalClaimed: false,
   };
 
   componentDidMount() {
@@ -48,7 +57,14 @@ export default class DashboardScene extends Component<Props, State> {
   }
 
   render() {
-    let {fadeInAnimatedValue, bmrModalVisible} = this.state;
+    let {
+      fadeInAnimatedValue,
+      bmrModalVisible,
+      waterModalVisible,
+      waterValue,
+      stepGoalClaimed,
+      waterGoalClaimed,
+    } = this.state;
     let {navigation} = this.props;
 
     let overlayStyle = {
@@ -107,18 +123,24 @@ export default class DashboardScene extends Component<Props, State> {
               </Text>
               <ProgressWithLabel
                 label="Steps"
-                currentValue={3000}
+                currentValue={5000}
                 maxValue={5000}
                 unit="steps"
                 containerStyle={{marginBottom: 25}}
                 iconName="refresh-cw"
+                onIconPress={() => {}}
+                isClaimed={stepGoalClaimed}
+                onClaimPress={this._onStepGoalClaim}
               />
               <ProgressWithLabel
                 label="Drink water"
-                currentValue={450}
-                maxValue={3000}
-                unit="mL"
+                currentValue={waterValue}
+                maxValue={8}
+                unit="glass"
                 iconName="plus-square"
+                onIconPress={this._toggleWaterModal}
+                isClaimed={waterGoalClaimed}
+                onClaimPress={this._onWaterGoalClaim}
               />
             </View>
 
@@ -165,6 +187,10 @@ export default class DashboardScene extends Component<Props, State> {
         <View style={styles.scrollHeight}>
           <StepsChartPage />
         </View>
+        <DrinkWaterModal
+          visible={waterModalVisible}
+          onAddPress={this._onAddWater}
+        />
       </ScrollView>
     );
   }
@@ -172,10 +198,23 @@ export default class DashboardScene extends Component<Props, State> {
   _toggleBMRModal = () => {
     this.setState({bmrModalVisible: !this.state.bmrModalVisible});
   };
+  _toggleWaterModal = () => {
+    this.setState({waterModalVisible: !this.state.waterModalVisible});
+  };
   _goToBMR = () => {
     let {navigation} = this.props;
     this.setState({bmrModalVisible: false});
     navigation.navigate('BMRCalculator', {previous_scene: 'Home'});
+  };
+  _onAddWater = (value: number) => {
+    this.setState({waterValue: this.state.waterValue + value});
+    this._toggleWaterModal();
+  };
+  _onStepGoalClaim = () => {
+    this.setState({stepGoalClaimed: true});
+  };
+  _onWaterGoalClaim = () => {
+    this.setState({waterGoalClaimed: true});
   };
 }
 

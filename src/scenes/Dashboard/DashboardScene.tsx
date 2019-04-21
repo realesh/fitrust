@@ -20,6 +20,7 @@ import {
   ProgressWithLabel,
   Toolbar,
   PopupInfoDialog,
+  PointsModal,
 } from '../../generals/components';
 import {food, fire} from '../../assets/images/dashboard';
 import CaloriesInfo from './CaloriesInfo';
@@ -36,6 +37,8 @@ type State = {
   waterValue: number;
   stepGoalClaimed: boolean;
   waterGoalClaimed: boolean;
+  stepClaimModalVisible: boolean;
+  waterClaimModalVisible: boolean;
 };
 
 export default class DashboardScene extends Component<Props, State> {
@@ -46,6 +49,8 @@ export default class DashboardScene extends Component<Props, State> {
     waterValue: 0,
     stepGoalClaimed: false,
     waterGoalClaimed: false,
+    stepClaimModalVisible: false,
+    waterClaimModalVisible: false,
   };
 
   componentDidMount() {
@@ -64,6 +69,8 @@ export default class DashboardScene extends Component<Props, State> {
       waterValue,
       stepGoalClaimed,
       waterGoalClaimed,
+      stepClaimModalVisible,
+      waterClaimModalVisible,
     } = this.state;
     let {navigation} = this.props;
 
@@ -187,9 +194,22 @@ export default class DashboardScene extends Component<Props, State> {
         <View style={styles.scrollHeight}>
           <StepsChartPage />
         </View>
+
         <DrinkWaterModal
           visible={waterModalVisible}
           onAddPress={this._onAddWater}
+        />
+        <PointsModal
+          visible={stepClaimModalVisible}
+          pointsSource="Daily Goal - Step"
+          pointsValue={9200}
+          onRequestClose={this._toggleStepClaimModalVisible}
+        />
+        <PointsModal
+          visible={waterClaimModalVisible}
+          pointsSource="Daily Goal - Drink Water"
+          pointsValue={800}
+          onRequestClose={this._toggleWaterClaimModalVisible}
         />
       </ScrollView>
     );
@@ -212,9 +232,17 @@ export default class DashboardScene extends Component<Props, State> {
   };
   _onStepGoalClaim = () => {
     this.setState({stepGoalClaimed: true});
+    this._toggleStepClaimModalVisible();
   };
   _onWaterGoalClaim = () => {
     this.setState({waterGoalClaimed: true});
+    this._toggleWaterClaimModalVisible();
+  };
+  _toggleStepClaimModalVisible = () => {
+    this.setState({stepClaimModalVisible: !this.state.stepClaimModalVisible});
+  };
+  _toggleWaterClaimModalVisible = () => {
+    this.setState({waterClaimModalVisible: !this.state.waterClaimModalVisible});
   };
 }
 

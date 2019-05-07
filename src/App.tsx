@@ -2,9 +2,11 @@ import React, {Component} from 'react';
 import {StyleSheet, NativeModules} from 'react-native';
 import {SafeAreaView} from 'react-navigation';
 import {Font, AppLoading} from 'expo';
+import {ApolloProvider} from 'react-apollo';
 
 import {WHITE} from './generals/constants/colors';
 import Main from './generals/routes/Main';
+import client from './ApolloClient';
 
 const {UIManager} = NativeModules;
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -22,9 +24,11 @@ export default class App extends Component<{}, State> {
   render() {
     let {fontLoaded} = this.state;
     return fontLoaded ? (
-      <SafeAreaView style={styles.root} forceInset={{top: 'always'}}>
-        <Main />
-      </SafeAreaView>
+      <ApolloProvider client={client}>
+        <SafeAreaView style={styles.root} forceInset={{top: 'always'}}>
+          <Main />
+        </SafeAreaView>
+      </ApolloProvider>
     ) : (
       <AppLoading
         startAsync={this._init}

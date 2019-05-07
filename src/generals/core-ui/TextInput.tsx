@@ -45,12 +45,12 @@ type Props = TextInputProps & {
   /**
    * Controlled value of the text input (REQUIRED)
    */
-  value: string;
+  value?: string;
 
   /**
    * Controller to change input value (REQUIRED)
    */
-  onChangeText: (text: string) => void;
+  onChangeText?: (text: string) => void;
 
   /**
    * Style for the TextInput Container
@@ -81,6 +81,11 @@ type Props = TextInputProps & {
    * if true, display error with message
    */
   error?: boolean;
+
+  /**
+   * if true, change line and icon color to green if inputted text is valid
+   */
+  validate?: boolean;
 };
 
 type INPUT_TYPE = 'password' | 'email' | 'username' | 'text';
@@ -114,6 +119,8 @@ type INPUT_TYPE = 'password' | 'email' | 'username' | 'text';
  *
  * __error__: if true, display error with message
  *
+ * __validate__: if true, change line and icon color to green if inputted text is valid
+ *
  * ---
  * Notes
  * ---
@@ -123,7 +130,7 @@ type INPUT_TYPE = 'password' | 'email' | 'username' | 'text';
 export default class TextInput extends Component<Props, State> {
   state = {
     focus: false,
-    filled: false,
+    filled: !!this.props.value ? true : false,
 
     focusAnimateValue: new Animated.Value(0),
     validAnimateValue: new Animated.Value(0),
@@ -141,25 +148,28 @@ export default class TextInput extends Component<Props, State> {
       onChangeText,
       value,
       inputType,
+      validate = true,
       error,
       ...otherProps
     } = this.props;
 
     let checkValid = (input: string) => {
       let valid = false;
-      switch (inputType) {
-        case 'email':
-          valid = validateEmail(input);
-          break;
-        case 'password':
-          valid = validatePassword(input);
-          break;
-        case 'username': {
-          valid = validateUsername(input);
-          break;
+      if (validate) {
+        switch (inputType) {
+          case 'email':
+            valid = validateEmail(input);
+            break;
+          case 'password':
+            valid = validatePassword(input);
+            break;
+          case 'username': {
+            valid = validateUsername(input);
+            break;
+          }
+          default:
+            valid = validateText(input);
         }
-        default:
-          valid = validateText(input);
       }
 
       if (valid) {
@@ -242,17 +252,17 @@ export default class TextInput extends Component<Props, State> {
                 name={
                   !filled
                     ? iconName
-                    : !checkValid(value)
-                    ? iconName
-                    : 'check-circle'
+                    : !!value && checkValid(value)
+                    ? 'check-circle'
+                    : iconName
                 }
                 size={DEFAULT_ICON_SIZE}
                 color={
                   error
                     ? ERROR_THEME_COLOR
-                    : !filled || !checkValid(value)
-                    ? LIGHT_GREY
-                    : SUCCESS_THEME_COLOR
+                    : !!value && checkValid(value)
+                    ? SUCCESS_THEME_COLOR
+                    : LIGHT_GREY
                 }
                 style={styles.iconStyle}
               />

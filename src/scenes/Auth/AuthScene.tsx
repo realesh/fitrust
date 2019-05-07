@@ -14,7 +14,6 @@ import {
 import {
   HEADER_FONT_SIZE,
   TINY_FONT_SIZE,
-  LARGE_FONT_SIZE,
   MEDIUM_FONT_SIZE,
 } from '../../generals/constants/size';
 import {
@@ -28,6 +27,7 @@ import {
   linearEasingLong,
   linearEasingShort,
 } from '../../generals/constants/animationConfig';
+import DatePicker from '../../generals/components/DatePicker';
 
 type Props = {
   navigation: NavigationScreenProp<any>;
@@ -36,6 +36,7 @@ type Props = {
 type State = {
   username: string;
   password: string;
+  date: Date;
   rememberMe: boolean;
   login: boolean;
 
@@ -48,6 +49,7 @@ export default class AuthScene extends Component<Props, State> {
   state = {
     username: '',
     password: '',
+    date: new Date(),
     rememberMe: false,
     login: true,
 
@@ -59,7 +61,7 @@ export default class AuthScene extends Component<Props, State> {
   };
 
   render() {
-    let {username, password, rememberMe, login, inputError} = this.state;
+    let {username, password, date, rememberMe, login, inputError} = this.state;
 
     return (
       <KeyboardAvoidingView style={styles.root}>
@@ -69,11 +71,8 @@ export default class AuthScene extends Component<Props, State> {
           <View style={{marginBottom: 40}}>
             <TextInput
               inputType="username"
-              onChangeText={(value: string) => {
-                this.setState({
-                  username: value,
-                });
-              }}
+              validate={login ? false : true}
+              onChangeText={this._onChangeUsername}
               value={username}
               label="Username"
               iconName="user"
@@ -83,24 +82,23 @@ export default class AuthScene extends Component<Props, State> {
             />
             <TextInput
               inputType="password"
-              onChangeText={(value: string) => {
-                this.setState({
-                  password: value,
-                });
-              }}
+              validate={login ? false : true}
+              onChangeText={this._onChangePassword}
               value={password}
               label="Password"
               iconName="unlock"
-              containerStyle={{marginBottom: 20}}
+              containerStyle={{marginBottom: 10}}
               error={inputError}
               onFocus={this._resetErrorState}
             />
+            {!login && (
+              <DatePicker onDateChange={this._onChangeDate} value={date} />
+            )}
             {login && (
               <CheckLabel
                 checked={rememberMe}
-                onPress={() => {
-                  this.setState({rememberMe: !rememberMe});
-                }}
+                onPress={this._onToggleRememberMe}
+                style={{marginTop: 10}}
               >
                 Remember me
               </CheckLabel>
@@ -147,6 +145,23 @@ export default class AuthScene extends Component<Props, State> {
     );
   }
 
+  _onChangeUsername = (value: string) => {
+    this.setState({
+      username: value,
+    });
+  };
+  _onChangePassword = (value: string) => {
+    this.setState({
+      password: value,
+    });
+  };
+  _onToggleRememberMe = () => {
+    this.setState({rememberMe: !this.state.rememberMe});
+  };
+  _onChangeDate = (value: Date) => {
+    this.setState({date: value});
+  };
+
   _renderSuccessOverlay = () => {
     let {welcomeAnimation} = this.state;
 
@@ -175,7 +190,6 @@ export default class AuthScene extends Component<Props, State> {
       )
     ) : null;
   };
-
   _renderButton = () => {
     let {login, loading} = this.state;
     if (login) {
@@ -192,7 +206,6 @@ export default class AuthScene extends Component<Props, State> {
       );
     }
   };
-
   _renderTextButton = () => {
     let {login} = this.state;
 
@@ -210,7 +223,6 @@ export default class AuthScene extends Component<Props, State> {
       </Text>
     );
   };
-
   _renderHeaderText = () => {
     let {login} = this.state;
 
@@ -220,7 +232,7 @@ export default class AuthScene extends Component<Props, State> {
           <Text
             fontWeight="bold"
             fontSize={HEADER_FONT_SIZE}
-            style={{marginVertical: 20}}
+            style={{marginBottom: 20}}
           >
             Glad you're back!
           </Text>
@@ -229,16 +241,12 @@ export default class AuthScene extends Component<Props, State> {
     } else {
       return (
         <Fragment>
-          <Text
-            fontWeight="bold"
-            fontSize={HEADER_FONT_SIZE}
-            style={{marginTop: 20}}
-          >
+          <Text fontWeight="bold" fontSize={HEADER_FONT_SIZE}>
             Start now to get fit!
           </Text>
           <Text
             fontWeight="light"
-            fontSize={LARGE_FONT_SIZE}
+            fontSize={MEDIUM_FONT_SIZE}
             style={{marginBottom: 20}}
           >
             Sign up to continue to Fitrust App
@@ -247,19 +255,16 @@ export default class AuthScene extends Component<Props, State> {
       );
     }
   };
-
   _resetErrorState = () => {
     LayoutAnimation.configureNext(linearEasingShort);
     this.setState({inputError: false});
   };
-
   _toggleLoginState = () => {
     let {login} = this.state;
     this._resetErrorState();
     LayoutAnimation.configureNext(linearEasingLong);
     this.setState({login: !login});
   };
-
   _handleLogin = () => {
     let {username, password} = this.state;
 
@@ -277,7 +282,6 @@ export default class AuthScene extends Component<Props, State> {
       setTimeout(setErrorState, 1800);
     }
   };
-
   _handleSignUp = () => {
     let {username, password} = this.state;
 
@@ -295,7 +299,6 @@ export default class AuthScene extends Component<Props, State> {
       setTimeout(setErrorState, 1800);
     }
   };
-
   _navigateToMain = () => {
     let {navigation} = this.props;
 

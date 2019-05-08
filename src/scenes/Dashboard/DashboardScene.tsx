@@ -28,7 +28,11 @@ import AnimatedChevron from '../../generals/components/AnimatedChevron';
 import StepsChartPage from './StepsChartPage';
 import DrinkWaterModal from './components/DrinkWaterModal';
 
-type Props = NavigationScreenProps;
+type NavigationScreenParams = {
+  name: string;
+};
+
+type Props = NavigationScreenProps<NavigationScreenParams>;
 
 type State = {
   fadeInAnimatedValue: Animated.Value;
@@ -92,6 +96,8 @@ export default class DashboardScene extends Component<Props, State> {
       'BMR and TDEE, and is reccommended for you to fulfill.  ' +
       'Recalculate your BMR and TDEE every month to maintain the accuracy.';
 
+    let name = this.props.navigation.getParam('name', 'Guest');
+    console.log(this.props.navigation.getParam('name'));
     return (
       <ScrollView
         contentContainerStyle={styles.root}
@@ -105,7 +111,7 @@ export default class DashboardScene extends Component<Props, State> {
           <Toolbar navigation={navigation} pointsInfo={true} />
           <View style={styles.paddedContainer}>
             <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
-              Hello, Sandro.
+              {`Hello, ${name}.`}
             </Text>
             <Text
               fontWeight="bold"

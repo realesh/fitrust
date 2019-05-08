@@ -22,18 +22,28 @@ import {
   ERROR_THEME_COLOR,
   WHITE,
 } from '../../generals/constants/colors';
-import {NavigationScreenProp} from 'react-navigation';
+import {NavigationScreenProps} from 'react-navigation';
 import {
   linearEasingLong,
   linearEasingShort,
 } from '../../generals/constants/animationConfig';
 import DatePicker from '../../generals/components/DatePicker';
+import {graphql, MutationFunc} from 'react-apollo';
+import {
+  REGISTER_USER,
+  RegisterUserResponse,
+  RegisterUserVariables,
+} from '../../graphql/queries/user';
 
-type Props = {
-  navigation: NavigationScreenProp<any>;
+type RegisterUserProps = {
+  registerUser?: MutationFunc<RegisterUserResponse, RegisterUserVariables>;
 };
+type OwnProps = NavigationScreenProps & {};
+
+type Props = OwnProps & RegisterUserProps;
 
 type State = {
+  name: string;
   username: string;
   password: string;
   date: Date;
@@ -45,8 +55,9 @@ type State = {
   welcomeAnimation: number;
 };
 
-export default class AuthScene extends Component<Props, State> {
+class AuthScene extends Component<Props, State> {
   state = {
+    name: '',
     username: '',
     password: '',
     date: new Date(),
@@ -61,7 +72,15 @@ export default class AuthScene extends Component<Props, State> {
   };
 
   render() {
-    let {username, password, date, rememberMe, login, inputError} = this.state;
+    let {
+      name,
+      username,
+      password,
+      date,
+      rememberMe,
+      login,
+      inputError,
+    } = this.state;
 
     return (
       <KeyboardAvoidingView style={styles.root}>
@@ -69,6 +88,17 @@ export default class AuthScene extends Component<Props, State> {
           {this._renderHeaderText()}
 
           <View style={{marginBottom: 40}}>
+            {!login && (
+              <TextInput
+                inputType="text"
+                onChangeText={this._onChangeName}
+                value={name}
+                label="Name"
+                containerStyle={{marginBottom: 10}}
+                error={inputError}
+                onFocus={this._resetErrorState}
+              />
+            )}
             <TextInput
               inputType="username"
               validate={login ? false : true}
@@ -145,6 +175,11 @@ export default class AuthScene extends Component<Props, State> {
     );
   }
 
+  _onChangeName = (value: string) => {
+    this.setState({
+      name: value,
+    });
+  };
   _onChangeUsername = (value: string) => {
     this.setState({
       username: value,
@@ -163,7 +198,7 @@ export default class AuthScene extends Component<Props, State> {
   };
 
   _renderSuccessOverlay = () => {
-    let {welcomeAnimation} = this.state;
+    let {welcomeAnimation, name} = this.state;
 
     return welcomeAnimation !== 0 ? (
       welcomeAnimation === 1 ? (
@@ -175,7 +210,7 @@ export default class AuthScene extends Component<Props, State> {
         >
           <View style={styles.paddedContainer}>
             <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
-              Hello, Sandro.
+              {`Hello, ${name}.`}
             </Text>
           </View>
         </View>
@@ -183,7 +218,7 @@ export default class AuthScene extends Component<Props, State> {
         <View style={styles.overlayContainer} pointerEvents="none">
           <View style={styles.paddedContainer}>
             <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
-              Hello, Sandro.
+              {`Hello, ${name}.`}
             </Text>
           </View>
         </View>
@@ -294,12 +329,30 @@ export default class AuthScene extends Component<Props, State> {
     this.setState({loading: true});
 
     if (username && password) {
-      setTimeout(this._navigateToMain, 1800);
+      setTimeout(this._registerUser, 1800);
     } else {
       setTimeout(setErrorState, 1800);
     }
   };
-  _navigateToMain = () => {
+  _registerUser = async () => {
+    let result =
+      this.props.registerUser &&
+      (await this.props.registerUser({
+        variables: {
+          username: this.state.username,
+          password: this.state.password,
+          name: this.state.name,
+          dob: this.state.date.toISOString(),
+        },
+      }));
+
+    let token = result && result.data && result.data.registerUser.token;
+    let name = result && result.data && result.data.registerUser.name;
+    {
+      name && this._navigateToMain(name);
+    }
+  };
+  _navigateToMain = (name: string) => {
     let {navigation} = this.props;
 
     let setTo1 = () => {
@@ -319,7 +372,7 @@ export default class AuthScene extends Component<Props, State> {
     setTimeout(setTo2, 300);
     setTimeout(setTo3, 1500);
 
-    let navigate = () => navigation.navigate('main');
+    let navigate = () => navigation.navigate('dashboardHome', {name});
     setTimeout(navigate, 1800);
   };
 }
@@ -364,3 +417,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default graphql<
+  OwnProps,
+  RegisterUserResponse,
+  RegisterUserVariables,
+  RegisterUserProps
+>(REGISTER_USER, {
+  props: ({mutate}) => {
+    return {
+      registerUser: mutate,
+    };
+  },
+})(AuthScene);

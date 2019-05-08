@@ -45,7 +45,7 @@ let authStack = createStackNavigator({
 });
 
 let dashboardStack = createStackNavigator({
-  home: {
+  dashboardHome: {
     screen: DashboardScene,
     navigationOptions: () => ({
       header: null,
@@ -111,6 +111,14 @@ let bottomTab = createBottomTabNavigator(
         ),
       },
     },
+    // leaderboard: {
+    //   screen: Placeholder,
+    //   navigationOptions: {
+    //     tabBarIcon: ({tintColor}: {tintColor: string}) => (
+    //       <Icon name="star" size={24} color={tintColor} />
+    //     ),
+    //   },
+    // },
     dashboard: {
       screen: dashboardStack,
       navigationOptions: {
@@ -167,7 +175,7 @@ let mainSwitch = createSwitchNavigator(
     main: appStack,
   },
   {
-    initialRouteName: 'main',
+    initialRouteName: 'auth',
   },
 );
 

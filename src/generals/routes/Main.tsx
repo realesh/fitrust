@@ -24,6 +24,7 @@ import BadgesListScene from '../../scenes/Badges/BadgesListScene';
 import BMICalculatorScene from '../../scenes/BMI/BMICalculatorScene';
 import EditProfileScene from '../../scenes/EditProfile/EditProfileScene';
 import ChangePasswordScene from '../../scenes/ChangePassword/ChangePasswordScene';
+import CheckAuthScene from '../../scenes/Auth/CheckAuthScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -173,9 +174,10 @@ let mainSwitch = createSwitchNavigator(
   {
     auth: authStack,
     main: appStack,
+    check: CheckAuthScene,
   },
   {
-    initialRouteName: 'auth',
+    initialRouteName: 'check',
   },
 );
 

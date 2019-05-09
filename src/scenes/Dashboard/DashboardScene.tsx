@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, ScrollView, Animated} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Animated,
+  AsyncStorage,
+} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Text, Button} from '../../generals/core-ui';
 import {
@@ -30,6 +36,7 @@ import DrinkWaterModal from './components/DrinkWaterModal';
 
 type NavigationScreenParams = {
   name: string;
+  token: string;
 };
 
 type Props = NavigationScreenProps<NavigationScreenParams>;
@@ -63,7 +70,18 @@ export default class DashboardScene extends Component<Props, State> {
       toValue: 1,
       duration: 500,
     }).start();
+
+    let token = this.props.navigation.getParam('token');
+    this._storeToken(token);
   }
+
+  _storeToken = async (token: string) => {
+    try {
+      await AsyncStorage.setItem('userToken', token);
+    } catch (error) {
+      // Handle ERROR
+    }
+  };
 
   render() {
     let {
@@ -96,8 +114,6 @@ export default class DashboardScene extends Component<Props, State> {
       'BMR and TDEE, and is reccommended for you to fulfill.  ' +
       'Recalculate your BMR and TDEE every month to maintain the accuracy.';
 
-    let name = this.props.navigation.getParam('name', 'Guest');
-    console.log(this.props.navigation.getParam('name'));
     return (
       <ScrollView
         contentContainerStyle={styles.root}

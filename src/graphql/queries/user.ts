@@ -12,7 +12,6 @@ export type RegisterUserVariables = {
   dob: string;
   name: string;
 };
-
 export const REGISTER_USER = gql`
   mutation registerUser(
     $username: String!
@@ -26,6 +25,25 @@ export const REGISTER_USER = gql`
       dob: $dob
       name: $name
     ) {
+      token
+      name
+    }
+  }
+`;
+
+export type LoginUserResponse = {
+  loginUser: {
+    name: string;
+    token: string;
+  };
+};
+export type LoginUserVariables = {
+  username: string;
+  password: string;
+};
+export const LOGIN_USER = gql`
+  mutation loginUser($username: String!, $password: String!) {
+    loginUser(username: $username, password: $password) {
       token
       name
     }

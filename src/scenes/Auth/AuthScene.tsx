@@ -28,19 +28,28 @@ import {
   linearEasingShort,
 } from '../../generals/constants/animationConfig';
 import DatePicker from '../../generals/components/DatePicker';
-import {graphql, MutationFunc} from 'react-apollo';
+import {MutationFunc, Mutation} from 'react-apollo';
 import {
   REGISTER_USER,
   RegisterUserResponse,
   RegisterUserVariables,
+  LoginUserResponse,
+  LoginUserVariables,
+  LOGIN_USER,
 } from '../../graphql/queries/user';
+import parseGraphQLError from '../../helpers/parseGraphQLError';
 
-type RegisterUserProps = {
-  registerUser?: MutationFunc<RegisterUserResponse, RegisterUserVariables>;
-};
 type OwnProps = NavigationScreenProps & {};
 
-type Props = OwnProps & RegisterUserProps;
+type Props = OwnProps;
+type BaseProps = Props & {
+  registerUser: MutationFunc<RegisterUserResponse, RegisterUserVariables>;
+  registerData?: RegisterUserResponse;
+  registerLoading: boolean;
+  loginUser: MutationFunc<LoginUserResponse, LoginUserVariables>;
+  loginData?: LoginUserResponse;
+  loginLoading: boolean;
+};
 
 type State = {
   name: string;
@@ -50,12 +59,45 @@ type State = {
   rememberMe: boolean;
   login: boolean;
 
-  inputError: boolean;
+  errorMessage: string | null;
   loading: boolean;
   welcomeAnimation: number;
 };
 
-class AuthScene extends Component<Props, State> {
+class AuthScene extends Component<Props> {
+  render() {
+    let {...props} = this.props;
+    return (
+      <Mutation<RegisterUserResponse, RegisterUserVariables>
+        mutation={REGISTER_USER}
+      >
+        {(registerUser, {data: registerData, loading: registerLoading}) => {
+          return (
+            <Mutation<LoginUserResponse, LoginUserVariables>
+              mutation={LOGIN_USER}
+            >
+              {(loginUser, {data: loginData, loading: loginLoading}) => {
+                return (
+                  <AuthSceneBase
+                    {...props}
+                    registerUser={registerUser}
+                    registerData={registerData}
+                    registerLoading={registerLoading}
+                    loginUser={loginUser}
+                    loginData={loginData}
+                    loginLoading={loginLoading}
+                  />
+                );
+              }}
+            </Mutation>
+          );
+        }}
+      </Mutation>
+    );
+  }
+}
+
+class AuthSceneBase extends Component<BaseProps, State> {
   state = {
     name: '',
     username: '',
@@ -64,12 +106,35 @@ class AuthScene extends Component<Props, State> {
     rememberMe: false,
     login: true,
 
-    inputError: false,
+    errorMessage: null,
     loading: false,
 
     // 0: init, 1: enter, 2: greetings, 3: translate
     welcomeAnimation: 0,
   };
+
+  componentDidUpdate(prevProps: BaseProps) {
+    let {
+      registerLoading: prevRegLoading,
+      loginLoading: prevLogLoading,
+    } = prevProps;
+    let {
+      registerLoading: currRegLoading,
+      loginLoading: currLogLoading,
+    } = this.props;
+    if (
+      prevRegLoading !== currRegLoading ||
+      prevLogLoading !== currLogLoading
+    ) {
+      if (prevRegLoading || currLogLoading) {
+        LayoutAnimation.configureNext(linearEasingShort);
+        this.setState({loading: true});
+      } else if (!prevRegLoading && !currLogLoading) {
+        LayoutAnimation.configureNext(linearEasingShort);
+        this.setState({loading: false});
+      }
+    }
+  }
 
   render() {
     let {
@@ -79,7 +144,7 @@ class AuthScene extends Component<Props, State> {
       date,
       rememberMe,
       login,
-      inputError,
+      errorMessage,
     } = this.state;
 
     return (
@@ -95,7 +160,7 @@ class AuthScene extends Component<Props, State> {
                 value={name}
                 label="Name"
                 containerStyle={{marginBottom: 10}}
-                error={inputError}
+                error={!!errorMessage}
                 onFocus={this._resetErrorState}
               />
             )}
@@ -107,7 +172,7 @@ class AuthScene extends Component<Props, State> {
               label="Username"
               iconName="user"
               containerStyle={{marginBottom: 10}}
-              error={inputError}
+              error={!!errorMessage}
               onFocus={this._resetErrorState}
             />
             <TextInput
@@ -118,7 +183,7 @@ class AuthScene extends Component<Props, State> {
               label="Password"
               iconName="unlock"
               containerStyle={{marginBottom: 10}}
-              error={inputError}
+              error={!!errorMessage}
               onFocus={this._resetErrorState}
             />
             {!login && (
@@ -135,7 +200,7 @@ class AuthScene extends Component<Props, State> {
             )}
           </View>
 
-          {inputError && login ? (
+          {errorMessage && (
             <Text
               fontSize={TINY_FONT_SIZE}
               fontWeight="bold"
@@ -147,24 +212,8 @@ class AuthScene extends Component<Props, State> {
                 textAlign: 'center',
               }}
             >
-              Oops! You've entered a wrong username or password
+              {errorMessage}
             </Text>
-          ) : (
-            inputError && (
-              <Text
-                fontSize={TINY_FONT_SIZE}
-                fontWeight="bold"
-                style={{
-                  width: '80%',
-                  color: ERROR_THEME_COLOR,
-                  marginBottom: 20,
-                  alignSelf: 'center',
-                  textAlign: 'center',
-                }}
-              >
-                Every field must be filled!
-              </Text>
-            )
           )}
 
           {this._renderButton()}
@@ -292,7 +341,11 @@ class AuthScene extends Component<Props, State> {
   };
   _resetErrorState = () => {
     LayoutAnimation.configureNext(linearEasingShort);
-    this.setState({inputError: false});
+    this.setState({errorMessage: null});
+  };
+  _setErrorState = (errorMessage: string) => {
+    LayoutAnimation.configureNext(linearEasingShort);
+    this.setState({errorMessage});
   };
   _toggleLoginState = () => {
     let {login} = this.state;
@@ -300,59 +353,58 @@ class AuthScene extends Component<Props, State> {
     LayoutAnimation.configureNext(linearEasingLong);
     this.setState({login: !login});
   };
-  _handleLogin = () => {
-    let {username, password} = this.state;
+  _handleLogin = async () => {
+    try {
+      let result =
+        this.props.loginUser &&
+        (await this.props.loginUser({
+          variables: {
+            username: this.state.username,
+            password: this.state.password,
+          },
+        }));
 
-    let setErrorState = () => {
-      LayoutAnimation.configureNext(linearEasingShort);
-      this.setState({inputError: true, loading: false});
-    };
-
-    LayoutAnimation.configureNext(linearEasingShort);
-    this.setState({loading: true});
-
-    if (username.toLowerCase() === 'realesh' && password === 'Testing123') {
-      setTimeout(this._navigateToMain, 1800);
-    } else {
-      setTimeout(setErrorState, 1800);
+      let token = result && result.data && result.data.loginUser.token;
+      let name =
+        (result && result.data && result.data.loginUser.name) || 'Guest';
+      this.setState({name});
+      if (token) {
+        this._navigateToMain(name, token);
+      } else {
+        this._setErrorState('Oops! Some error happened');
+      }
+    } catch (error) {
+      let errorMessage = parseGraphQLError(error);
+      this._setErrorState(errorMessage);
     }
   };
-  _handleSignUp = () => {
-    let {username, password} = this.state;
+  _handleSignUp = async () => {
+    try {
+      let result =
+        this.props.registerUser &&
+        (await this.props.registerUser({
+          variables: {
+            username: this.state.username,
+            password: this.state.password,
+            name: this.state.name,
+            dob: this.state.date.toISOString(),
+          },
+        }));
 
-    let setErrorState = () => {
-      LayoutAnimation.configureNext(linearEasingShort);
-      this.setState({inputError: true, loading: false});
-    };
-
-    LayoutAnimation.configureNext(linearEasingShort);
-    this.setState({loading: true});
-
-    if (username && password) {
-      setTimeout(this._registerUser, 1800);
-    } else {
-      setTimeout(setErrorState, 1800);
+      let token = result && result.data && result.data.registerUser.token;
+      let name =
+        (result && result.data && result.data.registerUser.name) || 'Guest';
+      if (token) {
+        this._navigateToMain(name, token);
+      } else {
+        this._setErrorState('Oops! Some error happened');
+      }
+    } catch (error) {
+      let errorMessage = parseGraphQLError(error);
+      this._setErrorState(errorMessage);
     }
   };
-  _registerUser = async () => {
-    let result =
-      this.props.registerUser &&
-      (await this.props.registerUser({
-        variables: {
-          username: this.state.username,
-          password: this.state.password,
-          name: this.state.name,
-          dob: this.state.date.toISOString(),
-        },
-      }));
-
-    let token = result && result.data && result.data.registerUser.token;
-    let name = result && result.data && result.data.registerUser.name;
-    {
-      name && this._navigateToMain(name);
-    }
-  };
-  _navigateToMain = (name: string) => {
+  _navigateToMain = (name: string, token: string) => {
     let {navigation} = this.props;
 
     let setTo1 = () => {
@@ -372,7 +424,7 @@ class AuthScene extends Component<Props, State> {
     setTimeout(setTo2, 300);
     setTimeout(setTo3, 1500);
 
-    let navigate = () => navigation.navigate('dashboardHome', {name});
+    let navigate = () => navigation.navigate('dashboardHome', {name, token});
     setTimeout(navigate, 1800);
   };
 }
@@ -418,15 +470,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default graphql<
-  OwnProps,
-  RegisterUserResponse,
-  RegisterUserVariables,
-  RegisterUserProps
->(REGISTER_USER, {
-  props: ({mutate}) => {
-    return {
-      registerUser: mutate,
-    };
-  },
-})(AuthScene);
+export default AuthScene;

@@ -33,7 +33,7 @@ let authStack = createStackNavigator({
       header: null,
     }),
   },
-  auth: {
+  authField: {
     screen: AuthScene,
     navigationOptions: ({
       navigation,

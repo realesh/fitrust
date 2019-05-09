@@ -40,7 +40,7 @@ export default class OnBoardingScene extends Component<Props, {}> {
 
   _navigateToAuth = () => {
     let {navigation} = this.props;
-    navigation.navigate('auth', {previous_scene: 'OnBoarding'});
+    navigation.navigate('authField', {previous_scene: 'OnBoarding'});
   };
 }
 

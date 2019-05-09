@@ -20,6 +20,7 @@ import {SettingsItem} from '../data/settingsDataFixtures';
 import {NavigationScreenProps} from 'react-navigation';
 
 type Props = NavigationScreenProps & {
+  logountFunc: () => void;
   settingsItems: Array<SettingsItem>;
 };
 
@@ -55,6 +56,7 @@ export default class CollapsibleSettings extends Component<Props, State> {
             data={settingsItems}
             renderItem={this._renderOptionsItem}
             keyExtractor={this._keyExtractor}
+            ListFooterComponent={this._renderListFooter}
           />
         </View>
       </View>
@@ -64,6 +66,18 @@ export default class CollapsibleSettings extends Component<Props, State> {
   _toggleCollapsible = () => {
     LayoutAnimation.configureNext(linearEasingShort);
     this.setState({collapsed: !this.state.collapsed});
+  };
+
+  _renderListFooter = () => {
+    let {logountFunc} = this.props;
+    return (
+      <TouchableOpacity style={styles.paddedItem} onPress={logountFunc}>
+        <View style={{flex: 1, paddingRight: 20}}>
+          <Text>Logout</Text>
+        </View>
+        <Icon name="chevron-right" color={GREY} style={styles.iconButton} />
+      </TouchableOpacity>
+    );
   };
 
   _renderOptionsItem = ({item}: ListRenderItemInfo<SettingsItem>) => {

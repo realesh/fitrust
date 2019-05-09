@@ -60,6 +60,7 @@ export default class ProfileScene extends Component<Props, State> {
           <CollapsibleSettings
             settingsItems={settingsItems}
             navigation={this.props.navigation}
+            logountFunc={this._logoutFunc}
           />
           <View style={styles.scrollHeight}>
             <View style={styles.paddedContainer}>
@@ -160,6 +161,9 @@ export default class ProfileScene extends Component<Props, State> {
       </ScrollView>
     );
   }
+
+  _logoutFunc = () =>
+    this.props.navigation.navigate('authField', {command: 'logout'});
 
   _goToBMI = () => {
     let {navigation} = this.props;

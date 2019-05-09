@@ -4,6 +4,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   LayoutAnimation,
+  AsyncStorage,
 } from 'react-native';
 import {
   Text,
@@ -39,7 +40,10 @@ import {
 } from '../../graphql/queries/user';
 import parseGraphQLError from '../../helpers/parseGraphQLError';
 
-type OwnProps = NavigationScreenProps & {};
+type NavigationScreenParams = {
+  command: string;
+};
+type OwnProps = NavigationScreenProps<NavigationScreenParams> & {};
 
 type Props = OwnProps;
 type BaseProps = Props & {
@@ -65,6 +69,13 @@ type State = {
 };
 
 class AuthScene extends Component<Props> {
+  componentDidMount() {
+    let isLoggedout = this.props.navigation.getParam('command', '');
+    if (isLoggedout === 'logout') {
+      AsyncStorage.removeItem('userToken');
+    }
+  }
+
   render() {
     let {...props} = this.props;
     return (

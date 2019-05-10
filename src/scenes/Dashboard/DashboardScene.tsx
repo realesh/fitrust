@@ -50,6 +50,7 @@ type State = {
   waterGoalClaimed: boolean;
   stepClaimModalVisible: boolean;
   waterClaimModalVisible: boolean;
+  userDisplayName: string;
 };
 
 export default class DashboardScene extends Component<Props, State> {
@@ -62,6 +63,7 @@ export default class DashboardScene extends Component<Props, State> {
     waterGoalClaimed: false,
     stepClaimModalVisible: false,
     waterClaimModalVisible: false,
+    userDisplayName: '',
   };
 
   componentDidMount() {
@@ -72,6 +74,10 @@ export default class DashboardScene extends Component<Props, State> {
     }).start();
 
     let token = this.props.navigation.getParam('token');
+    let name = this.props.navigation.getParam('name', '');
+    if (name) {
+      this.setState({userDisplayName: name});
+    }
     this._storeToken(token);
   }
 
@@ -127,7 +133,7 @@ export default class DashboardScene extends Component<Props, State> {
           <Toolbar navigation={navigation} pointsInfo={true} />
           <View style={styles.paddedContainer}>
             <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
-              {`Hello, ${name}.`}
+              {`Hello, ${this.state.userDisplayName}.`}
             </Text>
             <Text
               fontWeight="bold"

@@ -49,3 +49,21 @@ export const LOGIN_USER = gql`
     }
   }
 `;
+
+export type VerifyTokenResponse = {
+  verifyToken: {
+    id: string;
+    name: string;
+  };
+};
+export type VerifyTokenVariables = {
+  token: string;
+};
+export const VERIFY_TOKEN = gql`
+  query verifyToken($token: String!) {
+    verifyToken(token: $token) {
+      id
+      name
+    }
+  }
+`;

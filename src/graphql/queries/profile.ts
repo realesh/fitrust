@@ -67,3 +67,45 @@ export const UPDATE_BMI = gql`
     }
   }
 `;
+
+export type UpdateProfileResponse = {
+  user?: {
+    profile: {
+      name: string;
+    };
+  };
+};
+export type UpdateProfileVariables = {
+  userID: string;
+  name: string;
+  first: string;
+  middle: string;
+  last: string;
+};
+export const UPDATE_PROFILE = gql`
+  mutation updateProfile(
+    $userID: ID
+    $name: String
+    $first: String
+    $middle: String
+    $last: String
+  ) {
+    updateUser(
+      data: {
+        profile: {
+          update: {
+            name: $name
+            titleFirst: $first
+            titleMiddle: $middle
+            titleLast: $last
+          }
+        }
+      }
+      where: {id: $userID}
+    ) {
+      profile {
+        name
+      }
+    }
+  }
+`;

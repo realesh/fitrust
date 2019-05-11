@@ -4,6 +4,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   LayoutAnimation,
+  AsyncStorage,
 } from 'react-native';
 import {
   Text,
@@ -14,16 +15,29 @@ import {
 } from '../../generals/core-ui';
 import {TINY_FONT_SIZE, MEDIUM_FONT_SIZE} from '../../generals/constants/size';
 import {BLUE, ERROR_THEME_COLOR, WHITE} from '../../generals/constants/colors';
-import {NavigationScreenProp} from 'react-navigation';
+import {NavigationScreenProps} from 'react-navigation';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
 import {Toolbar} from '../../generals/components';
 import {onDropdownValueChangeFn} from '../../generals/core-ui/Dropdown';
 import {titles, middleTitles} from './data/EditProfileDataFixtures';
 import EditSuccessModal from './components/EditSuccessModal';
+import {Mutation} from 'react-apollo';
+import {
+  UpdateProfileResponse,
+  UpdateProfileVariables,
+  UPDATE_PROFILE,
+  USER_PROFILE,
+} from '../../graphql/queries/profile';
+import {USER_DASHBOARD} from '../../graphql/queries/dashboard';
 
-type Props = {
-  navigation: NavigationScreenProp<any>;
+type NavigationScreenParams = {
+  name: string;
+  titleFirst: string;
+  titleMiddle: string;
+  titleLast: string;
 };
+
+type Props = NavigationScreenProps<NavigationScreenParams>;
 
 type State = {
   name: string;
@@ -45,6 +59,19 @@ export default class EditProfileScene extends Component<Props, State> {
     loading: false,
     successModalVisible: false,
   };
+
+  componentDidMount() {
+    let name = this.props.navigation.getParam('name');
+    let firstTitle = this.props.navigation.getParam('titleFirst');
+    let middleTitle = this.props.navigation.getParam('titleMiddle');
+    let lastTitle = this.props.navigation.getParam('titleLast');
+    this.setState({
+      name,
+      firstTitle,
+      middleTitle,
+      lastTitle,
+    });
+  }
 
   render() {
     let {navigation} = this.props;
@@ -146,13 +173,14 @@ export default class EditProfileScene extends Component<Props, State> {
             )
           )}
 
-          <AnimatedButton
+          {this._renderUpdateButton()}
+          {/* <AnimatedButton
             style={{position: 'absolute', bottom: 20}}
             onPress={this._handleUpdate}
             loading={loading}
           >
             Update
-          </AnimatedButton>
+          </AnimatedButton> */}
         </View>
 
         <EditSuccessModal
@@ -178,27 +206,9 @@ export default class EditProfileScene extends Component<Props, State> {
   _onLastTitleChange: onDropdownValueChangeFn = (value) => {
     this.setState({lastTitle: value});
   };
-
   _resetErrorState = () => {
     LayoutAnimation.configureNext(linearEasingShort);
     this.setState({inputError: false});
-  };
-  _handleUpdate = () => {
-    let {name} = this.state;
-
-    let setErrorState = () => {
-      LayoutAnimation.configureNext(linearEasingShort);
-      this.setState({inputError: true, loading: false});
-    };
-
-    LayoutAnimation.configureNext(linearEasingShort);
-    this.setState({loading: true});
-
-    if (name) {
-      setTimeout(this._toggleSuccessModal, 1800);
-    } else {
-      setTimeout(setErrorState, 1800);
-    }
   };
   _navigateToProfile = () => {
     this._toggleSuccessModal();
@@ -211,6 +221,73 @@ export default class EditProfileScene extends Component<Props, State> {
       successModalVisible: !this.state.successModalVisible,
       loading: false,
     });
+  };
+
+  _renderUpdateButton = () => {
+    let {loading} = this.state;
+    return (
+      <Mutation<UpdateProfileResponse, UpdateProfileVariables>
+        mutation={UPDATE_PROFILE}
+      >
+        {(updateProfile, {loading: updateLoading}) => {
+          let setErrorState = () => {
+            LayoutAnimation.configureNext(linearEasingShort);
+            this.setState({inputError: true, loading: false});
+          };
+
+          let handleUpdate = async () => {
+            let {name, firstTitle, middleTitle, lastTitle} = this.state;
+
+            LayoutAnimation.configureNext(linearEasingShort);
+            this.setState({loading: true});
+
+            if (!name) {
+              setTimeout(setErrorState, 1800);
+            }
+
+            try {
+              let ID = await AsyncStorage.getItem('userID');
+              updateProfile &&
+                (await updateProfile({
+                  variables: {
+                    userID: ID || '',
+                    name,
+                    first: firstTitle || '',
+                    middle: middleTitle || '',
+                    last: lastTitle || '',
+                  },
+                  refetchQueries: [
+                    {
+                      query: USER_PROFILE,
+                      variables: {
+                        userID: ID,
+                      },
+                    },
+                    {
+                      query: USER_DASHBOARD,
+                      variables: {
+                        userID: ID,
+                      },
+                    },
+                  ],
+                }));
+              setTimeout(this._toggleSuccessModal, 1800);
+            } catch (error) {
+              // Handle Error
+            }
+          };
+          return (
+            <AnimatedButton
+              style={{position: 'absolute', bottom: 20}}
+              onPress={handleUpdate}
+              loading={loading}
+            >
+              Update
+            </AnimatedButton>
+          );
+        }}
+      </Mutation>
+    );
   };
 }
 

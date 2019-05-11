@@ -82,7 +82,8 @@ export default class CollapsibleSettings extends Component<Props, State> {
 
   _renderOptionsItem = ({item}: ListRenderItemInfo<SettingsItem>) => {
     let goToPage = () => {
-      this.props.navigation.navigate(item.goTo, {previous_scene: 'Profile'});
+      item.goTo();
+      // this.props.navigation.navigate(item.goTo, {previous_scene: 'Profile'});
       this._toggleCollapsible();
     };
     return (

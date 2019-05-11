@@ -25,7 +25,7 @@ import BMIInsight from './components/BMIInsight';
 import MHRInsight from './components/MHRInsight';
 import CollapsibleSettings from './components/CollapsibleSettings';
 import FancyRibbonButton from './components/FancyRibbonButton';
-import {settingsItems} from './data/settingsDataFixtures';
+// import {settingsItems} from './data/settingsDataFixtures';
 import ExerciseModePlaceholder from './components/ExerciseModePlaceholder';
 import {Query} from 'react-apollo';
 import {
@@ -34,6 +34,7 @@ import {
   UserProfileData,
   USER_PROFILE,
 } from '../../graphql/queries/profile';
+import {SettingsItem} from './data/settingsDataFixtures';
 
 type Props = NavigationScreenProps;
 
@@ -74,6 +75,32 @@ export default class ProfileScene extends Component<Props, State> {
         {({data, loading}) => {
           let result =
             (data && data.user && data.user.profile) || DEFAULT_USER_PROFILE;
+
+          let goToProfile = () => {
+            this.props.navigation.navigate('editProfile', {
+              name: result.name,
+              titleFirst: result.titleFirst,
+              titleMiddle: result.titleMiddle,
+              titleLast: result.titleLast,
+              previous_scene: 'Profile',
+            });
+          };
+          let goToChangePassword = () => {
+            this.props.navigation.navigate('changePassword', {
+              previous_scene: 'Profile',
+            });
+          };
+
+          const settingsItems: Array<SettingsItem> = [
+            {
+              title: 'Edit Profile',
+              goTo: goToProfile,
+            },
+            {
+              title: 'Change Password',
+              goTo: goToChangePassword,
+            },
+          ];
 
           return loading ? (
             <View style={styles.loadingContainer}>

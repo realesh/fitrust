@@ -79,11 +79,22 @@ export default class DashboardScene extends Component<Props, State> {
       this.setState({userDisplayName: name});
     }
     this._storeToken(token);
+    this._setSkipOnBoard();
   }
 
   _storeToken = async (token: string) => {
     try {
       await AsyncStorage.setItem('userToken', token);
+    } catch (error) {
+      // Handle ERROR
+    }
+  };
+  _setSkipOnBoard = async () => {
+    try {
+      let skipOnBoard = await AsyncStorage.getItem('skipOnBoard');
+      if (!skipOnBoard) {
+        await AsyncStorage.setItem('skipOnBoard', 'skip');
+      }
     } catch (error) {
       // Handle ERROR
     }

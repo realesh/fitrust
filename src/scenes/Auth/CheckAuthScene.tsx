@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, AsyncStorage, LayoutAnimation} from 'react-native';
-import {AnimatedButton} from '../../generals/core-ui';
-import {linearEasingShort} from '../../generals/constants/animationConfig';
+import {StyleSheet, View, AsyncStorage} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Query} from 'react-apollo';
 import {
@@ -13,7 +11,6 @@ import {
 type Props = NavigationScreenProps;
 
 type State = {
-  loading: boolean;
   token: string;
   sentID: string;
   sentName: string;
@@ -21,25 +18,26 @@ type State = {
 
 export default class CheckAuthScene extends Component<Props, State> {
   state = {
-    loading: false,
     token: '',
     sentID: '',
     sentName: '',
   };
 
   componentDidMount() {
-    LayoutAnimation.configureNext(linearEasingShort);
-    this.setState({loading: true});
     this._getToken();
   }
 
   _getToken = async () => {
     try {
-      let userData = await AsyncStorage.getItem('userToken');
-      if (userData) {
-        this.setState({token: userData});
+      let userToken = await AsyncStorage.getItem('userToken');
+      if (userToken) {
+        this.setState({token: userToken});
       } else {
-        this.props.navigation.navigate('authField');
+        let skipOnBoard = await AsyncStorage.getItem('skipOnBoard');
+        if (skipOnBoard) {
+          this.props.navigation.navigate('authField');
+        }
+        this.props.navigation.navigate('auth');
       }
     } catch (error) {
       // Handle Error
@@ -47,7 +45,6 @@ export default class CheckAuthScene extends Component<Props, State> {
   };
 
   render() {
-    let {loading} = this.state;
     return (
       <Query<VerifyTokenResponse, VerifyTokenVariables>
         query={VERIFY_TOKEN}
@@ -64,11 +61,7 @@ export default class CheckAuthScene extends Component<Props, State> {
             });
           }
 
-          return (
-            <View style={styles.container}>
-              <AnimatedButton loading={loading} />
-            </View>
-          );
+          return <View style={styles.container} />;
         }}
       </Query>
     );
@@ -78,7 +71,5 @@ export default class CheckAuthScene extends Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

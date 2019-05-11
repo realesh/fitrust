@@ -83,20 +83,21 @@ export default class DashboardScene extends Component<Props, State> {
       duration: 500,
     }).start();
 
-    console.log(this.props.navigation.getParam('id'), '<<<<<<<<<<<>>>>>>>>>>>');
-
-    let token = this.props.navigation.getParam('token');
     let name = this.props.navigation.getParam('name', '');
     if (name) {
       this.setState({userDisplayName: name});
     }
-    this._storeToken(token);
+    this._storeToken();
     this._setSkipOnBoard();
+    this._storeID();
   }
 
-  _storeToken = async (token: string) => {
+  _storeToken = async () => {
     try {
-      await AsyncStorage.setItem('userToken', token);
+      let token = this.props.navigation.getParam('token');
+      if (token) {
+        await AsyncStorage.setItem('userToken', token);
+      }
     } catch (error) {
       // Handle ERROR
     }
@@ -106,6 +107,16 @@ export default class DashboardScene extends Component<Props, State> {
       let skipOnBoard = await AsyncStorage.getItem('skipOnBoard');
       if (!skipOnBoard) {
         await AsyncStorage.setItem('skipOnBoard', 'skip');
+      }
+    } catch (error) {
+      // Handle ERROR
+    }
+  };
+  _storeID = async () => {
+    try {
+      let id = this.props.navigation.getParam('id', '');
+      if (id) {
+        await AsyncStorage.setItem('userID', id);
       }
     } catch (error) {
       // Handle ERROR

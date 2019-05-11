@@ -2,6 +2,7 @@ import gql from 'graphql-tag';
 
 export type RegisterUserResponse = {
   registerUser: {
+    id: string;
     name: string;
     token: string;
   };
@@ -25,6 +26,7 @@ export const REGISTER_USER = gql`
       dob: $dob
       name: $name
     ) {
+      id
       token
       name
     }
@@ -33,6 +35,7 @@ export const REGISTER_USER = gql`
 
 export type LoginUserResponse = {
   loginUser: {
+    id: string;
     name: string;
     token: string;
   };
@@ -44,6 +47,7 @@ export type LoginUserVariables = {
 export const LOGIN_USER = gql`
   mutation loginUser($username: String!, $password: String!) {
     loginUser(username: $username, password: $password) {
+      id
       token
       name
     }

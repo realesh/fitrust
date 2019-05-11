@@ -1,16 +1,18 @@
 import React, {ReactNode} from 'react';
 import {
   TouchableOpacity,
-  ViewProps,
   GestureResponderEvent,
   StyleSheet,
+  StyleProp,
+  ViewStyle,
+  TouchableOpacityProps,
 } from 'react-native';
 import {DEFAULT_FONT_SIZE} from '../constants/size';
 import Text from './Text';
 import {WHITE, BLUE} from '../constants/colors';
 import {Feather as Icon} from '@expo/vector-icons';
 
-type Props = ViewProps & {
+type Props = TouchableOpacityProps & {
   /**
    * Size of the button's font. Defaults to 14.
    */
@@ -29,6 +31,8 @@ type Props = ViewProps & {
    * Function to invoke when button pressed.
    */
   onPress?: (event: GestureResponderEvent) => void;
+
+  style: StyleProp<ViewStyle>;
 };
 
 const Button = (props: Props) => {

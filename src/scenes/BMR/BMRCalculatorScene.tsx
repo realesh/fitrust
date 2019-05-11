@@ -48,7 +48,8 @@ type State = {
   activeIndex: number;
   selectedActivityIndex: number;
   selectedGoalIndex: number;
-  tdeeResult: number;
+  intakeResult: number;
+  bmrResult: number;
 };
 
 export default class BMRCalculatorScene extends Component<Props, State> {
@@ -62,7 +63,8 @@ export default class BMRCalculatorScene extends Component<Props, State> {
     activeIndex: 0,
     selectedActivityIndex: 0,
     selectedGoalIndex: 0,
-    tdeeResult: 0,
+    intakeResult: 0,
+    bmrResult: 0,
   };
 
   _scrollView?: ScrollView;
@@ -79,7 +81,7 @@ export default class BMRCalculatorScene extends Component<Props, State> {
       selectedGender,
       selectedActivityIndex,
       selectedGoalIndex,
-      tdeeResult,
+      intakeResult,
     } = this.state;
 
     return (
@@ -179,9 +181,9 @@ export default class BMRCalculatorScene extends Component<Props, State> {
 
           <BMRResultModal
             visible={resultModalVisible}
-            goalResult={this._calcGoal()}
-            tdeeResult={tdeeResult.toFixed(0)}
-            onUpdatePress={() => {}}
+            burnoutResult={Number.parseInt(this._calcBurnout(), 10)}
+            intakeResult={Number.parseInt(intakeResult.toFixed(0), 10)}
+            onUpdatePress={this._navigateToDashboard}
             onRequestClose={this._toggleResultModal}
           />
         </ScrollView>
@@ -228,17 +230,18 @@ export default class BMRCalculatorScene extends Component<Props, State> {
     LayoutAnimation.configureNext(linearEasingShort);
     this.setState({loading: true});
 
-    this.setState({tdeeResult: this._calcTDEE()});
+    this.setState({intakeResult: this._calcIntake()});
 
     setTimeout(this._toggleResultModal, 1000);
   };
-  _calcTDEE = () => {
+  _calcIntake = () => {
     let {
       selectedGender,
       weightValue,
       heightValue,
       ageValue,
       selectedActivityIndex,
+      selectedGoalIndex,
     } = this.state;
     let bmrResult: number = 0;
     if (selectedGender === 'male') {
@@ -246,45 +249,50 @@ export default class BMRCalculatorScene extends Component<Props, State> {
     } else if (selectedGender === 'female') {
       bmrResult = 10 * weightValue + 6.25 * heightValue - 5 * ageValue - 161;
     }
+    this.setState({bmrResult});
 
-    let tdeeResult: number = 0;
+    let intakeResult: number = 0;
     switch (activityLevels[selectedActivityIndex].title) {
       case 'sedentary':
-        tdeeResult = bmrResult * 1.2;
+        intakeResult = bmrResult * 1.2;
         break;
       case 'light':
-        tdeeResult = bmrResult * 1.375;
+        intakeResult = bmrResult * 1.375;
         break;
       case 'moderate':
-        tdeeResult = bmrResult * 1.55;
+        intakeResult = bmrResult * 1.55;
         break;
       case 'very':
-        tdeeResult = bmrResult * 1.725;
+        intakeResult = bmrResult * 1.725;
         break;
       case 'super':
-        tdeeResult = bmrResult * 1.9;
+        intakeResult = bmrResult * 1.9;
         break;
     }
 
-    return tdeeResult;
+    switch (goals[selectedGoalIndex].title) {
+      case 'gain weight':
+        intakeResult += 500;
+        break;
+    }
+    return intakeResult;
   };
-  _calcGoal = () => {
-    let {selectedGoalIndex, tdeeResult} = this.state;
+  _calcBurnout = () => {
+    let {selectedGoalIndex, intakeResult, bmrResult} = this.state;
 
-    let goalResult: number = 0;
+    let burnoutResult: number = 0;
     switch (goals[selectedGoalIndex].title) {
       case 'lose weight':
-        goalResult = tdeeResult - 500;
+        burnoutResult = intakeResult - bmrResult + 500;
         break;
       case 'maintain weight':
-        goalResult = tdeeResult;
+        burnoutResult = intakeResult - bmrResult;
         break;
       case 'gain weight':
-        goalResult = tdeeResult + 500;
+        burnoutResult = intakeResult - bmrResult - 500;
         break;
     }
-
-    return goalResult.toFixed(0);
+    return burnoutResult.toFixed(0);
   };
 
   _toggleResultModal = () => {
@@ -293,6 +301,9 @@ export default class BMRCalculatorScene extends Component<Props, State> {
       resultModalVisible: !this.state.resultModalVisible,
       loading: false,
     });
+  };
+  _navigateToDashboard = () => {
+    this.props.navigation.navigate('dashboardHome');
   };
   _setScrollViewRef = (scrollView: ScrollView) =>
     (this._scrollView = scrollView);

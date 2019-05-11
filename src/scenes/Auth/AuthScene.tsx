@@ -378,9 +378,10 @@ class AuthSceneBase extends Component<BaseProps, State> {
       let token = result && result.data && result.data.loginUser.token;
       let name =
         (result && result.data && result.data.loginUser.name) || 'Guest';
+      let id = (result && result.data && result.data.loginUser.id) || 'Guest';
       this.setState({name});
       if (token) {
-        this._navigateToMain(name, token);
+        this._navigateToMain(id, name, token);
       } else {
         this._setErrorState('Oops! Some error happened');
       }
@@ -405,8 +406,10 @@ class AuthSceneBase extends Component<BaseProps, State> {
       let token = result && result.data && result.data.registerUser.token;
       let name =
         (result && result.data && result.data.registerUser.name) || 'Guest';
+      let id =
+        (result && result.data && result.data.registerUser.id) || 'Guest';
       if (token) {
-        this._navigateToMain(name, token);
+        this._navigateToMain(id, name, token);
       } else {
         this._setErrorState('Oops! Some error happened');
       }
@@ -415,7 +418,7 @@ class AuthSceneBase extends Component<BaseProps, State> {
       this._setErrorState(errorMessage);
     }
   };
-  _navigateToMain = (name: string, token: string) => {
+  _navigateToMain = (id: string, name: string, token: string) => {
     let {navigation} = this.props;
 
     let setTo1 = () => {
@@ -435,7 +438,8 @@ class AuthSceneBase extends Component<BaseProps, State> {
     setTimeout(setTo2, 300);
     setTimeout(setTo3, 1500);
 
-    let navigate = () => navigation.navigate('dashboardHome', {name, token});
+    let navigate = () =>
+      navigation.navigate('dashboardHome', {id, name, token});
     setTimeout(navigate, 1800);
   };
 }

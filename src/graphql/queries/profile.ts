@@ -46,3 +46,24 @@ export const USER_PROFILE = gql`
     }
   }
 `;
+
+export type UpdateBMIResponse = {
+  user?: {
+    profile: {
+      bmi: number;
+    };
+  };
+};
+export type UpdateBMIVariables = {
+  userID: string;
+  bmi: number;
+};
+export const UPDATE_BMI = gql`
+  mutation updateBMI($userID: ID, $bmi: Int) {
+    updateUser(data: {profile: {update: {bmi: $bmi}}}, where: {id: $userID}) {
+      profile {
+        bmi
+      }
+    }
+  }
+`;

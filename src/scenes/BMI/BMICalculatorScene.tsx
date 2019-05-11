@@ -98,7 +98,7 @@ export default class BMICalculatorScene extends Component<Props, State> {
         <BMIResultModal
           visible={resultModalVisible}
           onRequestClose={this._toggleResultModal}
-          bmiResult={bmiResult.toFixed(1)}
+          bmiResult={bmiResult}
           bmiScaleIndex={bmiScaleIndex}
           onUpdatePress={this._updateBMI}
         />
@@ -119,7 +119,7 @@ export default class BMICalculatorScene extends Component<Props, State> {
 
     let {heightValue, weightValue} = this.state;
     let meterHeight = Math.pow(heightValue / 100, 2);
-    let bmiResult = weightValue / meterHeight;
+    let bmiResult = Number.parseInt((weightValue / meterHeight).toFixed(0), 10);
 
     let bmiScaleIndex = bmiScaleList.findIndex(
       (bmiScale) => bmiResult >= bmiScale.min && bmiResult <= bmiScale.max,
@@ -129,7 +129,9 @@ export default class BMICalculatorScene extends Component<Props, State> {
 
     setTimeout(this._toggleResultModal, 1000);
   };
-  _updateBMI = () => {};
+  _updateBMI = () => {
+    this.props.navigation.goBack();
+  };
 
   _toggleResultModal = () => {
     LayoutAnimation.configureNext(linearEasingShort);

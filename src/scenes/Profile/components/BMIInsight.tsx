@@ -6,6 +6,7 @@ import {
   LARGE_FONT_SIZE,
   TINY_FONT_SIZE,
 } from '../../../generals/constants/size';
+import {bmiScaleList} from '../../BMI/data/BMIData';
 
 type Props = {
   /**
@@ -17,12 +18,24 @@ type Props = {
 
 export default function BMIInsight(props: Props) {
   let {onPress, BMIValue} = props;
+
+  let getBMIStatus = () => {
+    let bmiScaleIndex = bmiScaleList.findIndex(
+      (bmiScale) => BMIValue >= bmiScale.min && BMIValue <= bmiScale.max,
+    );
+
+    return bmiScaleIndex;
+  };
+
   return (
     <View style={styles.boxShadow}>
       <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-        {`${BMIValue.toFixed(1)} `}
-        <Text fontWeight="bold" style={{color: RED}}>
-          Obese
+        {`${BMIValue.toFixed(0)} `}
+        <Text
+          fontWeight="bold"
+          style={{color: bmiScaleList[getBMIStatus()].color}}
+        >
+          {bmiScaleList[getBMIStatus()].title}
         </Text>
       </Text>
       <Text fontSize={TINY_FONT_SIZE} style={{color: GREY, marginBottom: 15}}>

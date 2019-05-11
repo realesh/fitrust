@@ -116,7 +116,6 @@ export default function BMRResultModal(props: Props) {
                 Close
               </Button>
               <Button
-                // onPress={onUpdatePress}
                 onPress={handleUpdate}
                 style={styles.updateBtn}
                 fontColor={BLUE}

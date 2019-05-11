@@ -13,10 +13,16 @@ type Props = {
    * Function to invoke when button pressed.
    */
   onPress: (event: GestureResponderEvent) => void;
+  dob: string;
 };
 
 export default function MHRInsight(props: Props) {
-  let {onPress} = props;
+  let {onPress, dob} = props;
+
+  let now = new Date().getFullYear();
+  let dobYear = new Date(dob).getFullYear();
+  let age = now - dobYear;
+
   return (
     <View style={[styles.boxShadow, styles.mhrContainer]}>
       <Image
@@ -29,7 +35,7 @@ export default function MHRInsight(props: Props) {
           fontSize={LARGE_FONT_SIZE}
           style={{color: WHITE}}
         >
-          198{' '}
+          {`${220 - age} `}
           <Text fontWeight="bold" style={{color: 'rgba(255,255,255,0.5)'}}>
             BPM
           </Text>

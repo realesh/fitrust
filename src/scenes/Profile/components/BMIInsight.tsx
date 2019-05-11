@@ -12,14 +12,15 @@ type Props = {
    * Function to invoke when button pressed.
    */
   onPress: (event: GestureResponderEvent) => void;
+  BMIValue: number;
 };
 
 export default function BMIInsight(props: Props) {
-  let {onPress} = props;
+  let {onPress, BMIValue} = props;
   return (
     <View style={styles.boxShadow}>
       <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-        32.2{' '}
+        {`${BMIValue.toFixed(1)} `}
         <Text fontWeight="bold" style={{color: RED}}>
           Obese
         </Text>

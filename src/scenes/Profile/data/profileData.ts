@@ -1,3 +1,5 @@
+import {UserProfileData} from '../../../graphql/queries/profile';
+
 export const infoBMI = {
   title: 'BMI',
   message:
@@ -13,4 +15,15 @@ export const infoMHR = {
 export const infoMission = {
   title: 'Mission',
   message: 'Coming Soon!',
+};
+
+export const DEFAULT_USER_PROFILE: UserProfileData = {
+  name: '',
+  dob: '1990-01-01T17:00:00.000Z',
+  titleFirst: '',
+  titleMiddle: '',
+  titleLast: '',
+  points: 0,
+  badges: [],
+  bmi: 0,
 };

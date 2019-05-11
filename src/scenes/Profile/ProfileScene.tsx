@@ -5,6 +5,8 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  AsyncStorage,
+  ActivityIndicator,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Text, Avatar} from '../../generals/core-ui';
@@ -18,13 +20,20 @@ import {
 } from '../../generals/constants/colors';
 import {trophyCopper} from '../../assets/images/profile';
 import PopupInfoDialog from '../../generals/components/PopupInfoDialog';
-import {infoBMI, infoMHR} from './data/profileData';
+import {infoBMI, infoMHR, DEFAULT_USER_PROFILE} from './data/profileData';
 import BMIInsight from './components/BMIInsight';
 import MHRInsight from './components/MHRInsight';
 import CollapsibleSettings from './components/CollapsibleSettings';
 import FancyRibbonButton from './components/FancyRibbonButton';
 import {settingsItems} from './data/settingsDataFixtures';
 import ExerciseModePlaceholder from './components/ExerciseModePlaceholder';
+import {Query} from 'react-apollo';
+import {
+  UserProfileResponse,
+  UserProfileVariables,
+  UserProfileData,
+  USER_PROFILE,
+} from '../../graphql/queries/profile';
 
 type Props = NavigationScreenProps;
 
@@ -32,6 +41,7 @@ type State = {
   bmiModalVisible: boolean;
   mhrModalVisible: boolean;
   activeIndex: number;
+  userID: string;
 };
 
 export default class ProfileScene extends Component<Props, State> {
@@ -39,126 +49,162 @@ export default class ProfileScene extends Component<Props, State> {
     bmiModalVisible: false,
     mhrModalVisible: false,
     activeIndex: 0,
+    userID: '',
   };
 
   _scrollView?: ScrollView;
+
+  componentDidMount() {
+    this._getID();
+  }
+
+  _getID = async () => {
+    let userID = await AsyncStorage.getItem('userID');
+    userID && this.setState({userID});
+  };
 
   render() {
     let {bmiModalVisible, mhrModalVisible} = this.state;
 
     return (
-      <ScrollView
-        contentContainerStyle={styles.root}
-        showsHorizontalScrollIndicator={false}
-        bounces={false}
-        horizontal={true}
-        pagingEnabled={true}
-        scrollEnabled={false}
-        ref={this._setScrollViewRef}
+      <Query<UserProfileResponse, UserProfileVariables>
+        query={USER_PROFILE}
+        variables={{userID: this.state.userID}}
       >
-        <View style={styles.horizontalPage}>
-          <CollapsibleSettings
-            settingsItems={settingsItems}
-            navigation={this.props.navigation}
-            logountFunc={this._logoutFunc}
-          />
-          <View style={styles.scrollHeight}>
-            <View style={styles.paddedContainer}>
-              <Avatar
-                size="big"
-                source="https://pbs.twimg.com/profile_images/378800000500168907/7cba3b0f55df5a1a5458c18ba4a5d4a9_400x400.jpeg"
-                style={{marginBottom: 10}}
-              />
-              <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-                Samuel Sandro
-              </Text>
-              <Text style={{color: GREY, marginTop: 5, marginBottom: 20}}>
-                Health Trainee
-              </Text>
+        {({data, loading}) => {
+          let result =
+            (data && data.user && data.user.profile) || DEFAULT_USER_PROFILE;
 
-              <View style={styles.insightContainer}>
-                <View style={styles.insightItemContainer}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Image
-                      source={trophyCopper}
-                      style={{width: 24, height: 24}}
+          return loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color={BLUE} size="large" />
+            </View>
+          ) : (
+            <ScrollView
+              contentContainerStyle={styles.root}
+              showsHorizontalScrollIndicator={false}
+              bounces={false}
+              horizontal={true}
+              pagingEnabled={true}
+              scrollEnabled={false}
+              ref={this._setScrollViewRef}
+            >
+              <View style={styles.horizontalPage}>
+                <CollapsibleSettings
+                  settingsItems={settingsItems}
+                  navigation={this.props.navigation}
+                  logountFunc={this._logoutFunc}
+                />
+                <View style={styles.scrollHeight}>
+                  <View style={styles.paddedContainer}>
+                    <Avatar
+                      size="big"
+                      source="https://pickaface.net/gallery/avatar/gs315535348ce076c6.png"
+                      style={{marginBottom: 10}}
                     />
                     <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-                      36
+                      {result.name}
                     </Text>
+                    <Text style={{color: GREY, marginTop: 5, marginBottom: 20}}>
+                      {`${result.titleFirst} ${result.titleMiddle} ${
+                        result.titleLast
+                      }`}
+                    </Text>
+
+                    <View style={styles.insightContainer}>
+                      <View style={styles.insightItemContainer}>
+                        <View
+                          style={{flexDirection: 'row', alignItems: 'center'}}
+                        >
+                          <Image
+                            source={trophyCopper}
+                            style={{width: 24, height: 24}}
+                          />
+                          <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
+                            36
+                          </Text>
+                        </View>
+                        <Text style={{color: GREY, marginTop: 5}}>Ranking</Text>
+                      </View>
+                      <View
+                        style={[
+                          styles.insightItemContainer,
+                          styles.insightItemMiddle,
+                        ]}
+                      >
+                        <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
+                          {result.points}
+                        </Text>
+                        <Text style={{color: GREY, marginTop: 5}}>Points</Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.insightItemContainer}
+                        activeOpacity={0.6}
+                        onPress={this._goToBadges}
+                      >
+                        <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
+                          {result.badges.length}
+                        </Text>
+                        <Text style={{color: GREY, marginTop: 5}}>Badges</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                  <Text style={{color: GREY, marginTop: 5}}>Ranking</Text>
                 </View>
-                <View
-                  style={[
-                    styles.insightItemContainer,
-                    styles.insightItemMiddle,
-                  ]}
-                >
-                  <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-                    2,517
-                  </Text>
-                  <Text style={{color: GREY, marginTop: 5}}>Points</Text>
+
+                <View style={styles.contentContainer}>
+                  <View style={styles.paddedContainer}>
+                    <BMIInsight
+                      onPress={this._toggleBMIModal}
+                      BMIValue={result.bmi}
+                    />
+                  </View>
+                  <View style={styles.flexRow}>
+                    <MHRInsight
+                      onPress={this._toggleMHRModal}
+                      dob={result.dob}
+                    />
+                    <FancyRibbonButton
+                      onPress={this._togglePage}
+                      position="right"
+                      content="Exercise Mode"
+                      buttonColor={BLUE}
+                      textColor={WHITE}
+                      parentContainerBackgroundColor={LIGHTER_GREY}
+                    />
+                  </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.insightItemContainer}
-                  activeOpacity={0.6}
-                  onPress={this._goToBadges}
-                >
-                  <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-                    2
-                  </Text>
-                  <Text style={{color: GREY, marginTop: 5}}>Badges</Text>
-                </TouchableOpacity>
               </View>
-            </View>
-          </View>
 
-          <View style={styles.contentContainer}>
-            <View style={styles.paddedContainer}>
-              <BMIInsight onPress={this._toggleBMIModal} />
-            </View>
-            <View style={styles.flexRow}>
-              <MHRInsight onPress={this._toggleMHRModal} />
-              <FancyRibbonButton
-                onPress={this._togglePage}
-                position="right"
-                content="Exercise Mode"
-                buttonColor={BLUE}
-                textColor={WHITE}
-                parentContainerBackgroundColor={LIGHTER_GREY}
+              <View style={[styles.horizontalPage, styles.exercisePage]}>
+                <FancyRibbonButton
+                  onPress={this._togglePage}
+                  position="left"
+                  content="Back to Profile"
+                  buttonColor={WHITE}
+                  textColor={BLUE}
+                  parentContainerBackgroundColor={BLUE}
+                />
+                <ExerciseModePlaceholder navigation={this.props.navigation} />
+              </View>
+
+              <PopupInfoDialog
+                visible={bmiModalVisible}
+                title={infoBMI.title}
+                message={infoBMI.message}
+                onRequestClose={this._toggleBMIModal}
+                buttonOnPress={this._goToBMI}
+                buttonTitle="Recalculate"
               />
-            </View>
-          </View>
-        </View>
-
-        <View style={[styles.horizontalPage, styles.exercisePage]}>
-          <FancyRibbonButton
-            onPress={this._togglePage}
-            position="left"
-            content="Back to Profile"
-            buttonColor={WHITE}
-            textColor={BLUE}
-            parentContainerBackgroundColor={BLUE}
-          />
-          <ExerciseModePlaceholder navigation={this.props.navigation} />
-        </View>
-
-        <PopupInfoDialog
-          visible={bmiModalVisible}
-          title={infoBMI.title}
-          message={infoBMI.message}
-          onRequestClose={this._toggleBMIModal}
-          buttonOnPress={this._goToBMI}
-          buttonTitle="Recalculate"
-        />
-        <PopupInfoDialog
-          visible={mhrModalVisible}
-          title={infoMHR.title}
-          message={infoMHR.message}
-          onRequestClose={this._toggleMHRModal}
-        />
-      </ScrollView>
+              <PopupInfoDialog
+                visible={mhrModalVisible}
+                title={infoMHR.title}
+                message={infoMHR.message}
+                onRequestClose={this._toggleMHRModal}
+              />
+            </ScrollView>
+          );
+        }}
+      </Query>
     );
   }
 
@@ -243,5 +289,9 @@ const styles = StyleSheet.create({
     backgroundColor: LIGHTER_GREY,
     borderTopWidth: 1,
     borderColor: LIGHT_GREY,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
 });

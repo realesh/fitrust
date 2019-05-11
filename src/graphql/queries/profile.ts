@@ -109,3 +109,29 @@ export const UPDATE_PROFILE = gql`
     }
   }
 `;
+
+export type ChangePasswordResponse = {
+  user?: {
+    id: string;
+  };
+};
+export type ChangePasswordVariables = {
+  userID: string;
+  newPassword: string;
+  oldPassword: string;
+};
+export const CHANGE_PASSWORD = gql`
+  mutation changePassword(
+    $userID: String!
+    $newPassword: String!
+    $oldPassword: String!
+  ) {
+    changePassword(
+      id: $userID
+      oldPassword: $oldPassword
+      newPassword: $newPassword
+    ) {
+      id
+    }
+  }
+`;

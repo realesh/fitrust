@@ -4,6 +4,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   LayoutAnimation,
+  AsyncStorage,
 } from 'react-native';
 import {Text, TextInput, AnimatedButton} from '../../generals/core-ui';
 import {TINY_FONT_SIZE} from '../../generals/constants/size';
@@ -13,6 +14,13 @@ import {linearEasingShort} from '../../generals/constants/animationConfig';
 import {Toolbar} from '../../generals/components';
 import ChangePasswordSuccessModal from './components/ChangePasswordSuccessModal';
 import {validatePassword} from '../../helpers/inputValidation';
+import {Mutation} from 'react-apollo';
+import {
+  ChangePasswordResponse,
+  ChangePasswordVariables,
+  CHANGE_PASSWORD,
+} from '../../graphql/queries/profile';
+import parseGraphQLError from '../../helpers/parseGraphQLError';
 
 type Props = {
   navigation: NavigationScreenProp<any>;
@@ -23,8 +31,7 @@ type State = {
   newPassword: string;
   newRepeatPassword: string;
   loading: boolean;
-  inputError: boolean;
-  errorType: 'old' | 'new' | 'validation' | undefined;
+  errorMessage: string;
   successModalVisible: boolean;
 };
 
@@ -33,8 +40,7 @@ export default class ChangePasswordScene extends Component<Props, State> {
     oldPassword: '',
     newPassword: '',
     newRepeatPassword: '',
-    inputError: false,
-    errorType: undefined,
+    errorMessage: '',
     loading: false,
     successModalVisible: false,
   };
@@ -45,8 +51,7 @@ export default class ChangePasswordScene extends Component<Props, State> {
       oldPassword,
       newPassword,
       newRepeatPassword,
-      inputError,
-      errorType,
+      errorMessage,
       loading,
       successModalVisible,
     } = this.state;
@@ -62,7 +67,7 @@ export default class ChangePasswordScene extends Component<Props, State> {
             value={oldPassword}
             label="Old Password"
             containerStyle={{marginBottom: 20}}
-            error={inputError}
+            error={!!errorMessage}
             onFocus={this._resetErrorState}
           />
           <TextInput
@@ -72,7 +77,7 @@ export default class ChangePasswordScene extends Component<Props, State> {
             value={newPassword}
             label="New Password"
             containerStyle={{marginBottom: 20}}
-            error={inputError}
+            error={!!errorMessage}
             onFocus={this._resetErrorState}
           />
           <TextInput
@@ -82,64 +87,27 @@ export default class ChangePasswordScene extends Component<Props, State> {
             value={newRepeatPassword}
             label="Repeat New Password"
             containerStyle={{marginBottom: 20}}
-            error={inputError}
+            error={!!errorMessage}
             onFocus={this._resetErrorState}
           />
 
-          {inputError ? (
-            errorType === 'validation' ? (
-              <Text
-                fontSize={TINY_FONT_SIZE}
-                fontWeight="bold"
-                style={{
-                  width: '80%',
-                  color: ERROR_THEME_COLOR,
-                  marginBottom: 20,
-                  alignSelf: 'center',
-                  textAlign: 'center',
-                }}
-              >
-                Password must be at least 6 characters, and contain uppercase,
-                lowercase, and number
-              </Text>
-            ) : errorType === 'old' ? (
-              <Text
-                fontSize={TINY_FONT_SIZE}
-                fontWeight="bold"
-                style={{
-                  width: '80%',
-                  color: ERROR_THEME_COLOR,
-                  marginBottom: 20,
-                  alignSelf: 'center',
-                  textAlign: 'center',
-                }}
-              >
-                Wrong old password!
-              </Text>
-            ) : (
-              <Text
-                fontSize={TINY_FONT_SIZE}
-                fontWeight="bold"
-                style={{
-                  width: '80%',
-                  color: ERROR_THEME_COLOR,
-                  marginBottom: 20,
-                  alignSelf: 'center',
-                  textAlign: 'center',
-                }}
-              >
-                Repeated new password doesn't match!
-              </Text>
-            )
-          ) : null}
+          {!!errorMessage && (
+            <Text
+              fontSize={TINY_FONT_SIZE}
+              fontWeight="bold"
+              style={{
+                width: '80%',
+                color: ERROR_THEME_COLOR,
+                marginBottom: 20,
+                alignSelf: 'center',
+                textAlign: 'center',
+              }}
+            >
+              {errorMessage}
+            </Text>
+          )}
 
-          <AnimatedButton
-            style={{position: 'absolute', bottom: 20}}
-            onPress={this._handleUpdate}
-            loading={loading}
-          >
-            Change
-          </AnimatedButton>
+          {this._renderChangeButton()}
         </View>
 
         <ChangePasswordSuccessModal
@@ -169,48 +137,7 @@ export default class ChangePasswordScene extends Component<Props, State> {
 
   _resetErrorState = () => {
     LayoutAnimation.configureNext(linearEasingShort);
-    this.setState({inputError: false});
-  };
-  _handleUpdate = () => {
-    let {oldPassword, newPassword, newRepeatPassword} = this.state;
-
-    let setErrorValidation = () => {
-      LayoutAnimation.configureNext(linearEasingShort);
-      this.setState({
-        inputError: true,
-        errorType: 'validation',
-        loading: false,
-      });
-    };
-    let setErrorOld = () => {
-      LayoutAnimation.configureNext(linearEasingShort);
-      this.setState({inputError: true, errorType: 'old', loading: false});
-    };
-    let setErrorNew = () => {
-      LayoutAnimation.configureNext(linearEasingShort);
-      this.setState({inputError: true, errorType: 'new', loading: false});
-    };
-
-    LayoutAnimation.configureNext(linearEasingShort);
-    this.setState({loading: true});
-
-    let validation =
-      validatePassword(oldPassword) &&
-      validatePassword(newPassword) &&
-      validatePassword(newRepeatPassword);
-
-    if (validation && newPassword === newRepeatPassword) {
-      setTimeout(this._toggleSuccessModal, 1800);
-    } else {
-      if (!validation) {
-        setTimeout(setErrorValidation, 1800);
-      } else if (newPassword !== newRepeatPassword) {
-        setTimeout(setErrorNew, 1800);
-      } else {
-        // TODO: check if password match
-        setTimeout(setErrorOld, 1800);
-      }
-    }
+    this.setState({errorMessage: ''});
   };
   _navigateToProfile = () => {
     this._toggleSuccessModal();
@@ -223,6 +150,70 @@ export default class ChangePasswordScene extends Component<Props, State> {
       successModalVisible: !this.state.successModalVisible,
       loading: false,
     });
+  };
+
+  _setErrorState = (errorMessage: string) => {
+    LayoutAnimation.configureNext(linearEasingShort);
+    this.setState({
+      errorMessage,
+      loading: false,
+    });
+  };
+
+  _renderChangeButton = () => {
+    let {loading} = this.state;
+    return (
+      <Mutation<ChangePasswordResponse, ChangePasswordVariables>
+        mutation={CHANGE_PASSWORD}
+      >
+        {(changePassword) => {
+          let handleUpdate = async () => {
+            let {oldPassword, newPassword, newRepeatPassword} = this.state;
+
+            LayoutAnimation.configureNext(linearEasingShort);
+            this.setState({loading: true});
+
+            let validation =
+              validatePassword(oldPassword) &&
+              validatePassword(newPassword) &&
+              validatePassword(newRepeatPassword);
+
+            if (!validation) {
+              this._setErrorState(
+                'Password must be at least 6 characters, and contain uppercase, lowercase, and number',
+              );
+            } else if (newPassword !== newRepeatPassword) {
+              this._setErrorState("Repeated new password doesn't match!");
+            } else {
+              try {
+                let ID = await AsyncStorage.getItem('userID');
+                changePassword &&
+                  (await changePassword({
+                    variables: {
+                      userID: ID || '',
+                      oldPassword,
+                      newPassword,
+                    },
+                  }));
+                setTimeout(this._toggleSuccessModal, 1300);
+              } catch (error) {
+                let errorMessage = parseGraphQLError(error);
+                this._setErrorState(errorMessage);
+              }
+            }
+          };
+          return (
+            <AnimatedButton
+              style={{position: 'absolute', bottom: 20}}
+              onPress={handleUpdate}
+              loading={loading}
+            >
+              Change
+            </AnimatedButton>
+          );
+        }}
+      </Mutation>
+    );
   };
 }
 

@@ -5,6 +5,7 @@ import {
   ScrollView,
   Animated,
   AsyncStorage,
+  ActivityIndicator,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Text, Button} from '../../generals/core-ui';
@@ -33,8 +34,17 @@ import CaloriesInfo from './CaloriesInfo';
 import AnimatedChevron from '../../generals/components/AnimatedChevron';
 import StepsChartPage from './StepsChartPage';
 import DrinkWaterModal from './components/DrinkWaterModal';
+import {Query} from 'react-apollo';
+import {
+  UserDashboardResponse,
+  UserDashboardVariables,
+  USER_DASHBOARD,
+  UserDashboardData,
+} from '../../graphql/queries/dashboard';
+import {DEFAULT_USER_DASHBOARD} from './data/dashboardData';
 
 type NavigationScreenParams = {
+  id: string;
   name: string;
   token: string;
 };
@@ -72,6 +82,8 @@ export default class DashboardScene extends Component<Props, State> {
       toValue: 1,
       duration: 500,
     }).start();
+
+    console.log(this.props.navigation.getParam('id'), '<<<<<<<<<<<>>>>>>>>>>>');
 
     let token = this.props.navigation.getParam('token');
     let name = this.props.navigation.getParam('name', '');
@@ -132,125 +144,150 @@ export default class DashboardScene extends Component<Props, State> {
       'Recalculate your BMR and TDEE every month to maintain the accuracy.';
 
     return (
-      <ScrollView
-        contentContainerStyle={styles.root}
-        showsVerticalScrollIndicator={false}
-        pagingEnabled={true}
-        bounces={false}
+      <Query<UserDashboardResponse, UserDashboardVariables>
+        query={USER_DASHBOARD}
+        variables={{userID: this.props.navigation.getParam('id')}}
       >
-        <Animated.View style={overlayStyle} pointerEvents="none" />
+        {({data, loading}) => {
+          let result: UserDashboardData =
+            (data && data.user && data.user.profile) || DEFAULT_USER_DASHBOARD;
 
-        <View style={styles.scrollHeight}>
-          <Toolbar navigation={navigation} pointsInfo={true} />
-          <View style={styles.paddedContainer}>
-            <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
-              {`Hello, ${this.state.userDisplayName}.`}
-            </Text>
-            <Text
-              fontWeight="bold"
-              fontSize={HEADER_FONT_SIZE}
-              style={{marginBottom: 15}}
+          return (
+            <ScrollView
+              contentContainerStyle={styles.root}
+              showsVerticalScrollIndicator={false}
+              pagingEnabled={true}
+              bounces={false}
             >
-              Today's looking
-              <Text
-                fontWeight="bold"
-                fontSize={HEADER_FONT_SIZE}
-                style={{color: BLUE}}
-              >
-                {' '}
-                great!
-              </Text>
-            </Text>
-          </View>
-          <View style={[styles.paddedContainer, styles.contentContainer]}>
-            <View style={styles.boxShadow}>
-              <Text fontWeight="bold" style={{marginBottom: 20}}>
-                Daily Goals.
-              </Text>
-              <ProgressWithLabel
-                label="Steps"
-                currentValue={5000}
-                maxValue={5000}
-                unit="steps"
-                containerStyle={{marginBottom: 25}}
-                iconName="refresh-cw"
-                onIconPress={() => {}}
-                isClaimed={stepGoalClaimed}
-                onClaimPress={this._onStepGoalClaim}
-              />
-              <ProgressWithLabel
-                label="Drink water"
-                currentValue={waterValue}
-                maxValue={8}
-                unit="glass"
-                iconName="plus-square"
-                onIconPress={this._toggleWaterModal}
-                isClaimed={waterGoalClaimed}
-                onClaimPress={this._onWaterGoalClaim}
-              />
-            </View>
+              <Animated.View style={overlayStyle} pointerEvents="none" />
 
-            <View style={styles.boxShadow}>
-              <View style={styles.calLabelContainer}>
-                <Text fontWeight="bold">Calories.</Text>
+              <View style={styles.scrollHeight}>
+                <Toolbar
+                  navigation={navigation}
+                  points={loading ? '' : result.points.toString()}
+                />
+                <View style={styles.paddedContainer}>
+                  <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
+                    {`Hello, ${this.state.userDisplayName}.`}
+                  </Text>
+                  <Text
+                    fontWeight="bold"
+                    fontSize={HEADER_FONT_SIZE}
+                    style={{marginBottom: 15}}
+                  >
+                    Today's looking
+                    <Text
+                      fontWeight="bold"
+                      fontSize={HEADER_FONT_SIZE}
+                      style={{color: BLUE}}
+                    >
+                      {' '}
+                      great!
+                    </Text>
+                  </Text>
+                </View>
+                {loading ? (
+                  <View
+                    style={[styles.paddedContainer, styles.contentContainer]}
+                  >
+                    <ActivityIndicator color={BLUE} size="large" />
+                  </View>
+                ) : (
+                  <View
+                    style={[styles.paddedContainer, styles.contentContainer]}
+                  >
+                    <View style={styles.boxShadow}>
+                      <Text fontWeight="bold" style={{marginBottom: 20}}>
+                        Daily Goals.
+                      </Text>
+                      <ProgressWithLabel
+                        label="Steps"
+                        currentValue={0}
+                        maxValue={result.stepsGoal}
+                        unit="steps"
+                        containerStyle={{marginBottom: 25}}
+                        iconName="refresh-cw"
+                        onIconPress={() => {}}
+                        isClaimed={stepGoalClaimed}
+                        onClaimPress={this._onStepGoalClaim}
+                      />
+                      <ProgressWithLabel
+                        label="Drink water"
+                        currentValue={waterValue}
+                        maxValue={result.waterGoal}
+                        unit="glass"
+                        iconName="plus-square"
+                        onIconPress={this._toggleWaterModal}
+                        isClaimed={waterGoalClaimed}
+                        onClaimPress={this._onWaterGoalClaim}
+                      />
+                    </View>
+
+                    <View style={styles.boxShadow}>
+                      <View style={styles.calLabelContainer}>
+                        <Text fontWeight="bold">Calories.</Text>
+                      </View>
+
+                      <View style={{flexDirection: 'row'}}>
+                        <CaloriesInfo
+                          image={food}
+                          currentValue={1700}
+                          maxValue={result.goalIntake}
+                          buttonTitle="INTAKE"
+                        />
+                        <CaloriesInfo
+                          image={fire}
+                          currentValue={130}
+                          maxValue={result.intakeWorkout}
+                          buttonTitle="WORKOUT"
+                        />
+                      </View>
+
+                      <Button
+                        iconName="more-horizontal"
+                        style={styles.optionsButton}
+                        fontColor={GREY}
+                        fontSize={LARGE_FONT_SIZE}
+                        onPress={this._toggleBMRModal}
+                      />
+
+                      <PopupInfoDialog
+                        visible={bmrModalVisible}
+                        title="Calories"
+                        message={BMRMessage}
+                        onRequestClose={this._toggleBMRModal}
+                        buttonTitle="Recalculate"
+                        buttonOnPress={this._goToBMR}
+                      />
+                    </View>
+                  </View>
+                )}
+                <AnimatedChevron />
+              </View>
+              <View style={styles.scrollHeight}>
+                <StepsChartPage />
               </View>
 
-              <View style={{flexDirection: 'row'}}>
-                <CaloriesInfo
-                  image={food}
-                  currentValue={1700}
-                  maxValue={2324}
-                  buttonTitle="INTAKE"
-                />
-                <CaloriesInfo
-                  image={fire}
-                  currentValue={130}
-                  maxValue={430}
-                  buttonTitle="WORKOUT"
-                />
-              </View>
-
-              <Button
-                iconName="more-horizontal"
-                style={styles.optionsButton}
-                fontColor={GREY}
-                fontSize={LARGE_FONT_SIZE}
-                onPress={this._toggleBMRModal}
+              <DrinkWaterModal
+                visible={waterModalVisible}
+                onAddPress={this._onAddWater}
               />
-
-              <PopupInfoDialog
-                visible={bmrModalVisible}
-                title="Calories"
-                message={BMRMessage}
-                onRequestClose={this._toggleBMRModal}
-                buttonTitle="Recalculate"
-                buttonOnPress={this._goToBMR}
+              <PointsModal
+                visible={stepClaimModalVisible}
+                pointsSource="Daily Goal - Step"
+                pointsValue={9200}
+                onRequestClose={this._toggleStepClaimModalVisible}
               />
-            </View>
-          </View>
-          <AnimatedChevron />
-        </View>
-        <View style={styles.scrollHeight}>
-          <StepsChartPage />
-        </View>
-
-        <DrinkWaterModal
-          visible={waterModalVisible}
-          onAddPress={this._onAddWater}
-        />
-        <PointsModal
-          visible={stepClaimModalVisible}
-          pointsSource="Daily Goal - Step"
-          pointsValue={9200}
-          onRequestClose={this._toggleStepClaimModalVisible}
-        />
-        <PointsModal
-          visible={waterClaimModalVisible}
-          pointsSource="Daily Goal - Drink Water"
-          pointsValue={800}
-          onRequestClose={this._toggleWaterClaimModalVisible}
-        />
-      </ScrollView>
+              <PointsModal
+                visible={waterClaimModalVisible}
+                pointsSource="Daily Goal - Drink Water"
+                pointsValue={800}
+                onRequestClose={this._toggleWaterClaimModalVisible}
+              />
+            </ScrollView>
+          );
+        }}
+      </Query>
     );
   }
 

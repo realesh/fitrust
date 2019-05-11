@@ -23,7 +23,7 @@ type Props = NavigationScreenProps & {
    * ReactNode (Icon) to display on left side of toolbar
    */
   leftComponent?: ReactNode;
-  pointsInfo?: boolean;
+  points?: string;
 
   /**
    * optional color style for the title's font
@@ -40,7 +40,7 @@ function Toolbar(props: Props) {
   let {
     containerStyle,
     leftComponent,
-    pointsInfo = false,
+    points = '',
     title,
     subtitle,
     navigation,
@@ -75,7 +75,7 @@ function Toolbar(props: Props) {
         </Text>
       ) : null}
 
-      {pointsInfo ? (
+      {points ? (
         <View style={styles.rightComponent}>
           <TouchableOpacity style={styles.levelPointsContainer}>
             <View style={styles.levelInfoContainer}>
@@ -83,7 +83,7 @@ function Toolbar(props: Props) {
             </View>
             <View style={styles.pointsInfoContainer}>
               <Text fontWeight="bold" style={{color: BLUE}}>
-                2,517
+                {points}
               </Text>
             </View>
           </TouchableOpacity>

@@ -179,7 +179,7 @@ export default class DashboardScene extends Component<Props, State> {
                 />
                 <View style={styles.paddedContainer}>
                   <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
-                    {`Hello, ${this.state.userDisplayName}.`}
+                    {`Hello, ${result.name || this.state.userDisplayName}.`}
                   </Text>
                   <Text
                     fontWeight="bold"

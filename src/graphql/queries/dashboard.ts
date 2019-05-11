@@ -1,6 +1,7 @@
 import gql from 'graphql-tag';
 
 export type UserDashboardData = {
+  name: string;
   points: number;
   stepsGoal: number;
   waterGoal: number;
@@ -19,6 +20,7 @@ export const USER_DASHBOARD = gql`
   query user($userID: ID) {
     user(where: {id: $userID}) {
       profile {
+        name
         stepsGoal
         waterGoal
         intakeWorkout

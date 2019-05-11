@@ -271,7 +271,7 @@ export default class EditProfileScene extends Component<Props, State> {
                     },
                   ],
                 }));
-              setTimeout(this._toggleSuccessModal, 1800);
+              setTimeout(this._toggleSuccessModal, 1300);
             } catch (error) {
               // Handle Error
             }

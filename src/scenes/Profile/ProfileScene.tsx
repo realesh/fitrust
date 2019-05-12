@@ -31,7 +31,6 @@ import {Query} from 'react-apollo';
 import {
   UserProfileResponse,
   UserProfileVariables,
-  UserProfileData,
   USER_PROFILE,
 } from '../../graphql/queries/profile';
 import {SettingsItem} from './data/settingsDataFixtures';

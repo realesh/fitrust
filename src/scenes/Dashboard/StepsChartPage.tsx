@@ -20,6 +20,10 @@ import {
   GREEN,
 } from '../../generals/constants/colors';
 import SummaryInsights from './components/SummaryInsights';
+import {
+  TodayActivitiesResponseSummary,
+  DEFAULT_TOTAL_DISTANCES,
+} from '../../helpers/Fetchers/fetchTodayActivities';
 
 type StepNumber = number | null;
 type DecoratorProps = {
@@ -33,13 +37,13 @@ type DecoratorProps = {
 type LineProps = {line?: string};
 
 // type Props = NavigationScreenProps;
-type Props = {};
+type Props = Partial<TodayActivitiesResponseSummary> & {};
 
 type State = {};
 
 export default class StepsChartPage extends Component<Props, State> {
   render() {
-    // let {navigation} = this.props;
+    let {distances, floors, steps} = this.props;
 
     const maxNum = 13098;
     const lastWeekData = [
@@ -128,6 +132,13 @@ export default class StepsChartPage extends Component<Props, State> {
       return null;
     };
 
+    let distanceTotal =
+      (distances && distances.filter((d) => d.activity === 'total')) ||
+      DEFAULT_TOTAL_DISTANCES;
+
+    let distanceInKM =
+      (distanceTotal && distanceTotal[0] && distanceTotal[0].distance) || 0;
+
     return (
       <View style={styles.root}>
         <View style={styles.transitionContainer} />
@@ -140,7 +151,11 @@ export default class StepsChartPage extends Component<Props, State> {
             Today's Summary
           </Text>
 
-          <SummaryInsights steps={4528} distance={3.34} floors={16} />
+          <SummaryInsights
+            steps={steps || 0}
+            distance={distanceInKM}
+            floors={floors || 0}
+          />
 
           <View style={styles.comparisonContainer}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>

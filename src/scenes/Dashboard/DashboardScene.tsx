@@ -44,6 +44,10 @@ import {
 import {DEFAULT_USER_DASHBOARD} from './data/dashboardData';
 import LockedScene from '../LockedScene';
 import LockedProgressGoal from '../../generals/components/LockedProgressGoal';
+import fetchTodayActivities, {
+  DEFAULT_ACTIVITIES_SUMMARY,
+  TodayActivitiesResponseSummary,
+} from '../../helpers/Fetchers/fetchTodayActivities';
 
 export type UpdateFitbitAuthFn = (
   fitbitUserID: string,
@@ -58,7 +62,7 @@ type NavigationScreenParams = {
 
 type Props = NavigationScreenProps<NavigationScreenParams>;
 
-type State = {
+type State = TodayActivitiesResponseSummary & {
   fadeInAnimatedValue: Animated.Value;
   bmrModalVisible: boolean;
   waterModalVisible: boolean;
@@ -70,6 +74,7 @@ type State = {
   userDisplayName: string;
   fitbitUserID: string;
   fitbitAccessToken: string;
+  fetchFitbitLoading: boolean;
 };
 
 export default class DashboardScene extends Component<Props, State> {
@@ -85,6 +90,8 @@ export default class DashboardScene extends Component<Props, State> {
     userDisplayName: '',
     fitbitUserID: '',
     fitbitAccessToken: '',
+    fetchFitbitLoading: true,
+    ...DEFAULT_ACTIVITIES_SUMMARY,
   };
 
   componentDidMount() {
@@ -143,11 +150,31 @@ export default class DashboardScene extends Component<Props, State> {
           previous_scene: 'Dashboard',
           updateFunc: this._updateFitbitAuth,
         });
+        this.setState({fetchFitbitLoading: false});
       } else {
         this.setState({fitbitUserID, fitbitAccessToken});
+        this._fetchStepInfo();
       }
     } catch (error) {
       // Handle ERROR
+    }
+  };
+  _fetchStepInfo = async () => {
+    let fitbitUserID = await AsyncStorage.getItem('fitbit_user_id');
+    let fitbitAccessToken = await AsyncStorage.getItem('fitbit_access_token');
+    if (fitbitUserID && fitbitAccessToken) {
+      let fitbitResponse = await fetchTodayActivities(
+        fitbitUserID,
+        fitbitAccessToken,
+      );
+      let {steps, floors, distances, caloriesBMR} = fitbitResponse.summary;
+      this.setState({
+        steps,
+        floors,
+        distances,
+        caloriesBMR,
+        fetchFitbitLoading: false,
+      });
     }
   };
 
@@ -163,6 +190,11 @@ export default class DashboardScene extends Component<Props, State> {
       waterClaimModalVisible,
       fitbitUserID,
       fitbitAccessToken,
+      fetchFitbitLoading,
+      steps,
+      caloriesBMR,
+      floors,
+      distances,
     } = this.state;
     let {navigation} = this.props;
 
@@ -227,7 +259,7 @@ export default class DashboardScene extends Component<Props, State> {
                     </Text>
                   </Text>
                 </View>
-                {loading ? (
+                {loading || fetchFitbitLoading ? (
                   <View
                     style={[styles.paddedContainer, styles.contentContainer]}
                   >
@@ -244,7 +276,7 @@ export default class DashboardScene extends Component<Props, State> {
                       {fitbitUserID && fitbitAccessToken ? (
                         <ProgressWithLabel
                           label="Steps"
-                          currentValue={4528}
+                          currentValue={steps}
                           maxValue={result.stepsGoal}
                           unit="steps"
                           containerStyle={{marginBottom: 25}}
@@ -284,7 +316,7 @@ export default class DashboardScene extends Component<Props, State> {
                         />
                         <CaloriesInfo
                           image={fire}
-                          currentValue={130}
+                          currentValue={caloriesBMR}
                           maxValue={result.intakeWorkout}
                           buttonTitle="WORKOUT"
                         />
@@ -313,7 +345,11 @@ export default class DashboardScene extends Component<Props, State> {
               </View>
               <View style={styles.scrollHeight}>
                 {fitbitUserID && fitbitAccessToken ? (
-                  <StepsChartPage />
+                  <StepsChartPage
+                    distances={distances}
+                    steps={steps}
+                    floors={floors}
+                  />
                 ) : (
                   <LockedScene
                     navigation={this.props.navigation}

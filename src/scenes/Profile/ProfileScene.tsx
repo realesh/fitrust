@@ -34,12 +34,14 @@ import {
   USER_PROFILE,
 } from '../../graphql/queries/profile';
 import {SettingsItem} from './data/settingsDataFixtures';
+import LogoutModal from './components/LogoutModal';
 
 type Props = NavigationScreenProps;
 
 type State = {
   bmiModalVisible: boolean;
   mhrModalVisible: boolean;
+  logoutModalVisible: boolean;
   activeIndex: number;
   userID: string;
 };
@@ -48,6 +50,7 @@ export default class ProfileScene extends Component<Props, State> {
   state = {
     bmiModalVisible: false,
     mhrModalVisible: false,
+    logoutModalVisible: false,
     activeIndex: 0,
     userID: '',
   };
@@ -64,7 +67,7 @@ export default class ProfileScene extends Component<Props, State> {
   };
 
   render() {
-    let {bmiModalVisible, mhrModalVisible} = this.state;
+    let {bmiModalVisible, mhrModalVisible, logoutModalVisible} = this.state;
 
     return (
       <Query<UserProfileResponse, UserProfileVariables>
@@ -120,7 +123,7 @@ export default class ProfileScene extends Component<Props, State> {
                 <CollapsibleSettings
                   settingsItems={settingsItems}
                   navigation={this.props.navigation}
-                  logountFunc={this._logoutFunc}
+                  logountFunc={this._toggleLogoutModal}
                 />
                 <View style={styles.scrollHeight}>
                   <View style={styles.paddedContainer}>
@@ -228,6 +231,11 @@ export default class ProfileScene extends Component<Props, State> {
                 message={infoMHR.message}
                 onRequestClose={this._toggleMHRModal}
               />
+              <LogoutModal
+                visible={logoutModalVisible}
+                onOKPress={this._logoutFunc}
+                onRequestClose={this._toggleLogoutModal}
+              />
             </ScrollView>
           );
         }}
@@ -254,6 +262,9 @@ export default class ProfileScene extends Component<Props, State> {
   };
   _toggleMHRModal = () => {
     this.setState({mhrModalVisible: !this.state.mhrModalVisible});
+  };
+  _toggleLogoutModal = () => {
+    this.setState({logoutModalVisible: !this.state.logoutModalVisible});
   };
 
   _setScrollViewRef = (scrollView: ScrollView) =>

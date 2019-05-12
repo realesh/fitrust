@@ -72,8 +72,12 @@ class AuthScene extends Component<Props> {
   componentDidMount() {
     let isLoggedout = this.props.navigation.getParam('command', '');
     if (isLoggedout === 'logout') {
-      // AsyncStorage.removeItem('userToken');
-      AsyncStorage.clear();
+      AsyncStorage.multiRemove([
+        'fitbit_access_token',
+        'fitbit_user_id',
+        'userToken',
+        'userID',
+      ]);
     }
   }
 

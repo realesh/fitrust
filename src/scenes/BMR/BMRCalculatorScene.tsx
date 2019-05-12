@@ -49,7 +49,7 @@ type State = {
   selectedActivityIndex: number;
   selectedGoalIndex: number;
   intakeResult: number;
-  bmrResult: number;
+  burnoutResult: number;
 };
 
 export default class BMRCalculatorScene extends Component<Props, State> {
@@ -64,7 +64,7 @@ export default class BMRCalculatorScene extends Component<Props, State> {
     selectedActivityIndex: 0,
     selectedGoalIndex: 0,
     intakeResult: 0,
-    bmrResult: 0,
+    burnoutResult: 0,
   };
 
   _scrollView?: ScrollView;
@@ -82,6 +82,7 @@ export default class BMRCalculatorScene extends Component<Props, State> {
       selectedActivityIndex,
       selectedGoalIndex,
       intakeResult,
+      burnoutResult,
     } = this.state;
 
     return (
@@ -181,7 +182,7 @@ export default class BMRCalculatorScene extends Component<Props, State> {
 
           <BMRResultModal
             visible={resultModalVisible}
-            burnoutResult={Number.parseInt(this._calcBurnout(), 10)}
+            burnoutResult={Number.parseInt(burnoutResult.toFixed(0), 10)}
             intakeResult={Number.parseInt(intakeResult.toFixed(0), 10)}
             onUpdatePress={this._navigateToDashboard}
             onRequestClose={this._toggleResultModal}
@@ -229,12 +230,11 @@ export default class BMRCalculatorScene extends Component<Props, State> {
   _onCalcPress = () => {
     LayoutAnimation.configureNext(linearEasingShort);
     this.setState({loading: true});
-
-    this.setState({intakeResult: this._calcIntake()});
+    this._calcIntakeOuttake();
 
     setTimeout(this._toggleResultModal, 1000);
   };
-  _calcIntake = () => {
+  _calcIntakeOuttake = () => {
     let {
       selectedGender,
       weightValue,
@@ -249,7 +249,6 @@ export default class BMRCalculatorScene extends Component<Props, State> {
     } else if (selectedGender === 'female') {
       bmrResult = 10 * weightValue + 6.25 * heightValue - 5 * ageValue - 161;
     }
-    this.setState({bmrResult});
 
     let intakeResult: number = 0;
     switch (activityLevels[selectedActivityIndex].title) {
@@ -269,30 +268,29 @@ export default class BMRCalculatorScene extends Component<Props, State> {
         intakeResult = bmrResult * 1.9;
         break;
     }
-
     switch (goals[selectedGoalIndex].title) {
+      case 'lose weight':
+        intakeResult -= 500;
+        break;
       case 'gain weight':
         intakeResult += 500;
         break;
     }
-    return intakeResult;
-  };
-  _calcBurnout = () => {
-    let {selectedGoalIndex, intakeResult, bmrResult} = this.state;
 
-    let burnoutResult: number = 0;
-    switch (goals[selectedGoalIndex].title) {
-      case 'lose weight':
-        burnoutResult = intakeResult - bmrResult + 500;
-        break;
-      case 'maintain weight':
-        burnoutResult = intakeResult - bmrResult;
-        break;
-      case 'gain weight':
-        burnoutResult = intakeResult - bmrResult - 500;
-        break;
-    }
-    return burnoutResult.toFixed(0);
+    let burnoutResult: number = bmrResult;
+    // switch (goals[selectedGoalIndex].title) {
+    // case 'lose weight':
+    //   burnoutResult = bmrResult + 500;
+    //   break;
+    // case 'maintain weight':
+    //   burnoutResult = bmrResult;
+    //   break;
+    // case 'gain weight':
+    //   burnoutResult = bmrResult - 500;
+    //   break;
+    // }
+
+    this.setState({intakeResult, burnoutResult});
   };
 
   _toggleResultModal = () => {

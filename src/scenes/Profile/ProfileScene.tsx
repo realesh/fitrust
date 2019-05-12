@@ -82,6 +82,7 @@ export default class ProfileScene extends Component<Props, State> {
               titleFirst: result.titleFirst,
               titleMiddle: result.titleMiddle,
               titleLast: result.titleLast,
+              avatarUrl: result.avatarUrl,
               previous_scene: 'Profile',
             });
           };
@@ -126,7 +127,7 @@ export default class ProfileScene extends Component<Props, State> {
                   <View style={styles.paddedContainer}>
                     <Avatar
                       size="big"
-                      source="https://pickaface.net/gallery/avatar/gs315535348ce076c6.png"
+                      source={result.avatarUrl}
                       style={{marginBottom: 10}}
                     />
                     <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>

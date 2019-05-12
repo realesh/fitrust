@@ -35,6 +35,7 @@ type NavigationScreenParams = {
   titleFirst: string;
   titleMiddle: string;
   titleLast: string;
+  avatarUrl: string;
 };
 
 type Props = NavigationScreenProps<NavigationScreenParams>;
@@ -44,6 +45,7 @@ type State = {
   firstTitle: string | undefined;
   middleTitle: string | undefined;
   lastTitle: string | undefined;
+  avatarUrl: string;
   inputError: boolean;
   loading: boolean;
   successModalVisible: boolean;
@@ -55,6 +57,7 @@ export default class EditProfileScene extends Component<Props, State> {
     firstTitle: undefined,
     middleTitle: undefined,
     lastTitle: undefined,
+    avatarUrl: '',
     inputError: false,
     loading: false,
     successModalVisible: false,
@@ -65,11 +68,13 @@ export default class EditProfileScene extends Component<Props, State> {
     let firstTitle = this.props.navigation.getParam('titleFirst');
     let middleTitle = this.props.navigation.getParam('titleMiddle');
     let lastTitle = this.props.navigation.getParam('titleLast');
+    let avatarUrl = this.props.navigation.getParam('avatarUrl');
     this.setState({
       name,
       firstTitle,
       middleTitle,
       lastTitle,
+      avatarUrl,
     });
   }
 
@@ -80,8 +85,8 @@ export default class EditProfileScene extends Component<Props, State> {
       firstTitle,
       middleTitle,
       lastTitle,
+      avatarUrl,
       inputError,
-      loading,
       successModalVisible,
     } = this.state;
 
@@ -89,11 +94,7 @@ export default class EditProfileScene extends Component<Props, State> {
       <KeyboardAvoidingView style={styles.root}>
         <Toolbar navigation={navigation} title="Edit Profile" />
         <View style={styles.paddedContainer}>
-          <Avatar
-            size="big"
-            source="https://pbs.twimg.com/profile_images/378800000500168907/7cba3b0f55df5a1a5458c18ba4a5d4a9_400x400.jpeg"
-            style={{marginBottom: 15}}
-          />
+          <Avatar size="big" source={avatarUrl} style={{marginBottom: 15}} />
           <Text
             fontWeight="bold"
             fontSize={MEDIUM_FONT_SIZE}
@@ -174,13 +175,6 @@ export default class EditProfileScene extends Component<Props, State> {
           )}
 
           {this._renderUpdateButton()}
-          {/* <AnimatedButton
-            style={{position: 'absolute', bottom: 20}}
-            onPress={this._handleUpdate}
-            loading={loading}
-          >
-            Update
-          </AnimatedButton> */}
         </View>
 
         <EditSuccessModal

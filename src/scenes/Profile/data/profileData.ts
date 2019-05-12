@@ -26,4 +26,5 @@ export const DEFAULT_USER_PROFILE: UserProfileData = {
   points: 0,
   badges: [],
   bmi: 0,
+  avatarUrl: '',
 };

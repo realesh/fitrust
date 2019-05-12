@@ -8,13 +8,13 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   LayoutAnimation,
+  AsyncStorage,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Toolbar} from '../../generals/components';
 import {WHITE, LIGHT_GREY, LIGHTER_GREY} from '../../generals/constants/colors';
 import AvatarWithMedal from './components/AvatarWithMedal';
 import {
-  topThreeData,
   usersListData,
   UserLeaderboard,
   userLoggedIn,
@@ -22,86 +22,141 @@ import {
 import Separator from '../../generals/core-ui/Separator';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
 import UserRowItem from './components/UserRowItem';
+import {Query} from 'react-apollo';
+import {
+  LeaderboardResponse,
+  LeaderboardVariables,
+  UserLeaderboardResponse,
+  UserLeaderboardVariables,
+  LEADERBOARD_LIST,
+  USER_LEADERBOARD_PROFILE,
+} from '../../graphql/queries/leaderboard';
 
 type Props = NavigationScreenProps;
 
 type State = {
   minimizeHeader: boolean;
+  userID: string;
 };
 
 export default class LeaderboardScene extends Component<Props, State> {
   state: State = {
     minimizeHeader: false,
+    userID: '',
   };
 
   offset = 0;
 
+  componentDidMount() {
+    this._getID();
+  }
+
+  _getID = async () => {
+    let userID = await AsyncStorage.getItem('userID');
+    userID && this.setState({userID});
+  };
+
   render() {
     let {navigation} = this.props;
     let {minimizeHeader} = this.state;
-
-    let [firstPosUser, secondPosUser, thirdPosUser] = topThreeData;
 
     let topThreeContainer = [
       styles.topThreeContainer,
       minimizeHeader && styles.minimizedContainer,
     ];
 
-    let userLoggedInRank = usersListData.findIndex(this._findUserIndex);
-
     return (
-      <View style={styles.root}>
-        <Toolbar navigation={navigation} title="Leaderboard" />
-        <Animated.View style={[styles.paddedContainer, topThreeContainer]}>
-          <AvatarWithMedal
-            rank="silver"
-            name={secondPosUser.name}
-            points={secondPosUser.points}
-            avatarSource={{
-              uri: secondPosUser.avatarUri,
-            }}
-            avatarMinimized={minimizeHeader}
-          />
-          <AvatarWithMedal
-            rank="gold"
-            name={firstPosUser.name}
-            points={firstPosUser.points}
-            avatarSource={{
-              uri: firstPosUser.avatarUri,
-            }}
-            avatarMinimized={minimizeHeader}
-          />
-          <AvatarWithMedal
-            rank="bronze"
-            name={thirdPosUser.name}
-            points={thirdPosUser.points}
-            avatarSource={{
-              uri: thirdPosUser.avatarUri,
-            }}
-            avatarMinimized={minimizeHeader}
-          />
-        </Animated.View>
-        <View style={styles.contentContainer}>
-          <FlatList
-            data={usersListData.slice(3)}
-            renderItem={this._renderItem}
-            ItemSeparatorComponent={this._renderSeparator}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={this._keyExtractor}
-            onScrollEndDrag={this._handleScrollVertical}
-            onScrollBeginDrag={this._handleBeginDrag}
-            onMomentumScrollEnd={this._handleMomentumEnd}
-          />
+      <Query<LeaderboardResponse, LeaderboardVariables>
+        query={LEADERBOARD_LIST}
+      >
+        {({data}) => {
+          let result = (data && data.profiles) || usersListData;
 
-          <UserRowItem
-            name={userLoggedIn.name}
-            points={userLoggedIn.points}
-            rankNumber={userLoggedInRank + 1}
-            avatarUri={userLoggedIn.avatarUri}
-            currentUser={true}
-          />
-        </View>
-      </View>
+          let top20result =
+            result.length <= 20 ? [...result] : [...result.slice(0, 19)];
+          let [firstPosUser, secondPosUser, thirdPosUser] = top20result;
+
+          return (
+            <View style={styles.root}>
+              <Toolbar navigation={navigation} title="Leaderboard" />
+              <Animated.View
+                style={[styles.paddedContainer, topThreeContainer]}
+              >
+                <AvatarWithMedal
+                  rank="silver"
+                  name={secondPosUser.name}
+                  points={secondPosUser.points}
+                  avatarSource={{
+                    uri: secondPosUser.avatarUrl,
+                  }}
+                  avatarMinimized={minimizeHeader}
+                />
+                <AvatarWithMedal
+                  rank="gold"
+                  name={firstPosUser.name}
+                  points={firstPosUser.points}
+                  avatarSource={{
+                    uri: firstPosUser.avatarUrl,
+                  }}
+                  avatarMinimized={minimizeHeader}
+                />
+                <AvatarWithMedal
+                  rank="bronze"
+                  name={thirdPosUser.name}
+                  points={thirdPosUser.points}
+                  avatarSource={{
+                    uri: thirdPosUser.avatarUrl,
+                  }}
+                  avatarMinimized={minimizeHeader}
+                />
+              </Animated.View>
+              <View style={styles.contentContainer}>
+                <FlatList
+                  data={top20result.slice(3)}
+                  renderItem={this._renderItem}
+                  ItemSeparatorComponent={this._renderSeparator}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={this._keyExtractor}
+                  onScrollEndDrag={this._handleScrollVertical}
+                  onScrollBeginDrag={this._handleBeginDrag}
+                  onMomentumScrollEnd={this._handleMomentumEnd}
+                />
+
+                <Query<UserLeaderboardResponse, UserLeaderboardVariables>
+                  query={USER_LEADERBOARD_PROFILE}
+                  variables={{userID: this.state.userID}}
+                >
+                  {({data: userLeaderboardData, loading}) => {
+                    let userLeaderboard =
+                      (userLeaderboardData &&
+                        userLeaderboardData.user &&
+                        userLeaderboardData.user.profile) ||
+                      userLoggedIn;
+
+                    let userLeaderboardRank = result.findIndex(
+                      (user: UserLeaderboard) => {
+                        return user.name === userLeaderboard.name;
+                      },
+                    );
+
+                    return (
+                      !loading && (
+                        <UserRowItem
+                          name={userLeaderboard.name}
+                          points={userLeaderboard.points}
+                          rankNumber={userLeaderboardRank + 1}
+                          avatarUri={userLeaderboard.avatarUrl}
+                          currentUser={true}
+                        />
+                      )
+                    );
+                  }}
+                </Query>
+              </View>
+            </View>
+          );
+        }}
+      </Query>
     );
   }
 
@@ -111,7 +166,7 @@ export default class LeaderboardScene extends Component<Props, State> {
         name={item.name}
         points={item.points}
         rankNumber={index + 4}
-        avatarUri={item.avatarUri}
+        avatarUri={item.avatarUrl}
       />
     );
   };
@@ -144,9 +199,9 @@ export default class LeaderboardScene extends Component<Props, State> {
     }
   };
 
-  _findUserIndex(user: UserLeaderboard) {
-    return user.name === userLoggedIn.name;
-  }
+  // _findUserIndex(user: UserLeaderboard) {
+  //   return user.name === 'Depp';
+  // }
 }
 
 const styles = StyleSheet.create({

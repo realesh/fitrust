@@ -213,7 +213,7 @@ export default class DashboardScene extends Component<Props, State> {
                       </Text>
                       <ProgressWithLabel
                         label="Steps"
-                        currentValue={0}
+                        currentValue={4528}
                         maxValue={result.stepsGoal}
                         unit="steps"
                         containerStyle={{marginBottom: 25}}

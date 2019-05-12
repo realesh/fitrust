@@ -140,7 +140,7 @@ export default class StepsChartPage extends Component<Props, State> {
             Today's Summary
           </Text>
 
-          <SummaryInsights steps={12210} distance={3.34} floors={16} />
+          <SummaryInsights steps={4528} distance={3.34} floors={16} />
 
           <View style={styles.comparisonContainer}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>

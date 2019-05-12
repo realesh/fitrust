@@ -25,6 +25,7 @@ import BMICalculatorScene from '../../scenes/BMI/BMICalculatorScene';
 import EditProfileScene from '../../scenes/EditProfile/EditProfileScene';
 import ChangePasswordScene from '../../scenes/ChangePassword/ChangePasswordScene';
 import CheckAuthScene from '../../scenes/Auth/CheckAuthScene';
+import Placeholder from '../../scenes/Placeholder';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -166,6 +167,7 @@ let defaultStackConfig: StackNavigatorConfig = {
 let routeConfig = {
   bottomTab,
   ...exerciseModeStack,
+  fitbitAuth: Placeholder,
 };
 
 let appStack = createStackNavigator(routeConfig, defaultStackConfig);

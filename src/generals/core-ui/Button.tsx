@@ -32,7 +32,7 @@ type Props = TouchableOpacityProps & {
    */
   onPress?: (event: GestureResponderEvent) => void;
 
-  style: StyleProp<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
 };
 
 const Button = (props: Props) => {

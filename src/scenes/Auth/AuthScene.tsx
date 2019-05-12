@@ -72,7 +72,8 @@ class AuthScene extends Component<Props> {
   componentDidMount() {
     let isLoggedout = this.props.navigation.getParam('command', '');
     if (isLoggedout === 'logout') {
-      AsyncStorage.removeItem('userToken');
+      // AsyncStorage.removeItem('userToken');
+      AsyncStorage.clear();
     }
   }
 

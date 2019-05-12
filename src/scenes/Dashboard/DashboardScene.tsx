@@ -42,6 +42,13 @@ import {
   UserDashboardData,
 } from '../../graphql/queries/dashboard';
 import {DEFAULT_USER_DASHBOARD} from './data/dashboardData';
+import LockedScene from '../LockedScene';
+import LockedProgressGoal from '../../generals/components/LockedProgressGoal';
+
+export type UpdateFitbitAuthFn = (
+  fitbitUserID: string,
+  fitbitAccessToken: string,
+) => void;
 
 type NavigationScreenParams = {
   id: string;
@@ -61,6 +68,8 @@ type State = {
   stepClaimModalVisible: boolean;
   waterClaimModalVisible: boolean;
   userDisplayName: string;
+  fitbitUserID: string;
+  fitbitAccessToken: string;
 };
 
 export default class DashboardScene extends Component<Props, State> {
@@ -74,6 +83,8 @@ export default class DashboardScene extends Component<Props, State> {
     stepClaimModalVisible: false,
     waterClaimModalVisible: false,
     userDisplayName: '',
+    fitbitUserID: '',
+    fitbitAccessToken: '',
   };
 
   componentDidMount() {
@@ -90,6 +101,7 @@ export default class DashboardScene extends Component<Props, State> {
     this._storeToken();
     this._setSkipOnBoard();
     this._storeID();
+    this._getFitbitAuth();
   }
 
   _storeToken = async () => {
@@ -122,6 +134,22 @@ export default class DashboardScene extends Component<Props, State> {
       // Handle ERROR
     }
   };
+  _getFitbitAuth = async () => {
+    try {
+      let fitbitUserID = await AsyncStorage.getItem('fitbit_user_id');
+      let fitbitAccessToken = await AsyncStorage.getItem('fitbit_access_token');
+      if (!fitbitUserID || !fitbitAccessToken) {
+        this.props.navigation.navigate('fitbitAuth', {
+          previous_scene: 'Dashboard',
+          updateFunc: this._updateFitbitAuth,
+        });
+      } else {
+        this.setState({fitbitUserID, fitbitAccessToken});
+      }
+    } catch (error) {
+      // Handle ERROR
+    }
+  };
 
   render() {
     let {
@@ -133,6 +161,8 @@ export default class DashboardScene extends Component<Props, State> {
       waterGoalClaimed,
       stepClaimModalVisible,
       waterClaimModalVisible,
+      fitbitUserID,
+      fitbitAccessToken,
     } = this.state;
     let {navigation} = this.props;
 
@@ -211,17 +241,23 @@ export default class DashboardScene extends Component<Props, State> {
                       <Text fontWeight="bold" style={{marginBottom: 20}}>
                         Daily Goals.
                       </Text>
-                      <ProgressWithLabel
-                        label="Steps"
-                        currentValue={4528}
-                        maxValue={result.stepsGoal}
-                        unit="steps"
-                        containerStyle={{marginBottom: 25}}
-                        iconName="refresh-cw"
-                        onIconPress={() => {}}
-                        isClaimed={stepGoalClaimed}
-                        onClaimPress={this._onStepGoalClaim}
-                      />
+                      {fitbitUserID && fitbitAccessToken ? (
+                        <ProgressWithLabel
+                          label="Steps"
+                          currentValue={4528}
+                          maxValue={result.stepsGoal}
+                          unit="steps"
+                          containerStyle={{marginBottom: 25}}
+                          iconName="refresh-cw"
+                          onIconPress={() => {}}
+                          isClaimed={stepGoalClaimed}
+                          onClaimPress={this._onStepGoalClaim}
+                        />
+                      ) : (
+                        <LockedProgressGoal
+                          containerStyle={{marginBottom: 25}}
+                        />
+                      )}
                       <ProgressWithLabel
                         label="Drink water"
                         currentValue={waterValue}
@@ -276,7 +312,14 @@ export default class DashboardScene extends Component<Props, State> {
                 <AnimatedChevron />
               </View>
               <View style={styles.scrollHeight}>
-                <StepsChartPage />
+                {fitbitUserID && fitbitAccessToken ? (
+                  <StepsChartPage />
+                ) : (
+                  <LockedScene
+                    navigation={this.props.navigation}
+                    updateFunc={this._updateFitbitAuth}
+                  />
+                )}
               </View>
 
               <DrinkWaterModal
@@ -330,6 +373,12 @@ export default class DashboardScene extends Component<Props, State> {
   };
   _toggleWaterClaimModalVisible = () => {
     this.setState({waterClaimModalVisible: !this.state.waterClaimModalVisible});
+  };
+  _updateFitbitAuth: UpdateFitbitAuthFn = (
+    fitbitUserID: string,
+    fitbitAccessToken: string,
+  ) => {
+    this.setState({fitbitUserID, fitbitAccessToken});
   };
 }
 

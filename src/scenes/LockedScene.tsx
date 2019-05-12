@@ -30,7 +30,7 @@ export default class LockedScene extends Component<Props> {
           Steps tracking are only available when you're connected to Fitbit
         </Text>
         <AnimatedButton loading={loading} onPress={this._goToFitbitAuth}>
-          Connect
+          Unlock
         </AnimatedButton>
       </View>
     );
@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
   },
   message: {
     lineHeight: 24,

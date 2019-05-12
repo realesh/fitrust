@@ -46,7 +46,11 @@ export default class Placeholder extends Component<Props> {
               daily fitness tracking. Connect to Fitbit to have the best
               experience from Fitrust.
             </Text>
-            <AnimatedButton loading={loading} onPress={this._handlePressAsync}>
+            <AnimatedButton
+              loading={loading}
+              onPress={this._handlePressAsync}
+              style={styles.alignStretch}
+            >
               Connect
             </AnimatedButton>
           </View>
@@ -109,4 +113,5 @@ const styles = StyleSheet.create({
   messageContainer: {
     alignItems: 'center',
   },
+  alignStretch: {alignSelf: 'stretch'},
 });

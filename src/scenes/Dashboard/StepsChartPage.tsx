@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, AsyncStorage, ActivityIndicator} from 'react-native';
 import {Feather as Icon} from '@expo/vector-icons';
 import {AreaChart} from 'react-native-svg-charts';
 import {Path, Circle} from 'react-native-svg';
@@ -18,12 +18,17 @@ import {
   DARK_GREY70,
   LIGHTER_GREY,
   GREEN,
+  RED,
 } from '../../generals/constants/colors';
 import SummaryInsights from './components/SummaryInsights';
 import {
   TodayActivitiesResponseSummary,
   DEFAULT_TOTAL_DISTANCES,
 } from '../../helpers/Fetchers/fetchTodayActivities';
+import {
+  fetchThisWeekSteps,
+  fetchLastWeekSteps,
+} from '../../helpers/Fetchers/fetchWeeklySteps';
 
 type StepNumber = number | null;
 type DecoratorProps = {
@@ -36,42 +41,149 @@ type DecoratorProps = {
 };
 type LineProps = {line?: string};
 
+type Comparison = {
+  type: 'trending-up' | 'trending-down' | 'minus';
+  value: number;
+  color: string;
+};
+
 // type Props = NavigationScreenProps;
 type Props = Partial<TodayActivitiesResponseSummary> & {};
 
-type State = {};
+type State = {
+  loading: boolean;
+  thisWeekData: Array<number | undefined>;
+  lastWeekData: Array<number | undefined>;
+  biggestNumberStep: number;
+  comparison: Comparison;
+};
 
 export default class StepsChartPage extends Component<Props, State> {
-  render() {
-    let {distances, floors, steps} = this.props;
+  state: State = {
+    loading: true,
+    thisWeekData: [],
+    lastWeekData: [],
+    biggestNumberStep: 0,
+    comparison: {
+      type: 'minus',
+      value: 0,
+      color: LIGHT_GREY,
+    },
+  };
 
-    const maxNum = 13098;
-    const lastWeekData = [
-      maxNum / 2,
-      maxNum / 2,
-      1024,
-      5067,
-      10567,
-      5900,
-      9045,
-      3567,
-      13098,
-      maxNum / 2,
-      maxNum / 2,
-    ];
-    const thisWeekData = [
-      maxNum / 2,
-      maxNum / 2,
-      11087,
-      7099,
-      5817,
-      10900,
-      12000,
-      null,
-      null,
-      null,
-      null,
-    ];
+  componentDidMount() {
+    this._fetchWeeklyStep();
+  }
+
+  _fetchWeeklyStep = async () => {
+    let fitbitUserID = await AsyncStorage.getItem('fitbit_user_id');
+    let fitbitAccessToken = await AsyncStorage.getItem('fitbit_access_token');
+    if (fitbitUserID && fitbitAccessToken) {
+      let thisWeekResponse = await fetchThisWeekSteps(
+        fitbitUserID,
+        fitbitAccessToken,
+      );
+      let lastWeekResponse = await fetchLastWeekSteps(
+        fitbitUserID,
+        fitbitAccessToken,
+      );
+      let thisWeekSteps = thisWeekResponse['activities-steps'].map((step) =>
+        Number.parseInt(step.value, 10),
+      );
+      let lastWeekSteps = lastWeekResponse['activities-steps'].map((step) =>
+        Number.parseInt(step.value, 10),
+      );
+
+      let biggestNumberStep = 0;
+      thisWeekSteps.forEach((step) => {
+        if (step > biggestNumberStep) {
+          biggestNumberStep = step;
+        }
+      });
+      lastWeekSteps.forEach((step) => {
+        if (step > biggestNumberStep) {
+          biggestNumberStep = step;
+        }
+      });
+
+      let lastNumIndex = 0;
+      thisWeekSteps.forEach((step, index) => {
+        if (thisWeekSteps.length === index + 1 && thisWeekSteps[index] !== 0) {
+          lastNumIndex = thisWeekSteps.length;
+        } else {
+          if (step !== 0 && thisWeekSteps[index + 1] === 0) {
+            lastNumIndex = index;
+          }
+        }
+      });
+
+      let thisWeekData = [
+        biggestNumberStep / 2,
+        biggestNumberStep / 2,
+        ...thisWeekSteps.map((step, index) => {
+          if (index > lastNumIndex) {
+            return undefined;
+          }
+          return step;
+        }),
+        undefined,
+        undefined,
+      ];
+      let lastWeekData = [
+        biggestNumberStep / 2,
+        biggestNumberStep / 2,
+        ...lastWeekSteps,
+        biggestNumberStep / 2,
+        biggestNumberStep / 2,
+      ];
+
+      let thisWeekTotal = thisWeekSteps.reduce((a, b) => a + b);
+      let lastWeekTotal = lastWeekSteps.reduce((a, b) => a + b);
+
+      let comparison: Comparison = {
+        type: 'minus',
+        value: 0,
+        color: LIGHT_GREY,
+      };
+      if (thisWeekTotal < lastWeekTotal) {
+        comparison = {
+          type: 'trending-down',
+          value:
+            thisWeekTotal === 0
+              ? 100
+              : (lastWeekTotal / thisWeekTotal) * 100 - 100,
+          color: RED,
+        };
+      } else if (lastWeekTotal < thisWeekTotal) {
+        comparison = {
+          type: 'trending-up',
+          value:
+            lastWeekTotal === 0
+              ? 100
+              : (thisWeekTotal / lastWeekTotal) * 100 - 100,
+          color: GREEN,
+        };
+      }
+
+      this.setState({
+        biggestNumberStep,
+        thisWeekData,
+        lastWeekData,
+        comparison,
+        loading: false,
+      });
+    }
+  };
+
+  render() {
+    let {
+      loading,
+      biggestNumberStep,
+      thisWeekData,
+      lastWeekData,
+      comparison,
+    } = this.state;
+    let {distances, floors, steps} = this.props;
 
     const Line = ({line}: LineProps) => {
       if (line) {
@@ -139,7 +251,11 @@ export default class StepsChartPage extends Component<Props, State> {
     let distanceInKM =
       (distanceTotal && distanceTotal[0] && distanceTotal[0].distance) || 0;
 
-    return (
+    return loading ? (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator color={BLUE} size="large" />
+      </View>
+    ) : (
       <View style={styles.root}>
         <View style={styles.transitionContainer} />
         <View style={styles.paddedContainer}>
@@ -159,13 +275,18 @@ export default class StepsChartPage extends Component<Props, State> {
 
           <View style={styles.comparisonContainer}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Icon name="chevrons-up" size={30} color={GREEN} />
+              <Icon
+                name={comparison.type}
+                size={30}
+                color={comparison.color}
+                style={styles.marginRight}
+              />
               <Text
                 fontWeight="bold"
                 fontSize={BIG_FONT_SIZE}
-                style={{color: GREEN}}
+                style={{color: comparison.color}}
               >
-                30%
+                {comparison.value.toFixed(0)}%
               </Text>
             </View>
             <Text fontSize={SMALL_FONT_SIZE} style={{marginBottom: 10}}>
@@ -176,7 +297,7 @@ export default class StepsChartPage extends Component<Props, State> {
         <View style={styles.chartsContainer}>
           <AreaChart
             yMin={0}
-            yMax={13098}
+            yMax={biggestNumberStep}
             style={{
               height: 130,
               width: '100%',
@@ -190,7 +311,7 @@ export default class StepsChartPage extends Component<Props, State> {
           </AreaChart>
           <AreaChart
             yMin={0}
-            yMax={13098}
+            yMax={biggestNumberStep}
             style={{
               height: 130,
               width: '100%',
@@ -235,6 +356,11 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: WHITE,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: WHITE,
+    justifyContent: 'center',
   },
   transitionContainer: {
     backgroundColor: LIGHTER_GREY,
@@ -291,4 +417,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  marginRight: {marginRight: 5},
 });

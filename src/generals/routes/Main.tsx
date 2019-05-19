@@ -27,6 +27,7 @@ import ChangePasswordScene from '../../scenes/ChangePassword/ChangePasswordScene
 import CheckAuthScene from '../../scenes/Auth/CheckAuthScene';
 import Placeholder from '../../scenes/Placeholder';
 import FoodSearchScene from '../../scenes/SearchNutritionix/FoodSearchScene';
+import WorkoutSearchScene from '../../scenes/SearchNutritionix/WorkoutSearchScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -163,6 +164,7 @@ let exerciseModeStack = {
 
 let searchStack = {
   foodSearch: FoodSearchScene,
+  workoutSearch: WorkoutSearchScene,
 };
 
 let defaultStackConfig: StackNavigatorConfig = {

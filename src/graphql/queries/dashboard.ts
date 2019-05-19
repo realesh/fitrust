@@ -8,6 +8,7 @@ export type UserDashboardData = {
   goalWorkout: number;
   goalIntake: number;
   intakeValue: number;
+  workoutValue: number;
 };
 export type UserDashboardResponse = {
   user?: {
@@ -28,6 +29,7 @@ export const USER_DASHBOARD = gql`
         goalIntake
         points
         intakeValue
+        workoutValue
       }
     }
   }

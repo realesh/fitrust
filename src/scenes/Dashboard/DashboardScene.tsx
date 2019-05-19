@@ -231,6 +231,12 @@ export default class DashboardScene extends Component<Props, State> {
               currCals: result.intakeValue,
             });
           };
+          let goToSearchWorkout = () => {
+            this.props.navigation.navigate('workoutSearch', {
+              previous_scene: 'Home',
+              currCals: result.workoutValue,
+            });
+          };
 
           return (
             <ScrollView
@@ -324,9 +330,10 @@ export default class DashboardScene extends Component<Props, State> {
                         />
                         <CaloriesInfo
                           image={fire}
-                          currentValue={caloriesBMR}
+                          currentValue={caloriesBMR + result.workoutValue}
                           maxValue={result.goalWorkout}
                           buttonTitle="WORKOUT"
+                          onPress={goToSearchWorkout}
                         />
                       </View>
 

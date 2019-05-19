@@ -181,6 +181,8 @@ export default class EditProfileScene extends Component<Props, State> {
           visible={successModalVisible}
           onRequestClose={this._toggleSuccessModal}
           onClosePress={this._navigateToProfile}
+          title="Yeay!"
+          message="Profile has been succesfully updated!"
         />
       </KeyboardAvoidingView>
     );

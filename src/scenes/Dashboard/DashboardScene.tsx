@@ -313,6 +313,7 @@ export default class DashboardScene extends Component<Props, State> {
                           currentValue={1700}
                           maxValue={result.goalIntake}
                           buttonTitle="INTAKE"
+                          onPress={this._goToSearchFood}
                         />
                         <CaloriesInfo
                           image={fire}
@@ -391,6 +392,9 @@ export default class DashboardScene extends Component<Props, State> {
     let {navigation} = this.props;
     this.setState({bmrModalVisible: false});
     navigation.navigate('BMRCalculator', {previous_scene: 'Home'});
+  };
+  _goToSearchFood = () => {
+    this.props.navigation.navigate('foodSearch', {previous_scene: 'Home'});
   };
   _onAddWater = (value: number) => {
     this.setState({waterValue: this.state.waterValue + value});

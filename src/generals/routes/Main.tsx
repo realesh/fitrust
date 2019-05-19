@@ -26,6 +26,7 @@ import EditProfileScene from '../../scenes/EditProfile/EditProfileScene';
 import ChangePasswordScene from '../../scenes/ChangePassword/ChangePasswordScene';
 import CheckAuthScene from '../../scenes/Auth/CheckAuthScene';
 import Placeholder from '../../scenes/Placeholder';
+import FoodSearchScene from '../../scenes/SearchNutritionix/FoodSearchScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -114,7 +115,7 @@ let bottomTab = createBottomTabNavigator(
       },
     },
     // leaderboard: {
-    //   screen: Placeholder,
+    //   screen: FoodSearchScene,
     //   navigationOptions: {
     //     tabBarIcon: ({tintColor}: {tintColor: string}) => (
     //       <Icon name="star" size={24} color={tintColor} />
@@ -160,6 +161,10 @@ let exerciseModeStack = {
   exerciseModeCountdown: ExerciseModeCountdownScene,
 };
 
+let searchStack = {
+  foodSearch: FoodSearchScene,
+};
+
 let defaultStackConfig: StackNavigatorConfig = {
   headerMode: 'none',
 };
@@ -167,6 +172,7 @@ let defaultStackConfig: StackNavigatorConfig = {
 let routeConfig = {
   bottomTab,
   ...exerciseModeStack,
+  ...searchStack,
   fitbitAuth: Placeholder,
 };
 

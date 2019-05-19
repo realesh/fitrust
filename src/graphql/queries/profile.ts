@@ -137,3 +137,37 @@ export const CHANGE_PASSWORD = gql`
     }
   }
 `;
+
+export type BadgeItemRaw = {
+  name: string;
+  desc: string;
+  imageUrl: string;
+};
+export type BadgesListData = {
+  unlocked: number;
+  lockedBadges: Array<BadgeItemRaw>;
+  userBadges: Array<BadgeItemRaw>;
+};
+export type BadgesListResponse = {
+  badgesList?: BadgesListData;
+};
+export type BadgesListVariables = {
+  userID: string;
+};
+export const BADGES_LIST = gql`
+  query badgesList($userID: String!) {
+    badgesList(id: $userID) {
+      unlocked
+      userBadges {
+        name
+        imageUrl
+        desc
+      }
+      lockedBadges {
+        name
+        imageUrl
+        desc
+      }
+    }
+  }
+`;

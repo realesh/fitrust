@@ -36,13 +36,9 @@ type Props = TouchableOpacityProps & {
 export default function BadgeRowItem(props: Props) {
   let {name, desc, thumbUri, style, unlocked} = props;
   return (
-    <TouchableOpacity
-      style={[styles.badgeRowContainer, style]}
-      onPress={() => {}}
-      activeOpacity={0.6}
-    >
+    <View style={[styles.badgeRowContainer, style]}>
       <Image
-        source={unlocked ? mhrBadge : lockedBadge}
+        source={unlocked ? {uri: thumbUri} : lockedBadge}
         style={styles.image}
         resizeMethod="scale"
       />
@@ -54,7 +50,7 @@ export default function BadgeRowItem(props: Props) {
           {desc}
         </Text>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 

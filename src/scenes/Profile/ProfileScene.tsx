@@ -254,7 +254,10 @@ export default class ProfileScene extends Component<Props, State> {
 
   _goToBadges = () => {
     let {navigation} = this.props;
-    navigation.navigate('badgesList', {previous_scene: 'Profile'});
+    navigation.navigate('badgesList', {
+      previous_scene: 'Profile',
+      userID: this.state.userID,
+    });
   };
 
   _toggleBMIModal = () => {

@@ -5,9 +5,19 @@ import {Toolbar} from '../../generals/components';
 import {WHITE} from '../../generals/constants/colors';
 import Separator from '../../generals/core-ui/Separator';
 import BadgeRowItem from './components/BadgeRowItem';
-import {BadgeItem, badgesList} from './data/BadgeDataFixtures';
+import {Query} from 'react-apollo';
+import {
+  BADGES_LIST,
+  BadgesListResponse,
+  BadgesListVariables,
+} from '../../graphql/queries/profile';
+import {BadgeItem} from './data/BadgeDataFixtures';
 
-type Props = NavigationScreenProps;
+type NavigationScreenParams = {
+  userID: string;
+};
+
+type Props = NavigationScreenProps<NavigationScreenParams>;
 
 type State = {
   minimizeHeader: boolean;
@@ -24,27 +34,54 @@ export default class BadgesListScene extends Component<Props, State> {
     let {navigation} = this.props;
 
     return (
-      <View style={styles.root}>
-        <Toolbar navigation={navigation} title="Badges" />
-        <View style={styles.contentContainer}>
-          <FlatList
-            data={badgesList}
-            renderItem={this._renderItem}
-            ItemSeparatorComponent={this._renderSeparator}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={this._keyExtractor}
-          />
-        </View>
-      </View>
+      <Query<BadgesListResponse, BadgesListVariables>
+        query={BADGES_LIST}
+        variables={{userID: this.props.navigation.getParam('userID', '')}}
+      >
+        {({data}) => {
+          let result = data && data.badgesList;
+          let badgesList: Array<BadgeItem> = [];
+          if (result) {
+            let unlocked = result.userBadges.map((badge) => {
+              return {
+                ...badge,
+                unlocked: true,
+              };
+            });
+            let locked = result.lockedBadges.map((badge) => {
+              return {
+                ...badge,
+                unlocked: false,
+              };
+            });
+            badgesList = [...unlocked, ...locked];
+          }
+
+          return (
+            <View style={styles.root}>
+              <Toolbar navigation={navigation} title="Badges" />
+              <View style={styles.contentContainer}>
+                <FlatList
+                  data={badgesList}
+                  renderItem={this._renderItem}
+                  ItemSeparatorComponent={this._renderSeparator}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={this._keyExtractor}
+                />
+              </View>
+            </View>
+          );
+        }}
+      </Query>
     );
   }
 
-  _renderItem = ({item}: ListRenderItemInfo<BadgeItem>) => {
+  _renderItem = ({item}: ListRenderItemInfo<Partial<BadgeItem>>) => {
     return (
       <BadgeRowItem
-        name={item.name}
-        desc={item.desc}
-        thumbUri={item.thumbUri}
+        name={item.name || ''}
+        desc={item.desc || ''}
+        thumbUri={item.imageUrl || ''}
         unlocked={item.unlocked}
       />
     );

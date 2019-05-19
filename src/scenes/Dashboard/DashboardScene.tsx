@@ -318,7 +318,7 @@ export default class DashboardScene extends Component<Props, State> {
                         <CaloriesInfo
                           image={fire}
                           currentValue={caloriesBMR}
-                          maxValue={result.intakeWorkout}
+                          maxValue={result.goalWorkout}
                           buttonTitle="WORKOUT"
                         />
                       </View>

@@ -5,7 +5,7 @@ export type UserDashboardData = {
   points: number;
   stepsGoal: number;
   waterGoal: number;
-  intakeWorkout: number;
+  goalWorkout: number;
   goalIntake: number;
 };
 export type UserDashboardResponse = {
@@ -23,7 +23,7 @@ export const USER_DASHBOARD = gql`
         name
         stepsGoal
         waterGoal
-        intakeWorkout
+        goalWorkout
         goalIntake
         points
       }
@@ -35,7 +35,7 @@ export type UpdateIntakeGoalResponse = {
   user?: {
     profile: {
       goalIntake: number;
-      intakeWorkout: number;
+      goalWorkout: number;
     };
   };
 };
@@ -47,12 +47,12 @@ export type UpdateIntakeGoalVariables = {
 export const UPDATE_INTAKE_GOAL = gql`
   mutation updateIntake($userID: ID, $intake: Int, $burnout: Int) {
     updateUser(
-      data: {profile: {update: {goalIntake: $intake, intakeWorkout: $burnout}}}
+      data: {profile: {update: {goalIntake: $intake, goalWorkout: $burnout}}}
       where: {id: $userID}
     ) {
       profile {
         goalIntake
-        intakeWorkout
+        goalWorkout
       }
     }
   }

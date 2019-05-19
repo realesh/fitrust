@@ -225,6 +225,13 @@ export default class DashboardScene extends Component<Props, State> {
           let result: UserDashboardData =
             (data && data.user && data.user.profile) || DEFAULT_USER_DASHBOARD;
 
+          let goToSearchFood = () => {
+            this.props.navigation.navigate('foodSearch', {
+              previous_scene: 'Home',
+              currCals: result.intakeValue,
+            });
+          };
+
           return (
             <ScrollView
               contentContainerStyle={styles.root}
@@ -310,10 +317,10 @@ export default class DashboardScene extends Component<Props, State> {
                       <View style={{flexDirection: 'row'}}>
                         <CaloriesInfo
                           image={food}
-                          currentValue={1700}
+                          currentValue={result.intakeValue}
                           maxValue={result.goalIntake}
                           buttonTitle="INTAKE"
-                          onPress={this._goToSearchFood}
+                          onPress={goToSearchFood}
                         />
                         <CaloriesInfo
                           image={fire}
@@ -392,9 +399,6 @@ export default class DashboardScene extends Component<Props, State> {
     let {navigation} = this.props;
     this.setState({bmrModalVisible: false});
     navigation.navigate('BMRCalculator', {previous_scene: 'Home'});
-  };
-  _goToSearchFood = () => {
-    this.props.navigation.navigate('foodSearch', {previous_scene: 'Home'});
   };
   _onAddWater = (value: number) => {
     this.setState({waterValue: this.state.waterValue + value});

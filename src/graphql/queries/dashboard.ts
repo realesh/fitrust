@@ -7,6 +7,7 @@ export type UserDashboardData = {
   waterGoal: number;
   goalWorkout: number;
   goalIntake: number;
+  intakeValue: number;
 };
 export type UserDashboardResponse = {
   user?: {
@@ -26,6 +27,7 @@ export const USER_DASHBOARD = gql`
         goalWorkout
         goalIntake
         points
+        intakeValue
       }
     }
   }

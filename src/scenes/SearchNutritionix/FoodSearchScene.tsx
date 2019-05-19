@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   TextInput,
+  AsyncStorage,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Feather as Icon} from '@expo/vector-icons';
@@ -26,14 +27,27 @@ import fetchFoodSearch, {
 } from '../../helpers/Fetchers/fetchFoodSearch';
 import {noResults} from '../../assets/images/search';
 import {SMALL_FONT_SIZE} from '../../generals/constants/size';
+import {Mutation} from 'react-apollo';
+import {
+  UPDATE_INTAKE,
+  UpdateIntakeResponse,
+  UpdateIntakeVariables,
+} from '../../graphql/queries/foodSearch';
+import {USER_DASHBOARD} from '../../graphql/queries/dashboard';
+import EditSuccessModal from '../EditProfile/components/EditSuccessModal';
 
-type Props = NavigationScreenProps;
+type NavigationScreenParams = {
+  currCals: number;
+};
+
+type Props = NavigationScreenProps<NavigationScreenParams>;
 
 type State = {
   foodsResult: Array<FoodDetail>;
   loading: boolean;
   searchQuery: string;
   totalCals: number;
+  successModalVisible: boolean;
 };
 
 export default class FoodSearchScene extends Component<Props, State> {
@@ -42,6 +56,7 @@ export default class FoodSearchScene extends Component<Props, State> {
     loading: false,
     searchQuery: '',
     totalCals: 0,
+    successModalVisible: false,
   };
 
   _searchBarRef = createRef<TextInput>();
@@ -72,7 +87,13 @@ export default class FoodSearchScene extends Component<Props, State> {
   };
 
   render() {
-    let {loading, foodsResult, searchQuery, totalCals} = this.state;
+    let {
+      loading,
+      foodsResult,
+      searchQuery,
+      totalCals,
+      successModalVisible,
+    } = this.state;
     // let {navigation} = this.props;
 
     return (
@@ -131,15 +152,7 @@ export default class FoodSearchScene extends Component<Props, State> {
                 ListHeaderComponent={this._renderHeader}
               />
 
-              <View style={styles.paddedContainer}>
-                <AnimatedButton
-                  // loading={loading}
-                  onPress={this._handleSubmitAsync}
-                  style={styles.alignStretch}
-                >
-                  Add {totalCals !== 0 && totalCals} Calories
-                </AnimatedButton>
-              </View>
+              {this._renderUpdateButton(totalCals)}
             </Fragment>
           ) : (
             <View style={styles.placeholderContainer}>
@@ -160,9 +173,25 @@ export default class FoodSearchScene extends Component<Props, State> {
             </View>
           )}
         </View>
+
+        <EditSuccessModal
+          visible={successModalVisible}
+          onRequestClose={this._toggleSuccessModal}
+          onClosePress={this._goBack}
+          title="Got it!"
+          message="Food has been logged for you."
+        />
       </View>
     );
   }
+
+  _toggleSuccessModal = () => {
+    this.setState({successModalVisible: !this.state.successModalVisible});
+  };
+  _goBack = () => {
+    this._toggleSuccessModal();
+    this.props.navigation.goBack();
+  };
 
   _renderHeader = () =>
     this.state.foodsResult.length > 0 ? (
@@ -205,7 +234,52 @@ export default class FoodSearchScene extends Component<Props, State> {
   _onSearchChange = (searchQuery: string) => {
     this.setState({searchQuery});
   };
-  _handleSubmitAsync = async () => {};
+
+  _renderUpdateButton = (totalCals: number) => (
+    <Mutation<UpdateIntakeResponse, UpdateIntakeVariables>
+      mutation={UPDATE_INTAKE}
+    >
+      {(updateIntake, {loading}) => {
+        let currentCals = this.props.navigation.getParam('currCals', 0);
+        let intake = Number.parseInt((totalCals + currentCals).toFixed(0), 10);
+        let handleUpdate = async () => {
+          try {
+            let ID = await AsyncStorage.getItem('userID');
+            updateIntake &&
+              (await updateIntake({
+                variables: {
+                  userID: ID || '',
+                  intake,
+                },
+                refetchQueries: [
+                  {
+                    query: USER_DASHBOARD,
+                    variables: {
+                      userID: ID,
+                    },
+                  },
+                ],
+              }));
+            this._toggleSuccessModal();
+          } catch (error) {
+            // Handle Error
+          }
+        };
+
+        return (
+          <View style={styles.paddedContainer}>
+            <AnimatedButton
+              loading={loading}
+              onPress={handleUpdate}
+              style={styles.alignStretch}
+            >
+              Add {totalCals !== 0 && totalCals} Calories
+            </AnimatedButton>
+          </View>
+        );
+      }}
+    </Mutation>
+  );
 }
 
 const styles = StyleSheet.create({

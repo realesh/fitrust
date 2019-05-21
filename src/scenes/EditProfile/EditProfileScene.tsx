@@ -29,6 +29,7 @@ import {
   USER_PROFILE,
 } from '../../graphql/queries/profile';
 import {USER_DASHBOARD} from '../../graphql/queries/dashboard';
+import {imageResolvers} from '../../helpers/imageResolvers';
 
 type NavigationScreenParams = {
   name: string;
@@ -47,8 +48,8 @@ type State = {
   lastTitle: string | undefined;
   avatarUrl: string;
   inputError: boolean;
-  loading: boolean;
   successModalVisible: boolean;
+  loading: boolean;
 };
 
 export default class EditProfileScene extends Component<Props, State> {
@@ -94,12 +95,16 @@ export default class EditProfileScene extends Component<Props, State> {
       <KeyboardAvoidingView style={styles.root}>
         <Toolbar navigation={navigation} title="Edit Profile" />
         <View style={styles.paddedContainer}>
-          <Avatar size="big" source={avatarUrl} style={{marginBottom: 15}} />
+          <Avatar
+            size="big"
+            source={imageResolvers(avatarUrl)}
+            style={{marginBottom: 15}}
+          />
           <Text
             fontWeight="bold"
             fontSize={MEDIUM_FONT_SIZE}
             style={{color: BLUE}}
-            onPress={() => {}}
+            onPress={this._goToAvatarSelector}
           >
             Change Profile Picture
           </Text>
@@ -218,6 +223,15 @@ export default class EditProfileScene extends Component<Props, State> {
       loading: false,
     });
   };
+  _setTempAvatar = (index: number) => {
+    this.setState({avatarUrl: String(index)});
+  };
+  _goToAvatarSelector = () => {
+    this.props.navigation.navigate('avatarSelector', {
+      previous_scene: 'editProfile',
+      setTempAvatar: this._setTempAvatar,
+    });
+  };
 
   _renderUpdateButton = () => {
     let {loading} = this.state;
@@ -232,7 +246,13 @@ export default class EditProfileScene extends Component<Props, State> {
           };
 
           let handleUpdate = async () => {
-            let {name, firstTitle, middleTitle, lastTitle} = this.state;
+            let {
+              name,
+              firstTitle,
+              middleTitle,
+              lastTitle,
+              avatarUrl,
+            } = this.state;
 
             LayoutAnimation.configureNext(linearEasingShort);
             this.setState({loading: true});
@@ -251,6 +271,7 @@ export default class EditProfileScene extends Component<Props, State> {
                     first: firstTitle || '',
                     middle: middleTitle || '',
                     last: lastTitle || '',
+                    avatarUrl,
                   },
                   refetchQueries: [
                     {
@@ -276,7 +297,7 @@ export default class EditProfileScene extends Component<Props, State> {
             <AnimatedButton
               style={{position: 'absolute', bottom: 20}}
               onPress={handleUpdate}
-              loading={loading}
+              loading={loading || updateLoading}
             >
               Update
             </AnimatedButton>

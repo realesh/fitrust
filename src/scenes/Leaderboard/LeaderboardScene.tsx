@@ -31,6 +31,7 @@ import {
   LEADERBOARD_LIST,
   USER_LEADERBOARD_PROFILE,
 } from '../../graphql/queries/leaderboard';
+import {imageResolvers} from '../../helpers/imageResolvers';
 
 type Props = NavigationScreenProps;
 
@@ -86,27 +87,30 @@ export default class LeaderboardScene extends Component<Props, State> {
                   rank="silver"
                   name={secondPosUser.name}
                   points={secondPosUser.points}
-                  avatarSource={{
-                    uri: secondPosUser.avatarUrl,
-                  }}
+                  // avatarSource={{
+                  //   uri: secondPosUser.avatarUrl,
+                  // }}
+                  avatarSource={imageResolvers(secondPosUser.avatarUrl)}
                   avatarMinimized={minimizeHeader}
                 />
                 <AvatarWithMedal
                   rank="gold"
                   name={firstPosUser.name}
                   points={firstPosUser.points}
-                  avatarSource={{
-                    uri: firstPosUser.avatarUrl,
-                  }}
+                  // avatarSource={{
+                  //   uri: firstPosUser.avatarUrl,
+                  // }}
+                  avatarSource={imageResolvers(firstPosUser.avatarUrl)}
                   avatarMinimized={minimizeHeader}
                 />
                 <AvatarWithMedal
                   rank="bronze"
                   name={thirdPosUser.name}
                   points={thirdPosUser.points}
-                  avatarSource={{
-                    uri: thirdPosUser.avatarUrl,
-                  }}
+                  // avatarSource={{
+                  //   uri: thirdPosUser.avatarUrl,
+                  // }}
+                  avatarSource={imageResolvers(thirdPosUser.avatarUrl)}
                   avatarMinimized={minimizeHeader}
                 />
               </Animated.View>

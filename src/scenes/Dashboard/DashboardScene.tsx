@@ -34,12 +34,15 @@ import CaloriesInfo from './CaloriesInfo';
 import AnimatedChevron from '../../generals/components/AnimatedChevron';
 import StepsChartPage from './StepsChartPage';
 import DrinkWaterModal from './components/DrinkWaterModal';
-import {Query} from 'react-apollo';
+import {Query, Mutation} from 'react-apollo';
 import {
   UserDashboardResponse,
   UserDashboardVariables,
   USER_DASHBOARD,
   UserDashboardData,
+  RESET_DAILY_GOAL,
+  ResetDailyResponse,
+  ResetDailyVariables,
 } from '../../graphql/queries/dashboard';
 import {DEFAULT_USER_DASHBOARD} from './data/dashboardData';
 import LockedScene from '../LockedScene';
@@ -60,9 +63,18 @@ type NavigationScreenParams = {
   token: string;
 };
 
+type State = {
+  isChecked: boolean;
+};
+
 type Props = NavigationScreenProps<NavigationScreenParams>;
 
-type State = TodayActivitiesResponseSummary & {
+type BaseProps = Props & {
+  resetDailyFunc: (userID: string, resetValue: number) => Promise<void>;
+  // resetDailyFunc: MutationFn<ResetDailyResponse, ResetDailyVariables>;
+};
+
+type BaseState = TodayActivitiesResponseSummary & {
   fadeInAnimatedValue: Animated.Value;
   bmrModalVisible: boolean;
   waterModalVisible: boolean;
@@ -76,8 +88,43 @@ type State = TodayActivitiesResponseSummary & {
   fitbitAccessToken: string;
   fetchFitbitLoading: boolean;
 };
-
 export default class DashboardScene extends Component<Props, State> {
+  render() {
+    return (
+      <Mutation<ResetDailyResponse, ResetDailyVariables>
+        mutation={RESET_DAILY_GOAL}
+      >
+        {(resetDailyFn) => {
+          let resetDaily = async (userID: string, resetValue: number) => {
+            await resetDailyFn({
+              variables: {
+                userID,
+                resetValue,
+              },
+              refetchQueries: [
+                {
+                  query: USER_DASHBOARD,
+                  variables: {
+                    userID,
+                  },
+                },
+              ],
+            });
+            // TODO: reset all daily cache
+          };
+          return (
+            <DashboardSceneBase
+              navigation={this.props.navigation}
+              resetDailyFunc={resetDaily}
+            />
+          );
+        }}
+      </Mutation>
+    );
+  }
+}
+
+class DashboardSceneBase extends Component<BaseProps, BaseState> {
   state = {
     fadeInAnimatedValue: new Animated.Value(0),
     bmrModalVisible: false,
@@ -224,6 +271,15 @@ export default class DashboardScene extends Component<Props, State> {
         {({data, loading}) => {
           let result: UserDashboardData =
             (data && data.user && data.user.profile) || DEFAULT_USER_DASHBOARD;
+          let todayDate = new Date().getDate();
+          let lastUpdatedDate = new Date(result.updatedAt).getDate();
+
+          if (todayDate !== lastUpdatedDate && !loading) {
+            this.props.resetDailyFunc(
+              this.props.navigation.getParam('id', ''),
+              0,
+            );
+          }
 
           let goToSearchFood = () => {
             this.props.navigation.navigate('foodSearch', {
@@ -395,6 +451,10 @@ export default class DashboardScene extends Component<Props, State> {
       </Query>
     );
   }
+
+  _resetDailyState = () => {
+    alert('halo');
+  };
 
   _toggleBMRModal = () => {
     this.setState({bmrModalVisible: !this.state.bmrModalVisible});

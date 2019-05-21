@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   GestureResponderEvent,
   View,
+  ImageSourcePropType,
 } from 'react-native';
-import MALE_AVATAR from '../../assets/images/male-avatar.jpeg';
 import {AVATAR_SIZE_BIG, AVATAR_SIZE_SMALL} from '../constants/size';
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
   /**
    * image uri to show as Avatar
    */
-  source?: string;
+  source: ImageSourcePropType;
 
   /**
    * function to invoke when Avatar is pressed
@@ -66,19 +66,11 @@ export default function Avatar(props: Props) {
       style={[styles[size], styles.shadow, style]}
       onPress={onPress}
     >
-      <Image
-        source={source ? {uri: source} : MALE_AVATAR}
-        style={styles[size]}
-        resizeMethod="scale"
-      />
+      <Image source={source} style={styles[size]} resizeMethod="scale" />
     </TouchableOpacity>
   ) : (
     <View style={[styles[size], shadow && styles.shadow, style]}>
-      <Image
-        source={source ? {uri: source} : MALE_AVATAR}
-        style={styles[size]}
-        resizeMethod="scale"
-      />
+      <Image source={source} style={styles[size]} resizeMethod="scale" />
     </View>
   );
 }

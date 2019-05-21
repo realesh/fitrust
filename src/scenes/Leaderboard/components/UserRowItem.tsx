@@ -13,6 +13,7 @@ import {
   BLUE,
   BLUE30,
 } from '../../../generals/constants/colors';
+import {imageResolvers} from '../../../helpers/imageResolvers';
 
 type Props = ViewProps &
   TouchableOpacityProps & {
@@ -65,7 +66,8 @@ export default function UserRowItem(props: Props) {
         {rankNumber}
       </Text>
       <Avatar
-        source={avatarUri}
+        // source={{uri: avatarUri}}
+        source={imageResolvers(avatarUri)}
         size="small"
         shadow={false}
         style={styles.marginRight}

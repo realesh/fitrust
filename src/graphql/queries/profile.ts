@@ -83,6 +83,7 @@ export type UpdateProfileVariables = {
   first: string;
   middle: string;
   last: string;
+  avatarUrl: string;
 };
 export const UPDATE_PROFILE = gql`
   mutation updateProfile(
@@ -91,6 +92,7 @@ export const UPDATE_PROFILE = gql`
     $first: String
     $middle: String
     $last: String
+    $avatarUrl: String
   ) {
     updateUser(
       data: {
@@ -100,6 +102,7 @@ export const UPDATE_PROFILE = gql`
             titleFirst: $first
             titleMiddle: $middle
             titleLast: $last
+            avatarUrl: $avatarUrl
           }
         }
       }

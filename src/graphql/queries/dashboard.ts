@@ -9,6 +9,8 @@ export type UserDashboardData = {
   goalIntake: number;
   intakeValue: number;
   workoutValue: number;
+  createdAt: string;
+  updatedAt: string;
 };
 export type UserDashboardResponse = {
   user?: {
@@ -30,6 +32,8 @@ export const USER_DASHBOARD = gql`
         points
         intakeValue
         workoutValue
+        createdAt
+        updatedAt
       }
     }
   }
@@ -57,6 +61,34 @@ export const UPDATE_INTAKE_GOAL = gql`
       profile {
         goalIntake
         goalWorkout
+      }
+    }
+  }
+`;
+
+export type ResetDailyResponse = {
+  user?: {
+    profile: {
+      intakeValue: number;
+      workoutValue: number;
+    };
+  };
+};
+export type ResetDailyVariables = {
+  userID: string;
+  resetValue: number;
+};
+export const RESET_DAILY_GOAL = gql`
+  mutation updateIntake($userID: ID, $resetValue: Int) {
+    updateUser(
+      data: {
+        profile: {update: {intakeValue: $resetValue, workoutValue: $resetValue}}
+      }
+      where: {id: $userID}
+    ) {
+      profile {
+        intakeValue
+        workoutValue
       }
     }
   }

@@ -25,7 +25,6 @@ import BMIInsight from './components/BMIInsight';
 import MHRInsight from './components/MHRInsight';
 import CollapsibleSettings from './components/CollapsibleSettings';
 import FancyRibbonButton from './components/FancyRibbonButton';
-// import {settingsItems} from './data/settingsDataFixtures';
 import ExerciseModePlaceholder from './components/ExerciseModePlaceholder';
 import {Query} from 'react-apollo';
 import {
@@ -35,6 +34,7 @@ import {
 } from '../../graphql/queries/profile';
 import {SettingsItem} from './data/settingsDataFixtures';
 import LogoutModal from './components/LogoutModal';
+import {imageResolvers} from '../../helpers/imageResolvers';
 
 type Props = NavigationScreenProps;
 
@@ -129,7 +129,7 @@ export default class ProfileScene extends Component<Props, State> {
                   <View style={styles.paddedContainer}>
                     <Avatar
                       size="big"
-                      source={result.avatarUrl}
+                      source={imageResolvers(result.avatarUrl)}
                       style={{marginBottom: 10}}
                     />
                     <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>

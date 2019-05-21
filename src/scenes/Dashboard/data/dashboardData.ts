@@ -7,4 +7,8 @@ export const DEFAULT_USER_DASHBOARD: UserDashboardData = {
   waterGoal: 0,
   goalWorkout: 0,
   goalIntake: 0,
+  intakeValue: 0,
+  workoutValue: 0,
+  createdAt: '2010-01-01T11:46:57.748Z',
+  updatedAt: '2010-01-01T11:46:57.748Z',
 };

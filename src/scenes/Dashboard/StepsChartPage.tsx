@@ -274,24 +274,44 @@ export default class StepsChartPage extends Component<Props, State> {
           />
 
           <View style={styles.comparisonContainer}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Icon
-                name={comparison.type}
-                size={30}
-                color={comparison.color}
-                style={styles.marginRight}
-              />
+            <View style={styles.flex}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Icon
+                  name={comparison.type}
+                  size={30}
+                  color={comparison.color}
+                  style={styles.marginRight}
+                />
+                <Text
+                  fontWeight="bold"
+                  fontSize={BIG_FONT_SIZE}
+                  style={{color: comparison.color}}
+                >
+                  {comparison.value.toFixed(0)}%
+                </Text>
+              </View>
+              <Text fontSize={SMALL_FONT_SIZE} style={styles.labelText}>
+                than last week
+              </Text>
+            </View>
+            <View style={styles.flex}>
               <Text
                 fontWeight="bold"
                 fontSize={BIG_FONT_SIZE}
-                style={{color: comparison.color}}
+                style={{color: GREEN, textAlign: 'center'}}
               >
-                {comparison.value.toFixed(0)}%
+                {biggestNumberStep}
+              </Text>
+              <Text fontSize={SMALL_FONT_SIZE} style={styles.labelText}>
+                max steps
               </Text>
             </View>
-            <Text fontSize={SMALL_FONT_SIZE} style={{marginBottom: 10}}>
-              than last week
-            </Text>
           </View>
         </View>
         <View style={styles.chartsContainer}>
@@ -413,9 +433,12 @@ const styles = StyleSheet.create({
     borderColor: BLUE,
   },
   comparisonContainer: {
+    flexDirection: 'row',
     paddingTop: 20,
     flex: 1,
     alignItems: 'center',
   },
   marginRight: {marginRight: 5},
+  flex: {flex: 1},
+  labelText: {marginBottom: 10, textAlign: 'center'},
 });

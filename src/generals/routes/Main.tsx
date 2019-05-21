@@ -28,6 +28,7 @@ import CheckAuthScene from '../../scenes/Auth/CheckAuthScene';
 import Placeholder from '../../scenes/Placeholder';
 import FoodSearchScene from '../../scenes/SearchNutritionix/FoodSearchScene';
 import WorkoutSearchScene from '../../scenes/SearchNutritionix/WorkoutSearchScene';
+import AvatarSelectorScene from '../../scenes/Profile/AvatarSelectorScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -90,6 +91,12 @@ let profileStack = createStackNavigator({
   },
   changePassword: {
     screen: ChangePasswordScene,
+    navigationOptions: () => ({
+      header: null,
+    }),
+  },
+  avatarSelector: {
+    screen: AvatarSelectorScene,
     navigationOptions: () => ({
       header: null,
     }),

@@ -10,25 +10,45 @@ import numberFormatter from '../../helpers/numberFormatter';
 type Props = ModalBaseProps & {
   pointsSource: string;
   pointsValue: number;
+  exModeEffectivity?: number;
 };
 
 export default function PointsModal(props: Props) {
-  let {visible = false, onRequestClose, pointsSource, pointsValue} = props;
+  let {
+    visible = false,
+    onRequestClose,
+    pointsSource,
+    pointsValue,
+    exModeEffectivity,
+  } = props;
   return (
     <PopupDialog visible={visible} onRequestClose={onRequestClose}>
       <View style={styles.pointsContainer}>
         <Icon name="zap" size={30} color={BLUE} style={{marginRight: 10}} />
         <Text fontWeight="bold" fontSize={BIG_FONT_SIZE} style={{color: BLUE}}>
-          {numberFormatter(pointsValue)}
+          {numberFormatter(Math.floor(pointsValue))}
         </Text>
       </View>
       <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
         Points earned!
       </Text>
-      <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
-        You got points from <Text fontWeight="bold">{`${pointsSource}. `}</Text>
-        Gain more points to soar high above your friends!
-      </Text>
+      {exModeEffectivity ? (
+        <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
+          Great job! You finished your{' '}
+          <Text fontWeight="bold">{`\n ${pointsSource} `}</Text>with
+          <Text fontWeight="bold" style={styles.highlight}>{` ${Math.floor(
+            exModeEffectivity,
+          )}% `}</Text>
+          score!{'\n'}Try to maintain your heart rate in your goal zone to get
+          more score!
+        </Text>
+      ) : (
+        <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
+          You got points from{' '}
+          <Text fontWeight="bold">{`${pointsSource}. \n`}</Text>
+          Gain more points to soar high above your friends!
+        </Text>
+      )}
       <Button
         onPress={onRequestClose}
         style={styles.interactButton}
@@ -60,4 +80,5 @@ const styles = StyleSheet.create({
     borderColor: BLUE,
     width: '90%',
   },
+  highlight: {color: BLUE},
 });

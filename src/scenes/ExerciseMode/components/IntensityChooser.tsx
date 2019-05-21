@@ -19,9 +19,10 @@ import {
   BLACK,
 } from '../../../generals/constants/colors';
 import {fire, fireGrey} from '../../../assets/images/dashboard';
+import {ExerciseTypeEnum} from '../../../graphql/mutations/exerciseMode';
 
 export type Intensity = {
-  title: string;
+  title: ExerciseTypeEnum;
   level: IntensityIndexEnum;
   desc: string;
   min: number;

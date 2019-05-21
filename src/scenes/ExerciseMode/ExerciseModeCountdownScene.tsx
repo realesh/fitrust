@@ -5,10 +5,11 @@ import {
   LayoutAnimation,
   Image,
   BackHandler,
+  AsyncStorage,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import CountDown from 'react-native-countdown-component';
-import {Text} from '../../generals/core-ui';
+import {Text, Button} from '../../generals/core-ui';
 import {
   LARGE_FONT_SIZE,
   SCREEN_HEIGHT,
@@ -16,9 +17,18 @@ import {
 } from '../../generals/constants/size';
 import {BLUE, WHITE, BLACK30} from '../../generals/constants/colors';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
-import {exerciseMode} from '../../assets/images/exerciseMode';
+import {exerciseMode, exerciseReady} from '../../assets/images/exerciseMode';
 import {ExerciseSetting} from './ExerciseModeSettingScene';
 import {Moment} from 'moment';
+import {PopupDialog} from '../../generals/components';
+import {
+  UPDATE_COUPONS,
+  UpdateCouponResponse,
+  UpdateCouponVariables,
+  ExerciseTypeEnum,
+} from '../../graphql/mutations/exerciseMode';
+import {Mutation} from 'react-apollo';
+import moment from 'moment';
 
 type NavigationParams = {
   exerciseSetting: ExerciseSetting;
@@ -28,10 +38,8 @@ type NavigationParams = {
 type Props = NavigationScreenProps<NavigationParams>;
 
 type State = {
-  finishModalVisible: boolean;
   runningCount: boolean;
-  startTime: string;
-  finishTime: string;
+  finishModalVisible: boolean;
 };
 
 export default class ExerciseModeCountdownScene extends Component<
@@ -39,26 +47,12 @@ export default class ExerciseModeCountdownScene extends Component<
   State
 > {
   state = {
-    finishModalVisible: false,
     runningCount: false,
-    startTime: '00:00',
-    finishTime: '00:10',
+    finishModalVisible: false,
   };
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
-
-    let startMoment = this.props.navigation
-      .getParam('startMoment')
-      .subtract(5, 'minutes');
-    let startTime = `${startMoment.get('hours')}:${startMoment.get('minutes')}`;
-    let {duration} = this.props.navigation.getParam('exerciseSetting');
-    let finishMoment = startMoment.add(duration, 'minutes');
-    let finishTime = `${finishMoment.get('hours')}:${finishMoment.get(
-      'minutes',
-    )}`;
-
-    this.setState({startTime, finishTime});
   }
 
   componentWillUnmount() {
@@ -66,7 +60,7 @@ export default class ExerciseModeCountdownScene extends Component<
   }
 
   render() {
-    let {finishModalVisible, runningCount} = this.state;
+    let {runningCount} = this.state;
     let {duration, intensity} = this.props.navigation.getParam(
       'exerciseSetting',
     );
@@ -152,6 +146,14 @@ export default class ExerciseModeCountdownScene extends Component<
             running={runningCount}
           />
         </View>
+        {this._renderPopup(duration, intensity.title)}
+        {/* <PointsModal
+          visible={resultModalVisible}
+          pointsSource="Exercise Mode"
+          pointsValue={exModeEarnedPoints}
+          exModeEffectivity={exModeEffectivityResult}
+          onRequestClose={this._toggleResultmModalVisible}
+        /> */}
       </View>
     );
   }
@@ -166,9 +168,145 @@ export default class ExerciseModeCountdownScene extends Component<
     this.setState({runningCount: true});
   };
 
-  _onCountdownFinish = () => {
-    alert('yey');
+  _toggleResultModalVisible = () => {
+    this.setState({finishModalVisible: !this.state.finishModalVisible});
   };
+
+  _onCountdownFinish = () => {
+    this._toggleResultModalVisible();
+    // alert('yey');
+  };
+
+  _renderPopup = (duration: number, type: ExerciseTypeEnum) => (
+    <Mutation<UpdateCouponResponse, UpdateCouponVariables>
+      mutation={UPDATE_COUPONS}
+    >
+      {(updateCoupons) => {
+        let startMoment = this.props.navigation
+          .getParam('startMoment')
+          .subtract(5, 'minutes');
+        let getHours = (hour: number) => {
+          if (hour < 10) {
+            return `0${hour}`;
+          } else {
+            return String(hour);
+          }
+        };
+        let startTime = `${getHours(
+          startMoment.get('hours'),
+        )}:${startMoment.get('minutes')}`;
+        let finishMoment = startMoment.add(duration, 'minutes');
+        let finishTime = `${getHours(
+          finishMoment.get('hours'),
+        )}:${finishMoment.get('minutes')}`;
+
+        let dateMoment = moment();
+        let date = [
+          dateMoment.get('year'),
+          dateMoment.get('month') + 1 < 10
+            ? '0' + (dateMoment.get('month') + 1)
+            : dateMoment.get('month') + 1,
+          dateMoment.get('date') < 10
+            ? '0' + dateMoment.get('date')
+            : dateMoment.get('date'),
+        ].join('-');
+
+        let handleUpdate = async () => {
+          try {
+            let ID = await AsyncStorage.getItem('userID');
+            updateCoupons &&
+              (await updateCoupons({
+                variables: {
+                  userID: ID || '',
+                  duration,
+                  type,
+                  startTime,
+                  finishTime,
+                  date,
+                },
+              }));
+          } catch (error) {
+            // Handle Error
+          }
+          this._toggleResultModalVisible();
+          this.props.navigation.navigate('dashboardHome');
+        };
+        return (
+          <PopupDialog visible={this.state.finishModalVisible}>
+            <Image
+              source={exerciseReady}
+              style={styles.finishImage}
+              resizeMode="contain"
+            />
+            <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
+              Coupon earned!
+            </Text>
+            <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
+              Redeem your earned coupon later for points when your data has
+              completely processed!
+            </Text>
+            <Button
+              onPress={handleUpdate}
+              style={styles.interactButton}
+              fontColor={BLUE}
+            >
+              CLAIM
+            </Button>
+          </PopupDialog>
+        );
+      }}
+    </Mutation>
+  );
+
+  // _fetchResults = async () => {
+  //   let startMoment = this.props.navigation
+  //     .getParam('startMoment')
+  //     .subtract(5, 'minutes');
+  //   let getHours = (hour: number) => {
+  //     if (hour < 10) {
+  //       return `0${hour}`;
+  //     } else {
+  //       return String(hour);
+  //     }
+  //   };
+  //   let startTime = `${getHours(startMoment.get('hours'))}:${startMoment.get(
+  //     'minutes',
+  //   )}`;
+  //   let {duration} = this.props.navigation.getParam('exerciseSetting');
+  //   let finishMoment = startMoment.add(duration, 'minutes');
+  //   let finishTime = `${getHours(finishMoment.get('hours'))}:${finishMoment.get(
+  //     'minutes',
+  //   )}`;
+
+  //   let fitbitUserID = await AsyncStorage.getItem('fitbit_user_id');
+  //   let fitbitAccessToken = await AsyncStorage.getItem('fitbit_access_token');
+  //   if (fitbitUserID && fitbitAccessToken) {
+  //     let fitbitResponse = await fetchExerciseMode(
+  //       fitbitUserID,
+  //       fitbitAccessToken,
+  //       startTime,
+  //       finishTime,
+  //     );
+  //     let response =
+  //       (fitbitResponse['activities-heart-intraday'] &&
+  //         fitbitResponse['activities-heart-intraday'].dataset) ||
+  //       [];
+  //     if (response.length) {
+  //       let bpmData = [...response.map((data) => data.value)];
+  //       let total = bpmData.reduce((prev, curr) => prev + curr);
+  //       let successData = bpmData.filter((bpm) => 70 <= bpm && bpm <= 80);
+  //       let successTotal = successData.reduce((prev, curr) => prev + curr);
+  //       let effectivityResult = Math.floor((successTotal / total) * 100);
+  //       this.setState({
+  //         exModeEffectivityResult: effectivityResult,
+  //         exModeEarnedPoints: Math.floor((effectivityResult / 100) * 9765),
+  //       });
+  //     } else {
+  //       console.log('fetchfails');
+  //       // 0 data
+  //     }
+  //   }
+  // };
 }
 
 const styles = StyleSheet.create({
@@ -213,5 +351,18 @@ const styles = StyleSheet.create({
     height: 200,
     width: '100%',
     marginTop: 10,
+  },
+  finishImage: {
+    height: 250,
+    width: '100%',
+  },
+  interactButton: {
+    backgroundColor: WHITE,
+    marginTop: 20,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: BLUE,
+    width: '90%',
   },
 });

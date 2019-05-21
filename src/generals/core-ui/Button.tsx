@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {DEFAULT_FONT_SIZE} from '../constants/size';
 import Text from './Text';
-import {WHITE, BLUE} from '../constants/colors';
+import {WHITE, BLUE, DARK_GREY70} from '../constants/colors';
 import {Feather as Icon} from '@expo/vector-icons';
 
 type Props = TouchableOpacityProps & {
@@ -43,6 +43,7 @@ const Button = (props: Props) => {
     children,
     style,
     onPress,
+    disabled,
     ...otherProps
   } = props;
 
@@ -50,7 +51,8 @@ const Button = (props: Props) => {
     <TouchableOpacity
       activeOpacity={0.6}
       onPress={onPress}
-      style={[styles.clickableArea, style]}
+      style={[disabled ? styles.disabledArea : styles.clickableArea, style]}
+      disabled={disabled}
       {...otherProps}
     >
       {iconName && <Icon name={iconName} size={fontSize} color={fontColor} />}
@@ -58,7 +60,10 @@ const Button = (props: Props) => {
         <Text
           fontWeight="bold"
           fontSize={fontSize}
-          style={{color: fontColor, marginLeft: iconName ? 5 : 0}}
+          style={{
+            color: disabled ? DARK_GREY70 : fontColor,
+            marginLeft: iconName ? 5 : 0,
+          }}
         >
           {children}
         </Text>
@@ -84,6 +89,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: BLUE,
+    borderRadius: 10,
+  },
+  disabledArea: {
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: DARK_GREY70,
     borderRadius: 10,
   },
 });

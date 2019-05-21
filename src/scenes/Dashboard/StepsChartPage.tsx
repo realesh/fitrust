@@ -5,11 +5,7 @@ import {AreaChart} from 'react-native-svg-charts';
 import {Path, Circle} from 'react-native-svg';
 import * as shape from 'd3-shape';
 import {Text} from '../../generals/core-ui';
-import {
-  MEDIUM_FONT_SIZE,
-  SMALL_FONT_SIZE,
-  BIG_FONT_SIZE,
-} from '../../generals/constants/size';
+import {MEDIUM_FONT_SIZE, SMALL_FONT_SIZE} from '../../generals/constants/size';
 import {
   BLUE,
   LIGHT_GREY,
@@ -290,7 +286,7 @@ export default class StepsChartPage extends Component<Props, State> {
                 />
                 <Text
                   fontWeight="bold"
-                  fontSize={BIG_FONT_SIZE}
+                  fontSize={35}
                   style={{color: comparison.color}}
                 >
                   {comparison.value.toFixed(0)}%
@@ -303,7 +299,7 @@ export default class StepsChartPage extends Component<Props, State> {
             <View style={styles.flex}>
               <Text
                 fontWeight="bold"
-                fontSize={BIG_FONT_SIZE}
+                fontSize={35}
                 style={{color: GREEN, textAlign: 'center'}}
               >
                 {biggestNumberStep}

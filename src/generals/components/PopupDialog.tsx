@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE,
     borderRadius: 10,
     width: '100%',
-    maxHeight: '80%',
+    maxHeight: '100%',
     alignItems: 'center',
     overflow: 'hidden',
     padding: 20,
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   modalPage: {
     flex: 1,
     width: '100%',
-    maxHeight: '80%',
+    maxHeight: '100%',
     backgroundColor: WHITE,
     borderRadius: 10,
     overflow: 'hidden',

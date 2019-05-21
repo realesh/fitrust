@@ -30,6 +30,7 @@ import {
 } from '../../graphql/queries/profile';
 import {USER_DASHBOARD} from '../../graphql/queries/dashboard';
 import {imageResolvers} from '../../helpers/imageResolvers';
+import {LEADERBOARD_LIST} from '../../graphql/queries/leaderboard';
 
 type NavigationScreenParams = {
   name: string;
@@ -285,6 +286,9 @@ export default class EditProfileScene extends Component<Props, State> {
                       variables: {
                         userID: ID,
                       },
+                    },
+                    {
+                      query: LEADERBOARD_LIST,
                     },
                   ],
                 }));

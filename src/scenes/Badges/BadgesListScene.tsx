@@ -1,8 +1,14 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, FlatList, ListRenderItemInfo} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ListRenderItemInfo,
+  ActivityIndicator,
+} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Toolbar} from '../../generals/components';
-import {WHITE} from '../../generals/constants/colors';
+import {WHITE, BLUE} from '../../generals/constants/colors';
 import Separator from '../../generals/core-ui/Separator';
 import BadgeRowItem from './components/BadgeRowItem';
 import {Query} from 'react-apollo';
@@ -38,7 +44,7 @@ export default class BadgesListScene extends Component<Props, State> {
         query={BADGES_LIST}
         variables={{userID: this.props.navigation.getParam('userID', '')}}
       >
-        {({data}) => {
+        {({data, loading}) => {
           let result = data && data.badgesList;
           let badgesList: Array<BadgeItem> = [];
           if (result) {
@@ -57,7 +63,11 @@ export default class BadgesListScene extends Component<Props, State> {
             badgesList = [...unlocked, ...locked];
           }
 
-          return (
+          return loading ? (
+            <View style={{flex: 1, justifyContent: 'center'}}>
+              <ActivityIndicator color={BLUE} size="large" />
+            </View>
+          ) : (
             <View style={styles.root}>
               <Toolbar navigation={navigation} title="Badges" />
               <View style={styles.contentContainer}>

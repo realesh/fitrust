@@ -9,10 +9,16 @@ import {
   NativeScrollEvent,
   LayoutAnimation,
   AsyncStorage,
+  ActivityIndicator,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Toolbar} from '../../generals/components';
-import {WHITE, LIGHT_GREY, LIGHTER_GREY} from '../../generals/constants/colors';
+import {
+  WHITE,
+  LIGHT_GREY,
+  LIGHTER_GREY,
+  BLUE,
+} from '../../generals/constants/colors';
 import AvatarWithMedal from './components/AvatarWithMedal';
 import {
   usersListData,
@@ -69,15 +75,20 @@ export default class LeaderboardScene extends Component<Props, State> {
     return (
       <Query<LeaderboardResponse, LeaderboardVariables>
         query={LEADERBOARD_LIST}
+        fetchPolicy="network-only"
       >
-        {({data}) => {
+        {({data, loading}) => {
           let result = (data && data.profiles) || usersListData;
 
           let top20result =
             result.length <= 20 ? [...result] : [...result.slice(0, 19)];
           let [firstPosUser, secondPosUser, thirdPosUser] = top20result;
 
-          return (
+          return loading ? (
+            <View style={{flex: 1, justifyContent: 'center'}}>
+              <ActivityIndicator color={BLUE} size="large" />
+            </View>
+          ) : (
             <View style={styles.root}>
               <Toolbar navigation={navigation} title="Leaderboard" />
               <Animated.View
@@ -87,9 +98,6 @@ export default class LeaderboardScene extends Component<Props, State> {
                   rank="silver"
                   name={secondPosUser.name}
                   points={secondPosUser.points}
-                  // avatarSource={{
-                  //   uri: secondPosUser.avatarUrl,
-                  // }}
                   avatarSource={imageResolvers(secondPosUser.avatarUrl)}
                   avatarMinimized={minimizeHeader}
                 />
@@ -97,9 +105,6 @@ export default class LeaderboardScene extends Component<Props, State> {
                   rank="gold"
                   name={firstPosUser.name}
                   points={firstPosUser.points}
-                  // avatarSource={{
-                  //   uri: firstPosUser.avatarUrl,
-                  // }}
                   avatarSource={imageResolvers(firstPosUser.avatarUrl)}
                   avatarMinimized={minimizeHeader}
                 />
@@ -107,9 +112,6 @@ export default class LeaderboardScene extends Component<Props, State> {
                   rank="bronze"
                   name={thirdPosUser.name}
                   points={thirdPosUser.points}
-                  // avatarSource={{
-                  //   uri: thirdPosUser.avatarUrl,
-                  // }}
                   avatarSource={imageResolvers(thirdPosUser.avatarUrl)}
                   avatarMinimized={minimizeHeader}
                 />
@@ -202,10 +204,6 @@ export default class LeaderboardScene extends Component<Props, State> {
       });
     }
   };
-
-  // _findUserIndex(user: UserLeaderboard) {
-  //   return user.name === 'Depp';
-  // }
 }
 
 const styles = StyleSheet.create({

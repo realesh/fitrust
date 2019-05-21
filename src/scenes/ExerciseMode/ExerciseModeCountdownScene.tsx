@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, LayoutAnimation, Image} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  LayoutAnimation,
+  Image,
+  BackHandler,
+} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import CountDown from 'react-native-countdown-component';
 import {Text} from '../../generals/core-ui';
@@ -12,9 +18,11 @@ import {BLUE, WHITE, BLACK30} from '../../generals/constants/colors';
 import {linearEasingShort} from '../../generals/constants/animationConfig';
 import {exerciseMode} from '../../assets/images/exerciseMode';
 import {ExerciseSetting} from './ExerciseModeSettingScene';
+import {Moment} from 'moment';
 
 type NavigationParams = {
   exerciseSetting: ExerciseSetting;
+  startMoment: Moment;
 };
 
 type Props = NavigationScreenProps<NavigationParams>;
@@ -22,6 +30,8 @@ type Props = NavigationScreenProps<NavigationParams>;
 type State = {
   finishModalVisible: boolean;
   runningCount: boolean;
+  startTime: string;
+  finishTime: string;
 };
 
 export default class ExerciseModeCountdownScene extends Component<
@@ -31,7 +41,29 @@ export default class ExerciseModeCountdownScene extends Component<
   state = {
     finishModalVisible: false,
     runningCount: false,
+    startTime: '00:00',
+    finishTime: '00:10',
   };
+
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+
+    let startMoment = this.props.navigation
+      .getParam('startMoment')
+      .subtract(5, 'minutes');
+    let startTime = `${startMoment.get('hours')}:${startMoment.get('minutes')}`;
+    let {duration} = this.props.navigation.getParam('exerciseSetting');
+    let finishMoment = startMoment.add(duration, 'minutes');
+    let finishTime = `${finishMoment.get('hours')}:${finishMoment.get(
+      'minutes',
+    )}`;
+
+    this.setState({startTime, finishTime});
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+  }
 
   render() {
     let {finishModalVisible, runningCount} = this.state;
@@ -122,6 +154,11 @@ export default class ExerciseModeCountdownScene extends Component<
         </View>
       </View>
     );
+  }
+
+  handleBackButton() {
+    alert('hey');
+    return true;
   }
 
   _onInitialCountdownFinish = () => {

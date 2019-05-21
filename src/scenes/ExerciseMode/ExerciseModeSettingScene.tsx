@@ -2,7 +2,12 @@ import React, {Component} from 'react';
 import {View, StyleSheet, LayoutAnimation, Image} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Text, Button} from '../../generals/core-ui';
-import {BLUE, WHITE, LIGHTER_GREY} from '../../generals/constants/colors';
+import {
+  BLUE,
+  WHITE,
+  LIGHTER_GREY,
+  DARK_GREY70,
+} from '../../generals/constants/colors';
 import DurationChooser from './components/DurationChooser';
 import {LinearGradient} from 'expo';
 import {SCREEN_WIDTH, LARGE_FONT_SIZE} from '../../generals/constants/size';
@@ -14,6 +19,7 @@ import IntensityChooser, {
 import {linearEasingShort} from '../../generals/constants/animationConfig';
 import {intensitiesData, durationData} from './data/ExerciseModeDataFixtures';
 import {exerciseReady} from '../../assets/images/exerciseMode';
+import moment from 'moment';
 
 type Props = NavigationScreenProps;
 
@@ -82,7 +88,14 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
           />
         </View>
         <View style={styles.footerContainer}>
-          <Button onPress={this._toggleStartModalVisible}>Start</Button>
+          <Button
+            style={styles.startButton}
+            onPress={this._toggleStartModalVisible}
+            // ADD DISABLED
+          >
+            Start
+          </Button>
+          <Text style={{color: DARK_GREY70}}>Chances left (2/2)</Text>
         </View>
 
         <PopupDialog
@@ -127,12 +140,16 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
 
   _navToCountdown = () => {
     let {durationIndex, intensityIndex} = this.state;
+    let startMoment = moment();
     let exerciseSetting: ExerciseSetting = {
       duration: durationData[durationIndex],
       intensity: intensitiesData[intensityIndex],
     };
     this._toggleStartModalVisible();
-    this.props.navigation.navigate('exerciseModeCountdown', {exerciseSetting});
+    this.props.navigation.navigate('exerciseModeCountdown', {
+      exerciseSetting,
+      startMoment,
+    });
   };
 }
 
@@ -164,6 +181,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     paddingHorizontal: 20,
+    alignItems: 'center',
   },
   image: {
     height: 250,
@@ -177,5 +195,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: BLUE,
     width: '90%',
+  },
+  startButton: {
+    width: '100%',
+    marginBottom: 5,
   },
 });

@@ -129,8 +129,8 @@ export default class ExerciseModeCountdownScene extends Component<
           style={[styles.countContainer, {bottom: runningCount ? 0 : -300}]}
         >
           <CountDown
-            // until={duration * 60}
-            until={5}
+            until={duration * 60}
+            // until={5}
             timeToShow={['H', 'M', 'S']}
             onFinish={this._onCountdownFinish}
             size={50}
@@ -180,39 +180,6 @@ export default class ExerciseModeCountdownScene extends Component<
         let startTime = '';
         let finishTime = '';
         let date = '';
-
-        // let handleUpdate = () => {
-        //   let startMoment = this.props.navigation
-        //     .getParam('startMoment')
-        //     .add(1, 'minutes');
-        //   let formatTime = (time: number) => {
-        //     if (time < 10) {
-        //       return `0${time}`;
-        //     } else {
-        //       return String(time);
-        //     }
-        //   };
-        //   startTime = `${formatTime(startMoment.get('hours'))}:${formatTime(
-        //     startMoment.get('minutes'),
-        //   )}`;
-        //   let finishMoment = startMoment.add(duration - 1, 'minutes');
-        //   finishTime = `${formatTime(finishMoment.get('hours'))}:${formatTime(
-        //     finishMoment.get('minutes'),
-        //   )}`;
-
-        //   let dateMoment = moment();
-        //   date = [
-        //     dateMoment.get('year'),
-        //     dateMoment.get('month') + 1 < 10
-        //       ? '0' + (dateMoment.get('month') + 1)
-        //       : dateMoment.get('month') + 1,
-        //     dateMoment.get('date') < 10
-        //       ? '0' + dateMoment.get('date')
-        //       : dateMoment.get('date'),
-        //   ].join('-');
-
-        //   console.log(date, startTime, finishTime, '<<<');
-        // };
 
         let handleUpdate = async () => {
           let startMoment = this.props.navigation

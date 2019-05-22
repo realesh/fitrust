@@ -149,13 +149,6 @@ export default class ExerciseModeCountdownScene extends Component<
           />
         </View>
         {this._renderPopup(duration, intensity.title)}
-        {/* <PointsModal
-          visible={resultModalVisible}
-          pointsSource="Exercise Mode"
-          pointsValue={exModeEarnedPoints}
-          exModeEffectivity={exModeEffectivityResult}
-          onRequestClose={this._toggleResultmModalVisible}
-        /> */}
       </View>
     );
   }

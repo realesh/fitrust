@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
-import {Toolbar} from '../../generals/components';
+import {Toolbar, PointsModal} from '../../generals/components';
 import {
   WHITE,
   BLUE,
@@ -25,6 +25,7 @@ import {
   UserCouponsResponse,
   UserCouponsVariables,
   ExerciseCoupon,
+  ExerciseTypeEnum,
 } from '../../graphql/mutations/exerciseMode';
 import {Text} from '../../generals/core-ui';
 import {
@@ -35,6 +36,8 @@ import {
   MEDIUM_FONT_SIZE,
 } from '../../generals/constants/size';
 import fetchExerciseMode from '../../helpers/Fetchers/fetchExerciseMode';
+import {intensitiesData} from '../ExerciseMode/data/ExerciseModeDataFixtures';
+import CouponListItem from './components/CouponListItem';
 
 type NavigationScreenParams = {
   userID: string;
@@ -45,18 +48,27 @@ type NavigationScreenParams = {
 type Props = NavigationScreenProps<NavigationScreenParams>;
 
 type State = {
-  minimizeHeader: boolean;
+  exModeEffectivityResult: number;
+  exModeEarnedPoints: number;
+  resultModalVisible: boolean;
 };
 
 export default class CouponsListScene extends Component<Props, State> {
   state: State = {
-    minimizeHeader: false,
+    exModeEffectivityResult: 0,
+    exModeEarnedPoints: 0,
+    resultModalVisible: false,
   };
 
   offset = 0;
 
   render() {
     let {navigation} = this.props;
+    let {
+      exModeEarnedPoints,
+      exModeEffectivityResult,
+      resultModalVisible,
+    } = this.state;
 
     return (
       <Query<UserCouponsResponse, UserCouponsVariables>
@@ -71,6 +83,7 @@ export default class CouponsListScene extends Component<Props, State> {
               data.user.profile.exerciseCoupons) ||
             [];
 
+          let mhr = 220;
           if (!loading) {
             let dob =
               (data &&
@@ -81,14 +94,26 @@ export default class CouponsListScene extends Component<Props, State> {
             let now = new Date().getFullYear();
             let dobYear = new Date(dob).getFullYear();
             let age = now - dobYear;
-            let mhr =
+            mhr =
               (data &&
                 data.user &&
                 data.user.profile &&
                 data.user.profile.bpm) ||
               220 - age;
-            console.log(mhr, '<<<<<<<<<<<');
           }
+
+          let renderCoupon = ({item}: ListRenderItemInfo<ExerciseCoupon>) => {
+            let onPress = () =>
+              this._fetchResults(
+                item.duration,
+                item.startTime,
+                item.finishTime,
+                item.type,
+                mhr,
+              );
+
+            return <CouponListItem item={item} onPress={onPress} />;
+          };
 
           return loading ? (
             <View style={{flex: 1, justifyContent: 'center'}}>
@@ -115,12 +140,19 @@ export default class CouponsListScene extends Component<Props, State> {
               <View style={styles.contentContainer}>
                 <FlatList
                   data={exerciseCoupons}
-                  renderItem={this._renderItem}
+                  renderItem={renderCoupon}
                   ItemSeparatorComponent={this._renderSeparator}
                   showsVerticalScrollIndicator={false}
                   keyExtractor={this._keyExtractor}
                 />
               </View>
+              <PointsModal
+                visible={resultModalVisible}
+                pointsSource="Exercise Mode"
+                pointsValue={exModeEarnedPoints}
+                exModeEffectivity={exModeEffectivityResult}
+                onRequestClose={this._closeResultModal}
+              />
             </View>
           );
         }}
@@ -128,67 +160,24 @@ export default class CouponsListScene extends Component<Props, State> {
     );
   }
 
-  _renderItem = ({item}: ListRenderItemInfo<ExerciseCoupon>) => {
-    let onPress = () => this._fetchResults(item.startTime, item.finishTime);
-
-    return (
-      <TouchableOpacity
-        activeOpacity={0.6}
-        style={styles.couponContainer}
-        onPress={onPress}
-      >
-        <View style={styles.couponTypeInfo}>
-          <View style={styles.typeInitialBox}>
-            <Text
-              fontWeight="bold"
-              fontSize={HEADER_FONT_SIZE}
-              style={styles.whiteText}
-            >
-              {item.type[0]}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.topSeparatorCircle} />
-        <View style={styles.bottomSeparatorCircle} />
-        <View style={styles.exDetailInfo}>
-          <Text
-            fontWeight="bold"
-            fontSize={LARGE_FONT_SIZE}
-            style={{marginBottom: 5}}
-          >
-            {item.type}
-          </Text>
-          <Text
-            fontWeight="light"
-            fontSize={SMALL_FONT_SIZE}
-            style={{marginBottom: 3}}
-          >
-            {`${item.startTime} - ${item.finishTime}`}
-          </Text>
-          <Text
-            fontWeight="light"
-            fontSize={TINY_FONT_SIZE}
-            style={{color: DARK_GREY70}}
-          >
-            {`issued date: ${item.date}`}
-          </Text>
-          <View style={styles.durationContainer}>
-            <Text fontWeight="bold" style={{color: GREEN}}>
-              {`${item.duration} mins`}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   _renderSeparator = () => <View style={{height: 20}} />;
 
   _keyExtractor = (_item: ExerciseCoupon, index: number) => String(index);
 
-  _fetchResults = async (startTime: string, finishTime: string) => {
+  _fetchResults = async (
+    duration: number,
+    startTime: string,
+    finishTime: string,
+    type: ExerciseTypeEnum,
+    mhr: number,
+  ) => {
     let fitbitUserID = this.props.navigation.getParam('fitbitUserID');
     let fitbitAccessToken = this.props.navigation.getParam('fitbitAccessToken');
+    let [data] = intensitiesData.filter(
+      (intensity) => intensity.title === type,
+    );
+    let topBound = data.max * mhr;
+    let lowBound = data.min * mhr;
     if (fitbitUserID && fitbitAccessToken) {
       let fitbitResponse = await fetchExerciseMode(
         fitbitUserID,
@@ -200,22 +189,34 @@ export default class CouponsListScene extends Component<Props, State> {
         (fitbitResponse['activities-heart-intraday'] &&
           fitbitResponse['activities-heart-intraday'].dataset) ||
         [];
-      if (response.length) {
-        console.log(response, '<<<<<');
-        // let bpmData = [...response.map((data) => data.value)];
-        // let total = bpmData.reduce((prev, curr) => prev + curr);
-        // let successData = bpmData.filter((bpm) => 70 <= bpm && bpm <= 80);
-        // let successTotal = successData.reduce((prev, curr) => prev + curr);
-        // let effectivityResult = Math.floor((successTotal / total) * 100);
-        // this.setState({
-        //   exModeEffectivityResult: effectivityResult,
-        //   exModeEarnedPoints: Math.floor((effectivityResult / 100) * 9765),
-        // });
+      if (response.length >= duration) {
+        let bpmData = [...response.map((bpm) => bpm.value)];
+        let total = bpmData.reduce((prev, curr) => prev + curr);
+        let successData = bpmData.filter(
+          (bpm) => lowBound < bpm && bpm <= topBound,
+        );
+        let successTotal = successData.length
+          ? successData.reduce((prev, curr) => prev + curr)
+          : 0;
+        let exModeEffectivityResult = successTotal
+          ? Math.floor((successTotal / total) * 100)
+          : -1;
+        let exModeEarnedPoints = successTotal
+          ? Math.floor((exModeEffectivityResult / 100) * data.optimalScore)
+          : 0;
+        this.setState({
+          exModeEffectivityResult,
+          exModeEarnedPoints,
+          resultModalVisible: true,
+        });
       } else {
-        console.log('fetchfails');
         // 0 data
+        console.log('fetchfails');
       }
     }
+  };
+  _closeResultModal = () => {
+    this.setState({resultModalVisible: false});
   };
 }
 
@@ -234,63 +235,5 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopWidth: 1,
     borderTopColor: LIGHT_GREY,
-  },
-  couponContainer: {
-    height: 100,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: WHITE,
-  },
-  couponTypeInfo: {
-    height: '100%',
-    width: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: BLUE,
-  },
-  typeInitialBox: {
-    height: 60,
-    width: 60,
-    backgroundColor: WHITE30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 30,
-  },
-  whiteText: {color: WHITE},
-  greenText: {color: GREEN},
-  topSeparatorCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    position: 'absolute',
-    left: 90,
-    top: -10,
-    backgroundColor: LIGHTER_GREY,
-  },
-  bottomSeparatorCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    position: 'absolute',
-    left: 90,
-    bottom: -10,
-    backgroundColor: LIGHTER_GREY,
-  },
-  exDetailInfo: {
-    flex: 1,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-  },
-  durationContainer: {
-    height: 30,
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    borderRadius: 15,
-    backgroundColor: GREEN30,
-    position: 'absolute',
-    top: 10,
-    right: 10,
   },
 });

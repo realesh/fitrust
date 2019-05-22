@@ -63,7 +63,7 @@ export type ExerciseCoupon = {
 export type UserCouponsResponse = {
   user?: {
     profile?: {
-      bpm: string;
+      bpm: number;
       dob: string;
       exerciseCoupons: Array<ExerciseCoupon>;
     };

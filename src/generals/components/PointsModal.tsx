@@ -29,19 +29,32 @@ export default function PointsModal(props: Props) {
           {numberFormatter(Math.floor(pointsValue))}
         </Text>
       </View>
-      <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
-        Points earned!
-      </Text>
-      {exModeEffectivity ? (
-        <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
-          Great job! You finished your{' '}
-          <Text fontWeight="bold">{`\n ${pointsSource} `}</Text>with
-          <Text fontWeight="bold" style={styles.highlight}>{` ${Math.floor(
-            exModeEffectivity,
-          )}% `}</Text>
-          score!{'\n'}Try to maintain your heart rate in your goal zone to get
-          more score!
+      {exModeEffectivity && exModeEffectivity <= 0 ? (
+        <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
+          Whoops!
         </Text>
+      ) : (
+        <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
+          Points earned!
+        </Text>
+      )}
+      {exModeEffectivity ? (
+        exModeEffectivity > 0 ? (
+          <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
+            Great job! You finished your{' '}
+            <Text fontWeight="bold">{`\n ${pointsSource} `}</Text>with
+            <Text fontWeight="bold" style={styles.highlight}>{` ${Math.floor(
+              exModeEffectivity,
+            )}% `}</Text>
+            score!{'\n'}Try to maintain your heart rate in your goal zone to get
+            more score!
+          </Text>
+        ) : (
+          <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
+            Looks like you're not hitting your goal :({'\n'}Try to maintain your
+            heart rate in your goal zone to get some score!
+          </Text>
+        )
       ) : (
         <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
           You got points from{' '}

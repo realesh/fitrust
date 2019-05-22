@@ -5,13 +5,18 @@ import {fitbitWhite} from '../../../assets/images/profile';
 import {Text, Button} from '../../../generals/core-ui';
 import {WHITE, BLUE} from '../../../generals/constants/colors';
 
-type Props = NavigationScreenProps;
+type Props = NavigationScreenProps & {
+  mhr: number;
+};
 
 export default function ExerciseModePlaceholder(props: Props) {
-  let {navigation} = props;
+  let {navigation, mhr} = props;
 
   let navigate = () =>
-    navigation.navigate('exerciseModeSetting', {previous_scene: 'Placeholder'});
+    navigation.navigate('exerciseModeSetting', {
+      previous_scene: 'Placeholder',
+      mhr,
+    });
 
   return (
     <View style={styles.container}>

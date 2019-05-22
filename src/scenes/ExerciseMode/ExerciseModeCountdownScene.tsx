@@ -33,6 +33,7 @@ import moment from 'moment';
 type NavigationParams = {
   exerciseSetting: ExerciseSetting;
   startMoment: Moment;
+  mhr: number;
 };
 
 type Props = NavigationScreenProps<NavigationParams>;
@@ -64,6 +65,7 @@ export default class ExerciseModeCountdownScene extends Component<
     let {duration, intensity} = this.props.navigation.getParam(
       'exerciseSetting',
     );
+    let mhr = this.props.navigation.getParam('mhr');
 
     return (
       <View style={styles.container}>
@@ -93,9 +95,9 @@ export default class ExerciseModeCountdownScene extends Component<
             />
             <Text fontWeight="light" style={{color: WHITE, lineHeight: 25}}>
               Manage your heartbeat between{'\n'}
-              <Text fontWeight="bold">{`${intensity.min}-${
-                intensity.max
-              } BPM`}</Text>{' '}
+              <Text fontWeight="bold">{`${(intensity.min * mhr).toFixed(0)}-${(
+                intensity.max * mhr
+              ).toFixed(0)} BPM`}</Text>{' '}
               to get the best out of your goals!
             </Text>
           </View>

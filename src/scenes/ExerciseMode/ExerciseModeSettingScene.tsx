@@ -21,7 +21,11 @@ import {intensitiesData, durationData} from './data/ExerciseModeDataFixtures';
 import {exerciseReady} from '../../assets/images/exerciseMode';
 import moment from 'moment';
 
-type Props = NavigationScreenProps;
+type NavigationScreenParams = {
+  mhr: number;
+};
+
+type Props = NavigationScreenProps<NavigationScreenParams>;
 
 type State = {
   durationIndex: number;
@@ -140,6 +144,7 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
 
   _navToCountdown = () => {
     let {durationIndex, intensityIndex} = this.state;
+    let mhr = this.props.navigation.getParam('mhr');
     let startMoment = moment();
     let exerciseSetting: ExerciseSetting = {
       duration: durationData[durationIndex],
@@ -149,6 +154,7 @@ export default class ExerciseModeSettingScene extends Component<Props, State> {
     this.props.navigation.navigate('exerciseModeCountdown', {
       exerciseSetting,
       startMoment,
+      mhr,
     });
   };
 }

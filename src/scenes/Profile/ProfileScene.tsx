@@ -215,7 +215,10 @@ export default class ProfileScene extends Component<Props, State> {
                   textColor={BLUE}
                   parentContainerBackgroundColor={BLUE}
                 />
-                <ExerciseModePlaceholder navigation={this.props.navigation} />
+                <ExerciseModePlaceholder
+                  navigation={this.props.navigation}
+                  mhr={result.bpm}
+                />
               </View>
 
               <PopupInfoDialog

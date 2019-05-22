@@ -27,6 +27,7 @@ export type Intensity = {
   desc: string;
   min: number;
   max: number;
+  optimalScore: number;
 };
 
 export type IntensityIndexEnum = 0 | 1 | 2 | 3;

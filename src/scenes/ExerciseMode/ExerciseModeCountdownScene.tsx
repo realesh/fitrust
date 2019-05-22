@@ -129,7 +129,8 @@ export default class ExerciseModeCountdownScene extends Component<
           style={[styles.countContainer, {bottom: runningCount ? 0 : -300}]}
         >
           <CountDown
-            until={duration * 60}
+            // until={duration * 60}
+            until={5}
             timeToShow={['H', 'M', 'S']}
             onFinish={this._onCountdownFinish}
             size={50}
@@ -169,7 +170,6 @@ export default class ExerciseModeCountdownScene extends Component<
 
   _onCountdownFinish = () => {
     this._toggleResultModalVisible();
-    // alert('yey');
   };
 
   _renderPopup = (duration: number, type: ExerciseTypeEnum) => (
@@ -177,36 +177,73 @@ export default class ExerciseModeCountdownScene extends Component<
       mutation={UPDATE_COUPONS}
     >
       {(updateCoupons) => {
-        let startMoment = this.props.navigation
-          .getParam('startMoment')
-          .subtract(5, 'minutes');
-        let getHours = (hour: number) => {
-          if (hour < 10) {
-            return `0${hour}`;
-          } else {
-            return String(hour);
-          }
-        };
-        let startTime = `${getHours(
-          startMoment.get('hours'),
-        )}:${startMoment.get('minutes')}`;
-        let finishMoment = startMoment.add(duration, 'minutes');
-        let finishTime = `${getHours(
-          finishMoment.get('hours'),
-        )}:${finishMoment.get('minutes')}`;
+        let startTime = '';
+        let finishTime = '';
+        let date = '';
 
-        let dateMoment = moment();
-        let date = [
-          dateMoment.get('year'),
-          dateMoment.get('month') + 1 < 10
-            ? '0' + (dateMoment.get('month') + 1)
-            : dateMoment.get('month') + 1,
-          dateMoment.get('date') < 10
-            ? '0' + dateMoment.get('date')
-            : dateMoment.get('date'),
-        ].join('-');
+        // let handleUpdate = () => {
+        //   let startMoment = this.props.navigation
+        //     .getParam('startMoment')
+        //     .add(1, 'minutes');
+        //   let formatTime = (time: number) => {
+        //     if (time < 10) {
+        //       return `0${time}`;
+        //     } else {
+        //       return String(time);
+        //     }
+        //   };
+        //   startTime = `${formatTime(startMoment.get('hours'))}:${formatTime(
+        //     startMoment.get('minutes'),
+        //   )}`;
+        //   let finishMoment = startMoment.add(duration - 1, 'minutes');
+        //   finishTime = `${formatTime(finishMoment.get('hours'))}:${formatTime(
+        //     finishMoment.get('minutes'),
+        //   )}`;
+
+        //   let dateMoment = moment();
+        //   date = [
+        //     dateMoment.get('year'),
+        //     dateMoment.get('month') + 1 < 10
+        //       ? '0' + (dateMoment.get('month') + 1)
+        //       : dateMoment.get('month') + 1,
+        //     dateMoment.get('date') < 10
+        //       ? '0' + dateMoment.get('date')
+        //       : dateMoment.get('date'),
+        //   ].join('-');
+
+        //   console.log(date, startTime, finishTime, '<<<');
+        // };
 
         let handleUpdate = async () => {
+          let startMoment = this.props.navigation
+            .getParam('startMoment')
+            .add(1, 'minutes');
+          let formatTime = (time: number) => {
+            if (time < 10) {
+              return `0${time}`;
+            } else {
+              return String(time);
+            }
+          };
+          startTime = `${formatTime(startMoment.get('hours'))}:${formatTime(
+            startMoment.get('minutes'),
+          )}`;
+          let finishMoment = startMoment.add(duration - 1, 'minutes');
+          finishTime = `${formatTime(finishMoment.get('hours'))}:${formatTime(
+            finishMoment.get('minutes'),
+          )}`;
+
+          let dateMoment = moment();
+          date = [
+            dateMoment.get('year'),
+            dateMoment.get('month') + 1 < 10
+              ? '0' + (dateMoment.get('month') + 1)
+              : dateMoment.get('month') + 1,
+            dateMoment.get('date') < 10
+              ? '0' + dateMoment.get('date')
+              : dateMoment.get('date'),
+          ].join('-');
+
           try {
             let ID = await AsyncStorage.getItem('userID');
             updateCoupons &&
@@ -252,56 +289,6 @@ export default class ExerciseModeCountdownScene extends Component<
       }}
     </Mutation>
   );
-
-  // _fetchResults = async () => {
-  //   let startMoment = this.props.navigation
-  //     .getParam('startMoment')
-  //     .subtract(5, 'minutes');
-  //   let getHours = (hour: number) => {
-  //     if (hour < 10) {
-  //       return `0${hour}`;
-  //     } else {
-  //       return String(hour);
-  //     }
-  //   };
-  //   let startTime = `${getHours(startMoment.get('hours'))}:${startMoment.get(
-  //     'minutes',
-  //   )}`;
-  //   let {duration} = this.props.navigation.getParam('exerciseSetting');
-  //   let finishMoment = startMoment.add(duration, 'minutes');
-  //   let finishTime = `${getHours(finishMoment.get('hours'))}:${finishMoment.get(
-  //     'minutes',
-  //   )}`;
-
-  //   let fitbitUserID = await AsyncStorage.getItem('fitbit_user_id');
-  //   let fitbitAccessToken = await AsyncStorage.getItem('fitbit_access_token');
-  //   if (fitbitUserID && fitbitAccessToken) {
-  //     let fitbitResponse = await fetchExerciseMode(
-  //       fitbitUserID,
-  //       fitbitAccessToken,
-  //       startTime,
-  //       finishTime,
-  //     );
-  //     let response =
-  //       (fitbitResponse['activities-heart-intraday'] &&
-  //         fitbitResponse['activities-heart-intraday'].dataset) ||
-  //       [];
-  //     if (response.length) {
-  //       let bpmData = [...response.map((data) => data.value)];
-  //       let total = bpmData.reduce((prev, curr) => prev + curr);
-  //       let successData = bpmData.filter((bpm) => 70 <= bpm && bpm <= 80);
-  //       let successTotal = successData.reduce((prev, curr) => prev + curr);
-  //       let effectivityResult = Math.floor((successTotal / total) * 100);
-  //       this.setState({
-  //         exModeEffectivityResult: effectivityResult,
-  //         exModeEarnedPoints: Math.floor((effectivityResult / 100) * 9765),
-  //       });
-  //     } else {
-  //       console.log('fetchfails');
-  //       // 0 data
-  //     }
-  //   }
-  // };
 }
 
 const styles = StyleSheet.create({

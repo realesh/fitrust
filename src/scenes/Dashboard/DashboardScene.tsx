@@ -298,6 +298,7 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
               fitbitUserID,
               fitbitAccessToken,
               previous_scene: 'Home',
+              currPoints: result.points,
             });
           };
 

@@ -6,6 +6,7 @@ import {
   ListRenderItemInfo,
   ActivityIndicator,
   TouchableOpacity,
+  AsyncStorage,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Toolbar, PointsModal, PopupInfoDialog} from '../../generals/components';
@@ -13,36 +14,32 @@ import {
   WHITE,
   BLUE,
   LIGHTER_GREY,
-  WHITE30,
-  GREEN,
-  GREEN30,
   LIGHT_GREY,
-  DARK_GREY70,
 } from '../../generals/constants/colors';
-import {Query} from 'react-apollo';
+import {Query, Mutation} from 'react-apollo';
 import {
   USER_COUPONS,
   UserCouponsResponse,
   UserCouponsVariables,
   ExerciseCoupon,
   ExerciseTypeEnum,
+  DELETE_COUPON,
+  DeleteCouponResponse,
+  DeleteCouponVariables,
 } from '../../graphql/mutations/exerciseMode';
 import {Text} from '../../generals/core-ui';
-import {
-  HEADER_FONT_SIZE,
-  SMALL_FONT_SIZE,
-  LARGE_FONT_SIZE,
-  TINY_FONT_SIZE,
-  MEDIUM_FONT_SIZE,
-} from '../../generals/constants/size';
+import {MEDIUM_FONT_SIZE} from '../../generals/constants/size';
 import fetchExerciseMode from '../../helpers/Fetchers/fetchExerciseMode';
 import {intensitiesData} from '../ExerciseMode/data/ExerciseModeDataFixtures';
 import CouponListItem from './components/CouponListItem';
+import {USER_DASHBOARD} from '../../graphql/queries/dashboard';
+import {LEADERBOARD_LIST} from '../../graphql/queries/leaderboard';
 
 type NavigationScreenParams = {
   userID: string;
   fitbitUserID: string;
   fitbitAccessToken: string;
+  currPoints: number;
 };
 
 type Props = NavigationScreenProps<NavigationScreenParams>;
@@ -52,6 +49,7 @@ type State = {
   exModeEarnedPoints: number;
   resultModalVisible: boolean;
   notReadyModalVisible: boolean;
+  selectedCouponID: string;
 };
 
 export default class CouponsListScene extends Component<Props, State> {
@@ -60,18 +58,14 @@ export default class CouponsListScene extends Component<Props, State> {
     exModeEarnedPoints: 0,
     resultModalVisible: false,
     notReadyModalVisible: false,
+    selectedCouponID: '',
   };
 
   offset = 0;
 
   render() {
     let {navigation} = this.props;
-    let {
-      exModeEarnedPoints,
-      exModeEffectivityResult,
-      resultModalVisible,
-      notReadyModalVisible,
-    } = this.state;
+    let {notReadyModalVisible} = this.state;
 
     let notReadyMessage =
       "Looks like your exercise data hasn't being synchronized.\n" +
@@ -110,7 +104,7 @@ export default class CouponsListScene extends Component<Props, State> {
           }
 
           let renderCoupon = ({item}: ListRenderItemInfo<ExerciseCoupon>) => {
-            let onPress = () =>
+            let onPress = () => {
               this._fetchResults(
                 item.duration,
                 item.startTime,
@@ -118,6 +112,8 @@ export default class CouponsListScene extends Component<Props, State> {
                 item.type,
                 mhr,
               );
+              this.setState({selectedCouponID: item.id});
+            };
 
             return <CouponListItem item={item} onPress={onPress} />;
           };
@@ -151,15 +147,9 @@ export default class CouponsListScene extends Component<Props, State> {
                   ItemSeparatorComponent={this._renderSeparator}
                   showsVerticalScrollIndicator={false}
                   keyExtractor={this._keyExtractor}
+                  contentContainerStyle={{paddingBottom: 20}}
                 />
               </View>
-              <PointsModal
-                visible={resultModalVisible}
-                pointsSource="Exercise Mode"
-                pointsValue={exModeEarnedPoints}
-                exModeEffectivity={exModeEffectivityResult}
-                onRequestClose={this._closeResultModal}
-              />
               <PopupInfoDialog
                 visible={notReadyModalVisible}
                 title="Sorry"
@@ -168,6 +158,7 @@ export default class CouponsListScene extends Component<Props, State> {
                 buttonTitle="Got it"
                 buttonOnPress={this._toggleNotReadyModal}
               />
+              {this._renderResultModal()}
             </View>
           );
         }}
@@ -193,6 +184,7 @@ export default class CouponsListScene extends Component<Props, State> {
     );
     let topBound = data.max * mhr;
     let lowBound = data.min * mhr;
+    let multiplier = 1 + duration / 100;
     if (fitbitUserID && fitbitAccessToken) {
       let fitbitResponse = await fetchExerciseMode(
         fitbitUserID,
@@ -217,7 +209,9 @@ export default class CouponsListScene extends Component<Props, State> {
           ? Math.floor((successTotal / total) * 100)
           : -1;
         let exModeEarnedPoints = successTotal
-          ? Math.floor((exModeEffectivityResult / 100) * data.optimalScore)
+          ? Math.floor(
+              (exModeEffectivityResult / 100) * data.optimalScore * multiplier,
+            )
           : 0;
         this.setState({
           exModeEffectivityResult,
@@ -225,12 +219,67 @@ export default class CouponsListScene extends Component<Props, State> {
           resultModalVisible: true,
         });
       } else {
-        // 0 data
         this._toggleNotReadyModal();
-        console.log('fetchfails');
       }
     }
   };
+  _renderResultModal = () => (
+    <Mutation<DeleteCouponResponse, DeleteCouponVariables>
+      mutation={DELETE_COUPON}
+    >
+      {(deleteCoupon) => {
+        let {
+          resultModalVisible,
+          exModeEarnedPoints,
+          exModeEffectivityResult,
+        } = this.state;
+        let currPoints = this.props.navigation.getParam('currPoints', 0);
+        let onPress = async () => {
+          try {
+            let ID = this.props.navigation.getParam('userID', '');
+            deleteCoupon &&
+              (await deleteCoupon({
+                variables: {
+                  userID: this.props.navigation.getParam('userID', ''),
+                  couponID: this.state.selectedCouponID,
+                  addPoints: currPoints + exModeEarnedPoints,
+                },
+                refetchQueries: [
+                  {
+                    query: USER_DASHBOARD,
+                    variables: {
+                      userID: ID,
+                    },
+                  },
+                  {
+                    query: USER_COUPONS,
+                    variables: {
+                      userID: ID,
+                    },
+                  },
+                  {
+                    query: LEADERBOARD_LIST,
+                  },
+                ],
+              }));
+          } catch (error) {
+            // Handle Error
+          }
+          this._closeResultModal();
+        };
+
+        return (
+          <PointsModal
+            visible={resultModalVisible}
+            pointsSource="Exercise Mode"
+            pointsValue={exModeEarnedPoints}
+            exModeEffectivity={exModeEffectivityResult}
+            onRequestClose={onPress}
+          />
+        );
+      }}
+    </Mutation>
+  );
   _closeResultModal = () => {
     this.setState({resultModalVisible: false});
   };
@@ -251,7 +300,8 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     backgroundColor: LIGHTER_GREY,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
     borderTopWidth: 1,
     borderTopColor: LIGHT_GREY,
   },

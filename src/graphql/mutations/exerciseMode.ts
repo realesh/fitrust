@@ -90,3 +90,34 @@ export const USER_COUPONS = gql`
     }
   }
 `;
+
+export type DeleteCouponResponse = {
+  deleteExerciseCoupon?: {
+    id: string;
+  };
+  updateUser?: {
+    profile: {
+      points: number;
+    };
+  };
+};
+export type DeleteCouponVariables = {
+  userID: string;
+  couponID: string;
+  addPoints: number;
+};
+export const DELETE_COUPON = gql`
+  mutation deleteCoupon($userID: ID, $couponID: ID, $addPoints: Int!) {
+    deleteExerciseCoupon(where: {id: $couponID}) {
+      id
+    }
+    updateUser(
+      data: {profile: {update: {points: $addPoints}}}
+      where: {id: $userID}
+    ) {
+      profile {
+        points
+      }
+    }
+  }
+`;

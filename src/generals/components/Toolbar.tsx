@@ -34,6 +34,8 @@ type Props = NavigationScreenProps & {
    * optional style for the toolbar container
    */
   containerStyle?: StyleProp<ViewStyle>;
+
+  onPointsClick?: () => void;
 };
 
 function Toolbar(props: Props) {
@@ -45,6 +47,7 @@ function Toolbar(props: Props) {
     subtitle,
     navigation,
     fontColor = DEFAULT_TEXT_COLOR,
+    onPointsClick,
   } = props;
   let canGoBack: boolean =
     (navigation.state.params && navigation.state.params.previous_scene) ||
@@ -77,7 +80,10 @@ function Toolbar(props: Props) {
 
       {points ? (
         <View style={styles.rightComponent}>
-          <TouchableOpacity style={styles.levelPointsContainer}>
+          <TouchableOpacity
+            style={styles.levelPointsContainer}
+            onPress={onPointsClick}
+          >
             <View style={styles.levelInfoContainer}>
               <Icon name="zap" size={MEDIUM_FONT_SIZE} color={WHITE} />
             </View>

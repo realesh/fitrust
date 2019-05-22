@@ -12,6 +12,7 @@ export const BLUE = '#445EE8';
 export const LIGHT_BLUE = '#3090f2';
 export const BLUE30 = 'rgba(68, 94, 232, 0.3)';
 export const GREEN = '#1ED75F';
+export const GREEN30 = 'rgba(30, 215, 95, 0.3)';
 export const RED = '#e5446a';
 
 export const DEFAULT_TEXT_COLOR = BLACK;

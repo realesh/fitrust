@@ -29,6 +29,7 @@ import Placeholder from '../../scenes/Placeholder';
 import FoodSearchScene from '../../scenes/SearchNutritionix/FoodSearchScene';
 import WorkoutSearchScene from '../../scenes/SearchNutritionix/WorkoutSearchScene';
 import AvatarSelectorScene from '../../scenes/Profile/AvatarSelectorScene';
+import CouponsListScene from '../../scenes/Dashboard/CouponListScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -58,6 +59,12 @@ let dashboardStack = createStackNavigator({
   },
   BMRCalculator: {
     screen: BMRCalculatorScene,
+    navigationOptions: () => ({
+      header: null,
+    }),
+  },
+  exCouponList: {
+    screen: CouponsListScene,
     navigationOptions: () => ({
       header: null,
     }),

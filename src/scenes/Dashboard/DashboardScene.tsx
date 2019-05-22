@@ -307,6 +307,7 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
                 <Toolbar
                   navigation={navigation}
                   points={loading ? '' : result.points.toString()}
+                  onPointsClick={this._goToCouponList}
                 />
                 <View style={styles.paddedContainer}>
                   <Text fontWeight="regular" fontSize={MEDIUM_FONT_SIZE}>
@@ -466,6 +467,11 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
     let {navigation} = this.props;
     this.setState({bmrModalVisible: false});
     navigation.navigate('BMRCalculator', {previous_scene: 'Home'});
+  };
+  _goToCouponList = async () => {
+    let {navigation} = this.props;
+    let userID = await AsyncStorage.getItem('userID');
+    navigation.navigate('exCouponList', {userID, previous_scene: 'Home'});
   };
   _onAddWater = (value: number) => {
     this.setState({waterValue: this.state.waterValue + value});

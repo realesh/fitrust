@@ -63,6 +63,8 @@ export type ExerciseCoupon = {
 export type UserCouponsResponse = {
   user?: {
     profile?: {
+      bpm: string;
+      dob: string;
       exerciseCoupons: Array<ExerciseCoupon>;
     };
   };
@@ -74,6 +76,8 @@ export const USER_COUPONS = gql`
   query userCoupons($userID: ID) {
     user(where: {id: $userID}) {
       profile {
+        bpm
+        dob
         exerciseCoupons {
           id
           type

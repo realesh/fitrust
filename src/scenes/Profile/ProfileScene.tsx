@@ -192,6 +192,7 @@ export default class ProfileScene extends Component<Props, State> {
                     <MHRInsight
                       onPress={this._toggleMHRModal}
                       dob={result.dob}
+                      mhr={result.bpm}
                     />
                     <FancyRibbonButton
                       onPress={this._togglePage}

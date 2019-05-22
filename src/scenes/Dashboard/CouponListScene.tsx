@@ -60,12 +60,31 @@ export default class CouponsListScene extends Component<Props, State> {
         variables={{userID: this.props.navigation.getParam('userID', '')}}
       >
         {({data, loading}) => {
-          let result =
+          let exerciseCoupons =
             (data &&
               data.user &&
               data.user.profile &&
               data.user.profile.exerciseCoupons) ||
             [];
+
+          if (!loading) {
+            let dob =
+              (data &&
+                data.user &&
+                data.user.profile &&
+                data.user.profile.dob) ||
+              '';
+            let now = new Date().getFullYear();
+            let dobYear = new Date(dob).getFullYear();
+            let age = now - dobYear;
+            let mhr =
+              (data &&
+                data.user &&
+                data.user.profile &&
+                data.user.profile.bpm) ||
+              220 - age;
+            console.log(mhr, '<<<<<<<<<<<');
+          }
 
           return loading ? (
             <View style={{flex: 1, justifyContent: 'center'}}>
@@ -91,7 +110,7 @@ export default class CouponsListScene extends Component<Props, State> {
               </View>
               <View style={styles.contentContainer}>
                 <FlatList
-                  data={result}
+                  data={exerciseCoupons}
                   renderItem={this._renderItem}
                   ItemSeparatorComponent={this._renderSeparator}
                   showsVerticalScrollIndicator={false}

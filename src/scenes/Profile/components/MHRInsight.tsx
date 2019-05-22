@@ -14,10 +14,11 @@ type Props = {
    */
   onPress: (event: GestureResponderEvent) => void;
   dob: string;
+  mhr: number;
 };
 
 export default function MHRInsight(props: Props) {
-  let {onPress, dob} = props;
+  let {onPress, dob, mhr} = props;
 
   let now = new Date().getFullYear();
   let dobYear = new Date(dob).getFullYear();
@@ -35,7 +36,7 @@ export default function MHRInsight(props: Props) {
           fontSize={LARGE_FONT_SIZE}
           style={{color: WHITE}}
         >
-          {`${220 - age} `}
+          {mhr ? mhr : `${220 - age} `}
           <Text fontWeight="bold" style={{color: 'rgba(255,255,255,0.5)'}}>
             BPM
           </Text>

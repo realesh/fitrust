@@ -16,6 +16,7 @@ export type UserProfileData = {
   points: number;
   badges: Array<Badge>;
   bmi: number;
+  bpm: number;
   avatarUrl: string;
 };
 export type UserProfileResponse = {
@@ -43,6 +44,7 @@ export const USER_PROFILE = gql`
           imageUrl
         }
         bmi
+        bpm
         avatarUrl
       }
     }

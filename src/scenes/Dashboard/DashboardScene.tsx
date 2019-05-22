@@ -295,6 +295,8 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
             let userID = await AsyncStorage.getItem('userID');
             navigation.navigate('exCouponList', {
               userID,
+              fitbitUserID,
+              fitbitAccessToken,
               previous_scene: 'Home',
             });
           };

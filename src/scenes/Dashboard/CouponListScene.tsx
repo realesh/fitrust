@@ -17,6 +17,7 @@ import {
   GREEN,
   GREEN30,
   LIGHT_GREY,
+  DARK_GREY70,
 } from '../../generals/constants/colors';
 import {Query} from 'react-apollo';
 import {
@@ -33,9 +34,12 @@ import {
   TINY_FONT_SIZE,
   MEDIUM_FONT_SIZE,
 } from '../../generals/constants/size';
+import fetchExerciseMode from '../../helpers/Fetchers/fetchExerciseMode';
 
 type NavigationScreenParams = {
   userID: string;
+  fitbitUserID: string;
+  fitbitAccessToken: string;
 };
 
 type Props = NavigationScreenProps<NavigationScreenParams>;
@@ -125,8 +129,14 @@ export default class CouponsListScene extends Component<Props, State> {
   }
 
   _renderItem = ({item}: ListRenderItemInfo<ExerciseCoupon>) => {
+    let onPress = () => this._fetchResults(item.startTime, item.finishTime);
+
     return (
-      <TouchableOpacity activeOpacity={0.6} style={styles.couponContainer}>
+      <TouchableOpacity
+        activeOpacity={0.6}
+        style={styles.couponContainer}
+        onPress={onPress}
+      >
         <View style={styles.couponTypeInfo}>
           <View style={styles.typeInitialBox}>
             <Text
@@ -155,7 +165,11 @@ export default class CouponsListScene extends Component<Props, State> {
           >
             {`${item.startTime} - ${item.finishTime}`}
           </Text>
-          <Text fontWeight="light" fontSize={TINY_FONT_SIZE}>
+          <Text
+            fontWeight="light"
+            fontSize={TINY_FONT_SIZE}
+            style={{color: DARK_GREY70}}
+          >
             {`issued date: ${item.date}`}
           </Text>
           <View style={styles.durationContainer}>
@@ -171,6 +185,38 @@ export default class CouponsListScene extends Component<Props, State> {
   _renderSeparator = () => <View style={{height: 20}} />;
 
   _keyExtractor = (_item: ExerciseCoupon, index: number) => String(index);
+
+  _fetchResults = async (startTime: string, finishTime: string) => {
+    let fitbitUserID = this.props.navigation.getParam('fitbitUserID');
+    let fitbitAccessToken = this.props.navigation.getParam('fitbitAccessToken');
+    if (fitbitUserID && fitbitAccessToken) {
+      let fitbitResponse = await fetchExerciseMode(
+        fitbitUserID,
+        fitbitAccessToken,
+        startTime,
+        finishTime,
+      );
+      let response =
+        (fitbitResponse['activities-heart-intraday'] &&
+          fitbitResponse['activities-heart-intraday'].dataset) ||
+        [];
+      if (response.length) {
+        console.log(response, '<<<<<');
+        // let bpmData = [...response.map((data) => data.value)];
+        // let total = bpmData.reduce((prev, curr) => prev + curr);
+        // let successData = bpmData.filter((bpm) => 70 <= bpm && bpm <= 80);
+        // let successTotal = successData.reduce((prev, curr) => prev + curr);
+        // let effectivityResult = Math.floor((successTotal / total) * 100);
+        // this.setState({
+        //   exModeEffectivityResult: effectivityResult,
+        //   exModeEarnedPoints: Math.floor((effectivityResult / 100) * 9765),
+        // });
+      } else {
+        console.log('fetchfails');
+        // 0 data
+      }
+    }
+  };
 }
 
 const styles = StyleSheet.create({

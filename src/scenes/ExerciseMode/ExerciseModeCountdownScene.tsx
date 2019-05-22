@@ -104,7 +104,10 @@ export default class ExerciseModeCountdownScene extends Component<
         </View>
 
         <View
-          style={[styles.fillStyle, {right: runningCount ? SCREEN_WIDTH : 0}]}
+          style={[
+            styles.fillStyle,
+            {left: runningCount ? -SCREEN_WIDTH * 2 : 0},
+          ]}
         >
           <Text
             fontSize={LARGE_FONT_SIZE}
@@ -140,6 +143,7 @@ export default class ExerciseModeCountdownScene extends Component<
               paddingHorizontal: 10,
               fontFamily: 'Lato-Bold',
               color: BLUE,
+              marginBottom: 10,
             }}
             timeLabelStyle={{color: BLUE}}
             digitTxtStyle={{fontFamily: 'Lato-Bold', color: BLUE}}

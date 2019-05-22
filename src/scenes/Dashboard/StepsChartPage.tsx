@@ -247,6 +247,20 @@ export default class StepsChartPage extends Component<Props, State> {
     let distanceInKM =
       (distanceTotal && distanceTotal[0] && distanceTotal[0].distance) || 0;
 
+    const labelData = [
+      '',
+      '',
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun',
+      '',
+      '',
+    ];
+
     return loading ? (
       <View style={styles.loadingContainer}>
         <ActivityIndicator color={BLUE} size="large" />
@@ -315,7 +329,7 @@ export default class StepsChartPage extends Component<Props, State> {
             yMin={0}
             yMax={biggestNumberStep}
             style={{
-              height: 130,
+              height: 140,
               width: '100%',
             }}
             data={lastWeekData}
@@ -329,7 +343,7 @@ export default class StepsChartPage extends Component<Props, State> {
             yMin={0}
             yMax={biggestNumberStep}
             style={{
-              height: 130,
+              height: 140,
               width: '100%',
               position: 'absolute',
               top: 0,
@@ -342,6 +356,27 @@ export default class StepsChartPage extends Component<Props, State> {
             <LinePrimary />
             <Decorator />
           </AreaChart>
+          <View style={{flexDirection: 'row'}}>
+            {labelData.map((label, index) => (
+              <View
+                style={{
+                  flex: index === 0 || index === labelData.length - 1 ? 0.5 : 1,
+                  backgroundColor: LIGHTER_GREY,
+                  paddingVertical: 5,
+                  borderBottomColor: LIGHT_GREY,
+                  borderBottomWidth: 1,
+                }}
+              >
+                <Text
+                  fontSize={SMALL_FONT_SIZE}
+                  fontWeight="bold"
+                  style={{textAlign: 'center', color: DARK_GREY70}}
+                >
+                  {label}
+                </Text>
+              </View>
+            ))}
+          </View>
           <View style={styles.legendContainer}>
             <View style={styles.legendItem}>
               <View style={styles.lastWeekDot} />
@@ -399,7 +434,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: LIGHTER_GREY,
+    backgroundColor: LIGHT_GREY,
   },
   legendItem: {
     flex: 1,

@@ -36,7 +36,7 @@ export default function MHRInsight(props: Props) {
           fontSize={LARGE_FONT_SIZE}
           style={{color: WHITE}}
         >
-          {mhr ? mhr : `${220 - age} `}
+          {mhr ? `${mhr} ` : `${220 - age} `}
           <Text fontWeight="bold" style={{color: 'rgba(255,255,255,0.5)'}}>
             BPM
           </Text>

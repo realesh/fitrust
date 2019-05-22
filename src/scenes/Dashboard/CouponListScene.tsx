@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
-import {Toolbar, PointsModal} from '../../generals/components';
+import {Toolbar, PointsModal, PopupInfoDialog} from '../../generals/components';
 import {
   WHITE,
   BLUE,
@@ -51,6 +51,7 @@ type State = {
   exModeEffectivityResult: number;
   exModeEarnedPoints: number;
   resultModalVisible: boolean;
+  notReadyModalVisible: boolean;
 };
 
 export default class CouponsListScene extends Component<Props, State> {
@@ -58,6 +59,7 @@ export default class CouponsListScene extends Component<Props, State> {
     exModeEffectivityResult: 0,
     exModeEarnedPoints: 0,
     resultModalVisible: false,
+    notReadyModalVisible: false,
   };
 
   offset = 0;
@@ -68,7 +70,12 @@ export default class CouponsListScene extends Component<Props, State> {
       exModeEarnedPoints,
       exModeEffectivityResult,
       resultModalVisible,
+      notReadyModalVisible,
     } = this.state;
+
+    let notReadyMessage =
+      "Looks like your exercise data hasn't being synchronized.\n" +
+      'Open your Fitbit app and sync your device, then try again after 5-10 mins';
 
     return (
       <Query<UserCouponsResponse, UserCouponsVariables>
@@ -153,6 +160,14 @@ export default class CouponsListScene extends Component<Props, State> {
                 exModeEffectivity={exModeEffectivityResult}
                 onRequestClose={this._closeResultModal}
               />
+              <PopupInfoDialog
+                visible={notReadyModalVisible}
+                title="Sorry"
+                message={notReadyMessage}
+                onRequestClose={this._toggleNotReadyModal}
+                buttonTitle="Got it"
+                buttonOnPress={this._toggleNotReadyModal}
+              />
             </View>
           );
         }}
@@ -211,12 +226,16 @@ export default class CouponsListScene extends Component<Props, State> {
         });
       } else {
         // 0 data
+        this._toggleNotReadyModal();
         console.log('fetchfails');
       }
     }
   };
   _closeResultModal = () => {
     this.setState({resultModalVisible: false});
+  };
+  _toggleNotReadyModal = () => {
+    this.setState({notReadyModalVisible: !this.state.notReadyModalVisible});
   };
 }
 

@@ -51,3 +51,38 @@ export const UPDATE_COUPONS = gql`
     }
   }
 `;
+
+export type ExerciseCoupon = {
+  id: string;
+  type: ExerciseTypeEnum;
+  duration: number;
+  startTime: string;
+  finishTime: string;
+  date: string;
+};
+export type UserCouponsResponse = {
+  user?: {
+    profile?: {
+      exerciseCoupons: Array<ExerciseCoupon>;
+    };
+  };
+};
+export type UserCouponsVariables = {
+  userID: string;
+};
+export const USER_COUPONS = gql`
+  query userCoupons($userID: ID) {
+    user(where: {id: $userID}) {
+      profile {
+        exerciseCoupons {
+          id
+          type
+          duration
+          startTime
+          finishTime
+          date
+        }
+      }
+    }
+  }
+`;

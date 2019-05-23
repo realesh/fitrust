@@ -359,6 +359,7 @@ export default class StepsChartPage extends Component<Props, State> {
           <View style={{flexDirection: 'row'}}>
             {labelData.map((label, index) => (
               <View
+                key={'label' + index}
                 style={{
                   flex: index === 0 || index === labelData.length - 1 ? 0.5 : 1,
                   backgroundColor: LIGHTER_GREY,

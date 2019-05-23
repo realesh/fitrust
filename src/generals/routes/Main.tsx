@@ -30,6 +30,7 @@ import FoodSearchScene from '../../scenes/SearchNutritionix/FoodSearchScene';
 import WorkoutSearchScene from '../../scenes/SearchNutritionix/WorkoutSearchScene';
 import AvatarSelectorScene from '../../scenes/Profile/AvatarSelectorScene';
 import CouponsListScene from '../../scenes/Dashboard/CouponListScene';
+import SubMaxPlaceholder from '../../scenes/SubMax/SubMaxPlaceholder';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -57,6 +58,12 @@ let dashboardStack = createStackNavigator({
       header: null,
     }),
   },
+  // dashboardHome: {
+  //   screen: SubMaxPlaceholder,
+  //   navigationOptions: () => ({
+  //     header: null,
+  //   }),
+  // },
   BMRCalculator: {
     screen: BMRCalculatorScene,
     navigationOptions: () => ({
@@ -129,14 +136,6 @@ let bottomTab = createBottomTabNavigator(
         ),
       },
     },
-    // leaderboard: {
-    //   screen: FoodSearchScene,
-    //   navigationOptions: {
-    //     tabBarIcon: ({tintColor}: {tintColor: string}) => (
-    //       <Icon name="star" size={24} color={tintColor} />
-    //     ),
-    //   },
-    // },
     dashboard: {
       screen: dashboardStack,
       navigationOptions: {
@@ -181,6 +180,10 @@ let searchStack = {
   workoutSearch: WorkoutSearchScene,
 };
 
+let subMaxStack = {
+  subMaxPlaceholder: SubMaxPlaceholder,
+};
+
 let defaultStackConfig: StackNavigatorConfig = {
   headerMode: 'none',
 };
@@ -189,6 +192,7 @@ let routeConfig = {
   bottomTab,
   ...exerciseModeStack,
   ...searchStack,
+  ...subMaxStack,
   fitbitAuth: Placeholder,
 };
 

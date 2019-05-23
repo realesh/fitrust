@@ -234,6 +234,8 @@ export default class ProfileScene extends Component<Props, State> {
                 title={infoMHR.title}
                 message={infoMHR.message}
                 onRequestClose={this._toggleMHRModal}
+                buttonOnPress={this._goToSubMax}
+                buttonTitle="Recalculate"
               />
               <LogoutModal
                 visible={logoutModalVisible}
@@ -255,12 +257,18 @@ export default class ProfileScene extends Component<Props, State> {
     this.setState({bmiModalVisible: false});
     navigation.navigate('BMICalculator', {previous_scene: 'Profile'});
   };
-
   _goToBadges = () => {
     let {navigation} = this.props;
     navigation.navigate('badgesList', {
       previous_scene: 'Profile',
       userID: this.state.userID,
+    });
+  };
+  _goToSubMax = () => {
+    let {navigation} = this.props;
+    this.setState({mhrModalVisible: false});
+    navigation.navigate('subMaxPlaceholder', {
+      previous_scene: 'Profile',
     });
   };
 

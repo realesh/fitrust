@@ -33,6 +33,9 @@ type State = {};
 export default class SubMaxPlaceholder extends Component<Props, State> {
   state = {};
 
+  _reference =
+    'https://heartzones.com/wp-content/uploads/2016/03/hz-white-paper-1.pdf';
+
   render() {
     let {navigation} = this.props;
     let {} = this.state;
@@ -175,15 +178,20 @@ export default class SubMaxPlaceholder extends Component<Props, State> {
             I'm ready!
           </Button>
           <Text style={styles.marginTop}>References:</Text>
-          <Text style={styles.blueText}>
-            {
-              'https://heartzones.com/wp-content/uploads/2016/03/hz-white-paper-1.pdf'
-            }
+          <Text style={styles.blueText} onPress={this._onReferencePress}>
+            {this._reference}
           </Text>
         </ScrollView>
       </View>
     );
   }
+  _onReferencePress = () => {
+    this.props.navigation.navigate('webView', {
+      previous_scene: 'Dashboard',
+      uri: this._reference,
+      title: '',
+    });
+  };
 }
 
 type RPERowProps = {num: number; desc: string};

@@ -31,6 +31,7 @@ import WorkoutSearchScene from '../../scenes/SearchNutritionix/WorkoutSearchScen
 import AvatarSelectorScene from '../../scenes/Profile/AvatarSelectorScene';
 import CouponsListScene from '../../scenes/Dashboard/CouponListScene';
 import SubMaxPlaceholder from '../../scenes/SubMax/SubMaxPlaceholder';
+import WebViewScene from '../WebViewScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -193,6 +194,7 @@ let routeConfig = {
   ...exerciseModeStack,
   ...searchStack,
   ...subMaxStack,
+  webView: WebViewScene,
   fitbitAuth: Placeholder,
 };
 

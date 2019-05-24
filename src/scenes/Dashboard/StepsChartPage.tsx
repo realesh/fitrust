@@ -134,29 +134,34 @@ export default class StepsChartPage extends Component<Props, State> {
       ];
 
       let thisWeekTotal = thisWeekSteps.reduce((a, b) => a + b);
-      let lastWeekTotal = lastWeekSteps.reduce((a, b) => a + b);
+      let lastWeekTotalUntilToday = lastWeekSteps.reduce((a, b, index) => {
+        if (index < new Date().getDay()) {
+          return a + b;
+        }
+        return a;
+      });
 
       let comparison: Comparison = {
         type: 'minus',
         value: 0,
         color: LIGHT_GREY,
       };
-      if (thisWeekTotal < lastWeekTotal) {
+      if (thisWeekTotal < lastWeekTotalUntilToday) {
         comparison = {
           type: 'trending-down',
           value:
             thisWeekTotal === 0
               ? 100
-              : (lastWeekTotal / thisWeekTotal) * 100 - 100,
+              : 100 - ((lastWeekTotalUntilToday / thisWeekTotal) * 100 - 100),
           color: RED,
         };
-      } else if (lastWeekTotal < thisWeekTotal) {
+      } else if (lastWeekTotalUntilToday < thisWeekTotal) {
         comparison = {
           type: 'trending-up',
           value:
-            lastWeekTotal === 0
+            lastWeekTotalUntilToday === 0
               ? 100
-              : (thisWeekTotal / lastWeekTotal) * 100 - 100,
+              : (thisWeekTotal / lastWeekTotalUntilToday) * 100 - 100,
           color: GREEN,
         };
       }

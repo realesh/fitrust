@@ -32,6 +32,7 @@ import AvatarSelectorScene from '../../scenes/Profile/AvatarSelectorScene';
 import CouponsListScene from '../../scenes/Dashboard/CouponListScene';
 import SubMaxPlaceholder from '../../scenes/SubMax/SubMaxPlaceholder';
 import WebViewScene from '../WebViewScene';
+import SubMaxTestScene from '../../scenes/SubMax/SubMaxTestScene';
 
 let authStack = createStackNavigator({
   onBoard: {
@@ -59,12 +60,6 @@ let dashboardStack = createStackNavigator({
       header: null,
     }),
   },
-  // dashboardHome: {
-  //   screen: SubMaxPlaceholder,
-  //   navigationOptions: () => ({
-  //     header: null,
-  //   }),
-  // },
   BMRCalculator: {
     screen: BMRCalculatorScene,
     navigationOptions: () => ({
@@ -80,7 +75,7 @@ let dashboardStack = createStackNavigator({
 });
 
 let profileStack = createStackNavigator({
-  home: {
+  profileHome: {
     screen: ProfileScene,
     navigationOptions: () => ({
       header: null,
@@ -183,6 +178,7 @@ let searchStack = {
 
 let subMaxStack = {
   subMaxPlaceholder: SubMaxPlaceholder,
+  subMaxTest: SubMaxTestScene,
 };
 
 let defaultStackConfig: StackNavigatorConfig = {

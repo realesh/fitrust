@@ -1,15 +1,7 @@
 import React, {Component} from 'react';
-import {
-  View,
-  StyleSheet,
-  KeyboardAvoidingView,
-  LayoutAnimation,
-  AsyncStorage,
-  ScrollView,
-} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import {
   BLUE,
-  ERROR_THEME_COLOR,
   WHITE,
   LIGHTER_GREY,
   LIGHT_GREY,
@@ -174,8 +166,8 @@ export default class SubMaxPlaceholder extends Component<Props, State> {
           <Text style={styles.contentText}>
             Press start once you're ready and have done your warm up.
           </Text>
-          <Button onPress={() => {}} fontColor={WHITE}>
-            I'm ready!
+          <Button onPress={this._startTest} fontColor={WHITE}>
+            START
           </Button>
           <Text style={styles.marginTop}>References:</Text>
           <Text style={styles.blueText} onPress={this._onReferencePress}>
@@ -190,6 +182,11 @@ export default class SubMaxPlaceholder extends Component<Props, State> {
       previous_scene: 'Dashboard',
       uri: this._reference,
       title: '',
+    });
+  };
+  _startTest = () => {
+    this.props.navigation.navigate('subMaxTest', {
+      previous_scene: 'subMaxPlaceholder',
     });
   };
 }

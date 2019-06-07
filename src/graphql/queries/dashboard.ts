@@ -89,6 +89,10 @@ export const RESET_DAILY_GOAL = gql`
       profile {
         intakeValue
         workoutValue
+        # NEW
+        waterValue
+        todayStepClaimed
+        todaywaterClaimed
       }
     }
   }

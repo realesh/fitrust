@@ -109,6 +109,7 @@ export default class CouponsListScene extends Component<Props, State> {
                 item.duration,
                 item.startTime,
                 item.finishTime,
+                item.date,
                 item.type,
                 mhr,
               );
@@ -174,6 +175,7 @@ export default class CouponsListScene extends Component<Props, State> {
     duration: number,
     startTime: string,
     finishTime: string,
+    date: string,
     type: ExerciseTypeEnum,
     mhr: number,
   ) => {
@@ -191,6 +193,7 @@ export default class CouponsListScene extends Component<Props, State> {
         fitbitAccessToken,
         startTime,
         finishTime,
+        date,
       );
       let response =
         (fitbitResponse['activities-heart-intraday'] &&

@@ -16,9 +16,10 @@ let fetchExerciseMode = async (
   accessToken: string,
   startTime: string,
   finishTime: string,
+  date: string,
 ): Promise<HeartActivitiesResponse> => {
   let response = await fetch(
-    `https://api.fitbit.com/1/user/${userID}/activities/heart/date/today/1d/1min/time/${startTime}/${finishTime}.json`,
+    `https://api.fitbit.com/1/user/${userID}/activities/heart/date/${date}/1d/1min/time/${startTime}/${finishTime}.json`,
     {
       method: 'GET',
       headers: {

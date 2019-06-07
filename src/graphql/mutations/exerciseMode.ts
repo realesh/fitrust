@@ -119,5 +119,8 @@ export const DELETE_COUPON = gql`
         points
       }
     }
+    incCouponsRedeemed(id: $userID) {
+      total
+    }
   }
 `;

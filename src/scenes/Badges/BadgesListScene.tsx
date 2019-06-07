@@ -58,6 +58,7 @@ export default class BadgesListScene extends Component<Props, State> {
               return {
                 ...badge,
                 unlocked: false,
+                // unlocked: true,
               };
             });
             badgesList = [...unlocked, ...locked];

@@ -1,17 +1,8 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  Image,
-} from 'react-native';
+import {View, StyleSheet, TouchableOpacityProps, Image} from 'react-native';
 import {Text} from '../../../generals/core-ui';
-import {
-  LIGHT_TEXT_COLOR,
-  DARK_GREY70,
-} from '../../../generals/constants/colors';
-import {lockedBadge, mhrBadge} from '../../../assets/images/badges';
+import {DARK_GREY70} from '../../../generals/constants/colors';
+import {lockedBadge} from '../../../assets/images/badges';
 import {MEDIUM_FONT_SIZE} from '../../../generals/constants/size';
 
 type Props = TouchableOpacityProps & {
@@ -39,7 +30,7 @@ export default function BadgeRowItem(props: Props) {
     <View style={[styles.badgeRowContainer, style]}>
       <Image
         source={unlocked ? {uri: thumbUri} : lockedBadge}
-        style={styles.image}
+        style={unlocked ? styles.imageUnlocked : styles.imageLocked}
         resizeMethod="scale"
       />
       <View style={styles.flex}>
@@ -63,10 +54,17 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 30,
   },
-  image: {
-    height: 56,
-    width: 56,
+  imageUnlocked: {
+    height: 60,
+    width: 60,
     marginRight: 20,
+  },
+  imageLocked: {
+    height: 50,
+    width: 50,
+    marginLeft: 5,
+    marginRight: 25,
+    marginVertical: 10,
   },
   descText: {
     color: DARK_GREY70,

@@ -142,7 +142,7 @@ export default class ProfileScene extends Component<Props, State> {
                     </Text>
 
                     <View style={styles.insightContainer}>
-                      <View style={styles.insightItemContainer}>
+                      {/* <View style={styles.insightItemContainer}>
                         <View
                           style={{flexDirection: 'row', alignItems: 'center'}}
                         >
@@ -155,7 +155,7 @@ export default class ProfileScene extends Component<Props, State> {
                           </Text>
                         </View>
                         <Text style={{color: GREY, marginTop: 5}}>Ranking</Text>
-                      </View>
+                      </View> */}
                       <View
                         style={[
                           styles.insightItemContainer,
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   insightItemMiddle: {
-    borderLeftWidth: 2,
+    // borderLeftWidth: 2,
     borderRightWidth: 2,
     borderColor: LIGHTER_GREY,
   },

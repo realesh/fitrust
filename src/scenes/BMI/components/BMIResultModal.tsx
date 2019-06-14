@@ -51,14 +51,14 @@ export default function BMIResultModal(props: Props) {
                   userID: ID || '',
                   bmi: Number.parseInt(bmiResult.toFixed(0), 10),
                 },
-                refetchQueries: [
-                  {
-                    query: USER_PROFILE,
-                    variables: {
-                      userID: ID,
-                    },
-                  },
-                ],
+                // refetchQueries: [
+                //   {
+                //     query: USER_PROFILE,
+                //     variables: {
+                //       userID: ID,
+                //     },
+                //   },
+                // ],
               }));
           } catch (error) {
             // Handle Error

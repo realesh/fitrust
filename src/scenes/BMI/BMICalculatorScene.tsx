@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, Slider, LayoutAnimation, Image} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Slider,
+  LayoutAnimation,
+  Image,
+  AsyncStorage,
+} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 
 import {Text} from '../../generals/core-ui';
@@ -13,6 +20,15 @@ import ScalableItem from '../BMR/components/ScalableItem';
 import {bmiCalc} from '../../assets/images/bmi';
 import {bmiScaleList} from './data/BMIData';
 import BMIResultModal from './components/BMIResultModal';
+import {Mutation} from 'react-apollo';
+import {
+  CONNECT_BADGE,
+  ConnectBadgeResponse,
+  ConnectBadgeVariables,
+} from '../../graphql/mutations/exerciseMode';
+import {BADGESES} from '../../generals/constants/badgesList';
+import BadgeModal from '../../generals/components/BadgeModal';
+import {USER_PROFILE, BADGES_LIST} from '../../graphql/queries/profile';
 
 type Props = NavigationScreenProps;
 
@@ -22,6 +38,10 @@ type State = {
   ageValue: number;
   loading: boolean;
   resultModalVisible: boolean;
+  badgeModalVisible: boolean;
+  badgePoints: number;
+  badgeName: string;
+  badgeUrl: string;
 
   bmiScaleIndex: number;
   bmiResult: number;
@@ -34,20 +54,17 @@ export default class BMICalculatorScene extends Component<Props, State> {
     ageValue: 22,
     loading: false,
     resultModalVisible: false,
+    badgeModalVisible: false,
+    badgePoints: 0,
+    badgeName: '',
+    badgeUrl: '',
     bmiScaleIndex: 0,
     bmiResult: 0,
   };
 
   render() {
     let {navigation} = this.props;
-    let {
-      heightValue,
-      weightValue,
-      loading,
-      resultModalVisible,
-      bmiResult,
-      bmiScaleIndex,
-    } = this.state;
+    let {heightValue, weightValue, loading} = this.state;
 
     return (
       <View style={styles.root}>
@@ -95,12 +112,13 @@ export default class BMICalculatorScene extends Component<Props, State> {
           </AnimatedButton>
         </View>
 
-        <BMIResultModal
-          visible={resultModalVisible}
-          onRequestClose={this._toggleResultModal}
-          bmiResult={bmiResult}
-          bmiScaleIndex={bmiScaleIndex}
-          onUpdatePress={this._updateBMI}
+        {this._renderResultModal()}
+        <BadgeModal
+          visible={this.state.badgeModalVisible}
+          pointsValue={this.state.badgePoints}
+          name={this.state.badgeName}
+          imageUrl={this.state.badgeUrl}
+          onRequestClose={this._closeBadgeModal}
         />
       </View>
     );
@@ -129,9 +147,6 @@ export default class BMICalculatorScene extends Component<Props, State> {
 
     setTimeout(this._toggleResultModal, 1000);
   };
-  _updateBMI = () => {
-    this.props.navigation.goBack();
-  };
 
   _toggleResultModal = () => {
     LayoutAnimation.configureNext(linearEasingShort);
@@ -139,6 +154,86 @@ export default class BMICalculatorScene extends Component<Props, State> {
       resultModalVisible: !this.state.resultModalVisible,
       loading: false,
     });
+  };
+
+  _renderResultModal = () => (
+    <Mutation<ConnectBadgeResponse, ConnectBadgeVariables>
+      mutation={CONNECT_BADGE}
+    >
+      {(connectBadge, {data, loading}) => {
+        let {
+          badgeModalVisible,
+          resultModalVisible,
+          bmiResult,
+          bmiScaleIndex,
+        } = this.state;
+        let handleConnect = async () => {
+          try {
+            let ID = await AsyncStorage.getItem('userID');
+            connectBadge &&
+              (await connectBadge({
+                variables: {
+                  userID: ID || '',
+                  badgeID: BADGESES.bmiFirst,
+                },
+                refetchQueries: [
+                  {
+                    query: USER_PROFILE,
+                    variables: {
+                      userID: ID,
+                    },
+                  },
+                  {
+                    query: BADGES_LIST,
+                    variables: {
+                      userID: ID,
+                    },
+                  },
+                ],
+              }));
+          } catch (error) {
+            // Handle Error
+          }
+        };
+        if (
+          !loading &&
+          data &&
+          data.connectBadges &&
+          data.connectBadges.statusCode === 200 &&
+          !badgeModalVisible
+        ) {
+          this.setState({
+            badgeModalVisible: true,
+            badgeName: data.connectBadges.name,
+            badgePoints: data.connectBadges.badgePoints,
+            badgeUrl: data.connectBadges.imageUrl,
+          });
+        }
+        if (
+          !loading &&
+          data &&
+          data.connectBadges &&
+          data.connectBadges.statusCode === 409
+        ) {
+          this.props.navigation.goBack();
+        }
+
+        return (
+          <BMIResultModal
+            visible={resultModalVisible}
+            onRequestClose={this._toggleResultModal}
+            bmiResult={bmiResult}
+            bmiScaleIndex={bmiScaleIndex}
+            onUpdatePress={handleConnect}
+          />
+        );
+      }}
+    </Mutation>
+  );
+
+  _closeBadgeModal = () => {
+    this.props.navigation.goBack();
+    // this.setState({badgeModalVisible: false});
   };
 }
 

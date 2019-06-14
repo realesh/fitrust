@@ -30,7 +30,6 @@ export default class SubMaxPlaceholder extends Component<Props, State> {
 
   render() {
     let {navigation} = this.props;
-    let {} = this.state;
 
     return (
       <View style={styles.root}>

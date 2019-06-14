@@ -95,6 +95,9 @@ export type DeleteCouponResponse = {
   deleteExerciseCoupon?: {
     id: string;
   };
+  incCouponsRedeemed: {
+    total: number;
+  };
   updateUser?: {
     profile: {
       points: number;
@@ -121,6 +124,29 @@ export const DELETE_COUPON = gql`
     }
     incCouponsRedeemed(id: $userID) {
       total
+    }
+  }
+`;
+
+export type ConnectBadgeResponse = {
+  connectBadges?: {
+    statusCode: 200 | 409;
+    name: string;
+    imageUrl: string;
+    badgePoints: number;
+  };
+};
+export type ConnectBadgeVariables = {
+  userID: string;
+  badgeID: string;
+};
+export const CONNECT_BADGE = gql`
+  mutation connectBadges($userID: String!, $badgeID: String!) {
+    connectBadges(id: $userID, badgeID: $badgeID) {
+      statusCode
+      name
+      imageUrl
+      badgePoints
     }
   }
 `;

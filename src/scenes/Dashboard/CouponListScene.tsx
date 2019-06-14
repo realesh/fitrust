@@ -5,8 +5,6 @@ import {
   FlatList,
   ListRenderItemInfo,
   ActivityIndicator,
-  TouchableOpacity,
-  AsyncStorage,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
 import {Toolbar, PointsModal, PopupInfoDialog} from '../../generals/components';
@@ -26,6 +24,9 @@ import {
   DELETE_COUPON,
   DeleteCouponResponse,
   DeleteCouponVariables,
+  CONNECT_BADGE,
+  ConnectBadgeResponse,
+  ConnectBadgeVariables,
 } from '../../graphql/mutations/exerciseMode';
 import {Text} from '../../generals/core-ui';
 import {MEDIUM_FONT_SIZE} from '../../generals/constants/size';
@@ -34,6 +35,9 @@ import {intensitiesData} from '../ExerciseMode/data/ExerciseModeDataFixtures';
 import CouponListItem from './components/CouponListItem';
 import {USER_DASHBOARD} from '../../graphql/queries/dashboard';
 import {LEADERBOARD_LIST} from '../../graphql/queries/leaderboard';
+import {BADGESES_LIST, BADGESES} from '../../generals/constants/badgesList';
+import BadgeModal from '../../generals/components/BadgeModal';
+import {BADGES_LIST, USER_PROFILE} from '../../graphql/queries/profile';
 
 type NavigationScreenParams = {
   userID: string;
@@ -49,7 +53,9 @@ type State = {
   exModeEarnedPoints: number;
   resultModalVisible: boolean;
   notReadyModalVisible: boolean;
+  badgeModalVisible: boolean;
   selectedCouponID: string;
+  badgeUnlocked: BADGESES_LIST | '' | 'fin';
 };
 
 export default class CouponsListScene extends Component<Props, State> {
@@ -58,10 +64,22 @@ export default class CouponsListScene extends Component<Props, State> {
     exModeEarnedPoints: 0,
     resultModalVisible: false,
     notReadyModalVisible: false,
+    badgeModalVisible: false,
     selectedCouponID: '',
+    badgeUnlocked: '',
   };
 
   offset = 0;
+
+  componentDidUpdate(_: Props, prevState: State) {
+    if (
+      prevState.badgeUnlocked !== this.state.badgeUnlocked &&
+      this.state.badgeUnlocked &&
+      this.state.badgeUnlocked !== 'fin'
+    ) {
+      this._toggleBadgeModal();
+    }
+  }
 
   render() {
     let {navigation} = this.props;
@@ -160,6 +178,7 @@ export default class CouponsListScene extends Component<Props, State> {
                 buttonOnPress={this._toggleNotReadyModal}
               />
               {this._renderResultModal()}
+              {this._renderBadgeModal()}
             </View>
           );
         }}
@@ -230,7 +249,7 @@ export default class CouponsListScene extends Component<Props, State> {
     <Mutation<DeleteCouponResponse, DeleteCouponVariables>
       mutation={DELETE_COUPON}
     >
-      {(deleteCoupon) => {
+      {(deleteCoupon, {data}) => {
         let {
           resultModalVisible,
           exModeEarnedPoints,
@@ -271,6 +290,32 @@ export default class CouponsListScene extends Component<Props, State> {
           this._closeResultModal();
         };
 
+        if (
+          data &&
+          data.incCouponsRedeemed &&
+          data.incCouponsRedeemed.total &&
+          this.state.badgeUnlocked !== 'fin'
+        ) {
+          let total = data.incCouponsRedeemed.total;
+          switch (total) {
+            case 1:
+              this.setState({badgeUnlocked: 'exMode1'});
+              break;
+            case 5:
+              this.setState({badgeUnlocked: 'exMode5'});
+              break;
+            case 25:
+              this.setState({badgeUnlocked: 'exMode25'});
+              break;
+            case 50:
+              this.setState({badgeUnlocked: 'exMode50'});
+              break;
+            case 100:
+              this.setState({badgeUnlocked: 'exMode100'});
+              break;
+          }
+        }
+
         return (
           <PointsModal
             visible={resultModalVisible}
@@ -283,11 +328,97 @@ export default class CouponsListScene extends Component<Props, State> {
       }}
     </Mutation>
   );
+
+  _renderBadgeModal = () => (
+    <Mutation<ConnectBadgeResponse, ConnectBadgeVariables>
+      mutation={CONNECT_BADGE}
+    >
+      {(connectBadge, {data, loading}) => {
+        let {badgeUnlocked} = this.state;
+        let userID = this.props.navigation.getParam('userID', '');
+
+        let connectAsync = async () => {
+          this.setState({badgeUnlocked: 'fin'});
+          badgeUnlocked &&
+            badgeUnlocked !== 'fin' &&
+            connectBadge &&
+            (await connectBadge({
+              variables: {
+                userID,
+                badgeID: BADGESES[badgeUnlocked],
+              },
+              refetchQueries: [
+                {
+                  query: USER_DASHBOARD,
+                  variables: {
+                    userID,
+                  },
+                },
+                {
+                  query: LEADERBOARD_LIST,
+                },
+                {
+                  query: BADGES_LIST,
+                  variables: {
+                    userID,
+                  },
+                },
+                {
+                  query: USER_PROFILE,
+                  variables: {
+                    userID,
+                  },
+                },
+              ],
+            }));
+        };
+        if (!loading && badgeUnlocked && badgeUnlocked !== 'fin') {
+          connectAsync();
+        }
+
+        if (
+          !loading &&
+          data &&
+          data.connectBadges &&
+          data.connectBadges.statusCode === 200 &&
+          this.state.badgeModalVisible
+        ) {
+          return (
+            <BadgeModal
+              visible={true}
+              pointsValue={data.connectBadges.badgePoints}
+              name={data.connectBadges.name}
+              imageUrl={data.connectBadges.imageUrl}
+              onRequestClose={this._closeBadgeModal}
+            />
+          );
+        } else {
+          return (
+            <BadgeModal
+              visible={false}
+              pointsValue={0}
+              name=""
+              imageUrl=""
+              onRequestClose={this._closeBadgeModal}
+            />
+          );
+        }
+      }}
+    </Mutation>
+  );
+
   _closeResultModal = () => {
     this.setState({resultModalVisible: false});
   };
   _toggleNotReadyModal = () => {
     this.setState({notReadyModalVisible: !this.state.notReadyModalVisible});
+  };
+
+  _closeBadgeModal = () => {
+    this.setState({badgeModalVisible: false});
+  };
+  _toggleBadgeModal = () => {
+    this.setState({badgeModalVisible: !this.state.badgeModalVisible});
   };
 }
 

@@ -101,9 +101,9 @@ export default function BMRResultModal(props: Props) {
                 </View>
               </View>
               <Text style={{lineHeight: 24, textAlign: 'center', marginTop: 5}}>
-                TDEE is the number of cals burned by your body based on your
-                activity level during the day. Goal is the number of cals that
-                you should take depending on your desired goals!
+                INTAKE is the number that you should consume, while BURNOUT is
+                the number that you should burn each day. These 2 numbers are
+                set accordingly to the Activity Level and Goal that you select.
               </Text>
             </View>
 

@@ -261,7 +261,7 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
     const BMRMessage =
       'These numbers are the amount of cals that is determined by your ' +
       'BMR and TDEE, and is reccommended for you to fulfill.  ' +
-      'Recalculate your BMR and TDEE every month to maintain the accuracy.';
+      'Recalculate your these numbers every month to maintain the accuracy.';
 
     return (
       <Query<UserDashboardResponse, UserDashboardVariables>

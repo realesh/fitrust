@@ -296,7 +296,6 @@ export default class SubMaxTestScene extends Component<Props, State> {
       resultModalVisible: true,
       MHRResult: MHR,
     });
-    // console.log(Math.floor(MHR));
   };
   _toggleModalVisible = () => {
     this.setState({resultModalVisible: !this.state.resultModalVisible});

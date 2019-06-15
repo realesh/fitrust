@@ -264,8 +264,6 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
     let {
       fadeInAnimatedValue,
       bmrModalVisible,
-      stepClaimModalVisible,
-      waterClaimModalVisible,
       fitbitUserID,
       fitbitAccessToken,
       fetchFitbitLoading,

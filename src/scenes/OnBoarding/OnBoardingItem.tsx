@@ -25,7 +25,7 @@ export default function OnBoardingItem(props: OnBoardingItemProps) {
         <Text
           fontWeight="light"
           fontSize={MEDIUM_FONT_SIZE}
-          style={{marginTop: 10}}
+          style={{marginTop: 10, textAlign: 'center'}}
         >
           {content}
         </Text>

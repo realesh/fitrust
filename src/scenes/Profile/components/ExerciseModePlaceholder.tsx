@@ -1,16 +1,19 @@
 import React from 'react';
 import {View, StyleSheet, Image} from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
+import {Feather as Icon} from '@expo/vector-icons';
 import {fitbitWhite} from '../../../assets/images/profile';
 import {Text, Button} from '../../../generals/core-ui';
-import {WHITE, BLUE} from '../../../generals/constants/colors';
+import {WHITE, BLUE, WHITE30} from '../../../generals/constants/colors';
+import {LARGE_FONT_SIZE} from '../../../generals/constants/size';
 
 type Props = NavigationScreenProps & {
   mhr: number;
+  fitbitConnected: boolean;
 };
 
 export default function ExerciseModePlaceholder(props: Props) {
-  let {navigation, mhr} = props;
+  let {navigation, mhr, fitbitConnected} = props;
 
   let navigate = () =>
     navigation.navigate('exerciseModeSetting', {
@@ -18,7 +21,7 @@ export default function ExerciseModePlaceholder(props: Props) {
       mhr,
     });
 
-  return (
+  return fitbitConnected ? (
     <View style={styles.container}>
       <Image
         source={fitbitWhite}
@@ -31,10 +34,23 @@ export default function ExerciseModePlaceholder(props: Props) {
         exercise mode. Please make sure your phone's bluetooth is turned on and
         is connected to your FitBit device.
       </Text>
-
       <Button style={styles.button} fontColor={BLUE} onPress={navigate}>
         I'm ready!
       </Button>
+    </View>
+  ) : (
+    <View style={styles.container}>
+      <View style={styles.iconContainer}>
+        <Icon size={50} name="lock" color={WHITE} />
+      </View>
+      <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE} style={{color: WHITE}}>
+        Features Locked
+      </Text>
+      <Text style={styles.message}>
+        {
+          "Exercise Mode are only available when you're connected to Fitbit.\nGo back to dashboard to connect to your Fitbit account.\n\nIf you have connected your Fitbit account and still see this message, try to kill and reopen the app."
+        }
+      </Text>
     </View>
   );
 }
@@ -53,5 +69,21 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     width: '50%',
+  },
+  iconContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 20,
+    backgroundColor: WHITE30,
+  },
+  message: {
+    lineHeight: 24,
+    textAlign: 'center',
+    marginTop: 5,
+    marginBottom: 20,
+    color: WHITE,
   },
 });

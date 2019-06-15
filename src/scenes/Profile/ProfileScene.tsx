@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {
   View,
   StyleSheet,
-  Image,
   ScrollView,
   TouchableOpacity,
   AsyncStorage,
@@ -18,7 +17,6 @@ import {
   LIGHT_GREY,
   BLUE,
 } from '../../generals/constants/colors';
-import {trophyCopper} from '../../assets/images/profile';
 import PopupInfoDialog from '../../generals/components/PopupInfoDialog';
 import {infoBMI, infoMHR, DEFAULT_USER_PROFILE} from './data/profileData';
 import BMIInsight from './components/BMIInsight';
@@ -44,6 +42,7 @@ type State = {
   logoutModalVisible: boolean;
   activeIndex: number;
   userID: string;
+  fitbitConnected: boolean;
 };
 
 export default class ProfileScene extends Component<Props, State> {
@@ -53,21 +52,39 @@ export default class ProfileScene extends Component<Props, State> {
     logoutModalVisible: false,
     activeIndex: 0,
     userID: '',
+    fitbitConnected: false,
   };
 
   _scrollView?: ScrollView;
 
   componentDidMount() {
     this._getID();
+    this._getFitbitAuth();
   }
 
   _getID = async () => {
     let userID = await AsyncStorage.getItem('userID');
     userID && this.setState({userID});
   };
+  _getFitbitAuth = async () => {
+    try {
+      let fitbitUserID = await AsyncStorage.getItem('fitbit_user_id');
+      let fitbitAccessToken = await AsyncStorage.getItem('fitbit_access_token');
+      if (fitbitUserID && fitbitAccessToken) {
+        this.setState({fitbitConnected: true});
+      }
+    } catch (error) {
+      // Handle ERROR
+    }
+  };
 
   render() {
-    let {bmiModalVisible, mhrModalVisible, logoutModalVisible} = this.state;
+    let {
+      bmiModalVisible,
+      mhrModalVisible,
+      logoutModalVisible,
+      fitbitConnected,
+    } = this.state;
 
     return (
       <Query<UserProfileResponse, UserProfileVariables>
@@ -218,6 +235,7 @@ export default class ProfileScene extends Component<Props, State> {
                 <ExerciseModePlaceholder
                   navigation={this.props.navigation}
                   mhr={result.bpm}
+                  fitbitConnected={fitbitConnected}
                 />
               </View>
 

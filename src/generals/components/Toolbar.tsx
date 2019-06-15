@@ -12,7 +12,7 @@ import {DEFAULT_TEXT_COLOR, WHITE, BLUE, GREY} from '../constants/colors';
 import {MEDIUM_FONT_SIZE, LARGE_FONT_SIZE} from '../constants/size';
 import {Text} from '../core-ui';
 
-type Props = NavigationScreenProps & {
+type Props = NavigationScreenProps<any> & {
   /**
    * header text to be displayed on toolbar
    */

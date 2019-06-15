@@ -51,6 +51,26 @@ import fetchTodayActivities, {
   DEFAULT_ACTIVITIES_SUMMARY,
   TodayActivitiesResponseSummary,
 } from '../../helpers/Fetchers/fetchTodayActivities';
+import {
+  UPDATE_WATER,
+  UpdateWaterResponse,
+  UpdateWaterVariables,
+  CLAIM_WATER,
+  ClaimWaterResponse,
+  ClaimWaterVariables,
+  CLAIM_STEP,
+  ClaimStepResponse,
+  ClaimStepVariables,
+} from '../../graphql/queries/dashboardV2';
+import {
+  CONNECT_BADGE,
+  ConnectBadgeResponse,
+  ConnectBadgeVariables,
+} from '../../graphql/mutations/exerciseMode';
+import {BADGESES} from '../../generals/constants/badgesList';
+import {USER_PROFILE, BADGES_LIST} from '../../graphql/queries/profile';
+import BadgeModal from '../../generals/components/BadgeModal';
+import {LEADERBOARD_LIST} from '../../graphql/queries/leaderboard';
 
 export type UpdateFitbitAuthFn = (
   fitbitUserID: string,
@@ -74,20 +94,29 @@ type BaseProps = Props & {
   // resetDailyFunc: MutationFn<ResetDailyResponse, ResetDailyVariables>;
 };
 
-type BaseState = TodayActivitiesResponseSummary & {
-  fadeInAnimatedValue: Animated.Value;
-  bmrModalVisible: boolean;
-  waterModalVisible: boolean;
-  waterValue: number;
-  stepGoalClaimed: boolean;
-  waterGoalClaimed: boolean;
-  stepClaimModalVisible: boolean;
-  waterClaimModalVisible: boolean;
-  userDisplayName: string;
-  fitbitUserID: string;
-  fitbitAccessToken: string;
-  fetchFitbitLoading: boolean;
+type BagdeUnlockedState = {
+  badgePoints: number;
+  badgeImageUrl: string;
+  badgeName: string;
 };
+
+type BaseState = TodayActivitiesResponseSummary &
+  BagdeUnlockedState & {
+    fadeInAnimatedValue: Animated.Value;
+    bmrModalVisible: boolean;
+    waterModalVisible: boolean;
+    stepClaimModalVisible: boolean;
+    waterClaimModalVisible: boolean;
+    userDisplayName: string;
+    fitbitUserID: string;
+    fitbitAccessToken: string;
+    fetchFitbitLoading: boolean;
+
+    // badge related
+    stepsClaimedTotal: number;
+    watersClaimedTotal: number;
+    badgeEarnedModalVisible: boolean;
+  };
 export default class DashboardScene extends Component<Props, State> {
   render() {
     return (
@@ -129,9 +158,7 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
     fadeInAnimatedValue: new Animated.Value(0),
     bmrModalVisible: false,
     waterModalVisible: false,
-    waterValue: 0,
     stepGoalClaimed: false,
-    waterGoalClaimed: false,
     stepClaimModalVisible: false,
     waterClaimModalVisible: false,
     userDisplayName: '',
@@ -139,6 +166,14 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
     fitbitAccessToken: '',
     fetchFitbitLoading: true,
     ...DEFAULT_ACTIVITIES_SUMMARY,
+
+    // badge related
+    stepsClaimedTotal: 0,
+    watersClaimedTotal: 0,
+    badgePoints: 0,
+    badgeImageUrl: '',
+    badgeName: '',
+    badgeEarnedModalVisible: false,
   };
 
   componentDidMount() {
@@ -229,10 +264,6 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
     let {
       fadeInAnimatedValue,
       bmrModalVisible,
-      waterModalVisible,
-      waterValue,
-      stepGoalClaimed,
-      waterGoalClaimed,
       stepClaimModalVisible,
       waterClaimModalVisible,
       fitbitUserID,
@@ -290,7 +321,6 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
               currCals: result.workoutValue,
             });
           };
-
           let goToCouponList = async () => {
             let userID = await AsyncStorage.getItem('userID');
             navigation.navigate('exCouponList', {
@@ -352,32 +382,21 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
                         Daily Goals.
                       </Text>
                       {fitbitUserID && fitbitAccessToken ? (
-                        <ProgressWithLabel
-                          label="Steps"
-                          currentValue={steps}
-                          maxValue={result.stepsGoal}
-                          unit="steps"
-                          containerStyle={{marginBottom: 25}}
-                          iconName="refresh-cw"
-                          onIconPress={() => {}}
-                          isClaimed={stepGoalClaimed}
-                          onClaimPress={this._onStepGoalClaim}
-                        />
+                        this._renderStepsDailyGoal(
+                          steps,
+                          result.stepsGoal,
+                          !!result.todayStepClaimed,
+                        )
                       ) : (
                         <LockedProgressGoal
                           containerStyle={{marginBottom: 25}}
                         />
                       )}
-                      <ProgressWithLabel
-                        label="Drink water"
-                        currentValue={waterValue}
-                        maxValue={result.waterGoal}
-                        unit="glass"
-                        iconName="plus-square"
-                        onIconPress={this._toggleWaterModal}
-                        isClaimed={waterGoalClaimed}
-                        onClaimPress={this._onWaterGoalClaim}
-                      />
+                      {this._renderWaterDailyGoal(
+                        result.waterValue,
+                        result.waterGoal,
+                        !!result.todaywaterClaimed,
+                      )}
                     </View>
 
                     <View style={styles.boxShadow}>
@@ -438,21 +457,15 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
                 )}
               </View>
 
-              <DrinkWaterModal
-                visible={waterModalVisible}
-                onAddPress={this._onAddWater}
-              />
-              <PointsModal
-                visible={stepClaimModalVisible}
-                pointsSource="Daily Goal - Step"
-                pointsValue={9200}
-                onRequestClose={this._toggleStepClaimModalVisible}
-              />
-              <PointsModal
-                visible={waterClaimModalVisible}
-                pointsSource="Daily Goal - Drink Water"
-                pointsValue={800}
-                onRequestClose={this._toggleWaterClaimModalVisible}
+              {this._renderWaterModal(result.waterValue)}
+              {this._renderStepClaimModal()}
+              {this._renderWaterClaimModal()}
+              <BadgeModal
+                visible={this.state.badgeEarnedModalVisible}
+                pointsValue={this.state.badgePoints}
+                name={this.state.badgeName}
+                imageUrl={this.state.badgeImageUrl}
+                onRequestClose={this._toggleBadgeEarnedModal}
               />
             </ScrollView>
           );
@@ -460,6 +473,324 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
       </Query>
     );
   }
+
+  _renderWaterModal = (currWater: number) => (
+    <Mutation<UpdateWaterResponse, UpdateWaterVariables>
+      mutation={UPDATE_WATER}
+    >
+      {(updateWater) => {
+        let handleUpdate = async (water: number) => {
+          try {
+            let ID = await AsyncStorage.getItem('userID');
+            updateWater &&
+              (await updateWater({
+                variables: {
+                  userID: ID || '',
+                  water: currWater + water,
+                },
+                refetchQueries: [
+                  {
+                    query: USER_DASHBOARD,
+                    variables: {
+                      userID: ID,
+                    },
+                  },
+                ],
+              }));
+            this._toggleWaterModal();
+          } catch (error) {
+            // Handle Error
+          }
+        };
+        return (
+          <DrinkWaterModal
+            visible={this.state.waterModalVisible}
+            onAddPress={handleUpdate}
+          />
+        );
+      }}
+    </Mutation>
+  );
+
+  _renderWaterDailyGoal = (
+    waterValue: number,
+    waterGoal: number,
+    isClaimed: boolean,
+  ) => (
+    <Mutation<ClaimWaterResponse, ClaimWaterVariables> mutation={CLAIM_WATER}>
+      {(claimWater, {loading}) => {
+        let handleClaim = async () => {
+          try {
+            let ID = await AsyncStorage.getItem('userID');
+            let res =
+              claimWater &&
+              (await claimWater({
+                variables: {
+                  userID: ID || '',
+                },
+                refetchQueries: [
+                  {
+                    query: USER_DASHBOARD,
+                    variables: {
+                      userID: ID,
+                    },
+                  },
+                ],
+              }));
+            if (
+              res &&
+              res.data &&
+              res.data.claimWaterGoal &&
+              res.data.claimWaterGoal.total
+            ) {
+              this.setState({
+                watersClaimedTotal: res.data.claimWaterGoal.total,
+              });
+            }
+            this._toggleWaterClaimModalVisible();
+          } catch (error) {
+            // Handle Error
+          }
+        };
+        return (
+          <ProgressWithLabel
+            label="Drink water"
+            currentValue={loading ? 0 : waterValue}
+            maxValue={waterGoal}
+            unit="glass"
+            iconName="plus-square"
+            onIconPress={this._toggleWaterModal}
+            isClaimed={isClaimed}
+            onClaimPress={handleClaim}
+          />
+        );
+      }}
+    </Mutation>
+  );
+
+  _renderStepsDailyGoal = (
+    stepsValue: number,
+    stepsGoal: number,
+    isClaimed: boolean,
+  ) => (
+    <Mutation<ClaimStepResponse, ClaimStepVariables> mutation={CLAIM_STEP}>
+      {(claimStep, {loading}) => {
+        let handleClaim = async () => {
+          try {
+            let ID = await AsyncStorage.getItem('userID');
+            let res =
+              claimStep &&
+              (await claimStep({
+                variables: {
+                  userID: ID || '',
+                },
+                refetchQueries: [
+                  {
+                    query: USER_DASHBOARD,
+                    variables: {
+                      userID: ID,
+                    },
+                  },
+                ],
+              }));
+            if (
+              res &&
+              res.data &&
+              res.data.claimStepsGoal &&
+              res.data.claimStepsGoal.total
+            ) {
+              this.setState({
+                stepsClaimedTotal: res.data.claimStepsGoal.total,
+              });
+            }
+            this._toggleStepClaimModalVisible();
+          } catch (error) {
+            // Handle Error
+          }
+        };
+        return (
+          <ProgressWithLabel
+            label="Steps"
+            currentValue={loading ? 0 : stepsValue}
+            maxValue={stepsGoal}
+            unit="steps"
+            containerStyle={{marginBottom: 25}}
+            iconName="refresh-cw"
+            onIconPress={this._fetchStepInfo}
+            isClaimed={isClaimed}
+            onClaimPress={handleClaim}
+          />
+        );
+      }}
+    </Mutation>
+  );
+
+  _renderWaterClaimModal = () => (
+    <Mutation<ConnectBadgeResponse, ConnectBadgeVariables>
+      mutation={CONNECT_BADGE}
+    >
+      {(connectBadge) => {
+        let handleConnect = async () => {
+          let badgeUnlocked = '';
+          switch (this.state.watersClaimedTotal) {
+            case 1:
+              badgeUnlocked = BADGESES.water1;
+              break;
+            case 5:
+              badgeUnlocked = BADGESES.water5;
+              break;
+            case 25:
+              badgeUnlocked = BADGESES.water25;
+              break;
+            case 50:
+              badgeUnlocked = BADGESES.water50;
+              break;
+            case 100:
+              badgeUnlocked = BADGESES.water100;
+              break;
+          }
+          if (badgeUnlocked) {
+            try {
+              let ID = await AsyncStorage.getItem('userID');
+              let res =
+                connectBadge &&
+                (await connectBadge({
+                  variables: {
+                    userID: ID || '',
+                    badgeID: badgeUnlocked,
+                  },
+                  refetchQueries: [
+                    {
+                      query: USER_PROFILE,
+                      variables: {
+                        userID: ID,
+                      },
+                    },
+                    {
+                      query: BADGES_LIST,
+                      variables: {
+                        userID: ID,
+                      },
+                    },
+                    {
+                      query: LEADERBOARD_LIST,
+                    },
+                  ],
+                }));
+              if (
+                res &&
+                res.data &&
+                res.data.connectBadges &&
+                res.data.connectBadges.statusCode === 200
+              ) {
+                this.setState({
+                  badgeName: res.data.connectBadges.name,
+                  badgeImageUrl: res.data.connectBadges.imageUrl,
+                  badgePoints: res.data.connectBadges.badgePoints,
+                  badgeEarnedModalVisible: true,
+                });
+              }
+            } catch (error) {
+              // Handle Error
+            }
+          }
+          this._toggleWaterClaimModalVisible();
+        };
+        return (
+          <PointsModal
+            visible={this.state.waterClaimModalVisible}
+            pointsSource="Daily Goal - Drink Water"
+            pointsValue={50}
+            onRequestClose={handleConnect}
+          />
+        );
+      }}
+    </Mutation>
+  );
+
+  _renderStepClaimModal = () => (
+    <Mutation<ConnectBadgeResponse, ConnectBadgeVariables>
+      mutation={CONNECT_BADGE}
+    >
+      {(connectBadge) => {
+        let handleConnect = async () => {
+          let badgeUnlocked = '';
+          switch (this.state.stepsClaimedTotal) {
+            case 1:
+              badgeUnlocked = BADGESES.step1;
+              break;
+            case 5:
+              badgeUnlocked = BADGESES.step5;
+              break;
+            case 25:
+              badgeUnlocked = BADGESES.step25;
+              break;
+            case 50:
+              badgeUnlocked = BADGESES.step50;
+              break;
+            case 100:
+              badgeUnlocked = BADGESES.step100;
+              break;
+          }
+
+          if (badgeUnlocked) {
+            try {
+              let ID = await AsyncStorage.getItem('userID');
+              let res =
+                connectBadge &&
+                (await connectBadge({
+                  variables: {
+                    userID: ID || '',
+                    badgeID: badgeUnlocked,
+                  },
+                  refetchQueries: [
+                    {
+                      query: USER_PROFILE,
+                      variables: {
+                        userID: ID,
+                      },
+                    },
+                    {
+                      query: BADGES_LIST,
+                      variables: {
+                        userID: ID,
+                      },
+                    },
+                    {
+                      query: LEADERBOARD_LIST,
+                    },
+                  ],
+                }));
+              if (
+                res &&
+                res.data &&
+                res.data.connectBadges &&
+                res.data.connectBadges.statusCode === 200
+              ) {
+                this.setState({
+                  badgeName: res.data.connectBadges.name,
+                  badgeImageUrl: res.data.connectBadges.imageUrl,
+                  badgePoints: res.data.connectBadges.badgePoints,
+                  badgeEarnedModalVisible: true,
+                });
+              }
+            } catch (error) {
+              // Handle Error
+            }
+          }
+          this._toggleStepClaimModalVisible();
+        };
+        return (
+          <PointsModal
+            visible={this.state.stepClaimModalVisible}
+            pointsSource="Daily Goal - Step"
+            pointsValue={100}
+            onRequestClose={handleConnect}
+          />
+        );
+      }}
+    </Mutation>
+  );
 
   _resetDailyState = () => {
     alert('halo');
@@ -471,22 +802,15 @@ class DashboardSceneBase extends Component<BaseProps, BaseState> {
   _toggleWaterModal = () => {
     this.setState({waterModalVisible: !this.state.waterModalVisible});
   };
+  _toggleBadgeEarnedModal = () => {
+    this.setState({
+      badgeEarnedModalVisible: !this.state.badgeEarnedModalVisible,
+    });
+  };
   _goToBMR = () => {
     let {navigation} = this.props;
     this.setState({bmrModalVisible: false});
     navigation.navigate('BMRCalculator', {previous_scene: 'Home'});
-  };
-  _onAddWater = (value: number) => {
-    this.setState({waterValue: this.state.waterValue + value});
-    this._toggleWaterModal();
-  };
-  _onStepGoalClaim = () => {
-    this.setState({stepGoalClaimed: true});
-    this._toggleStepClaimModalVisible();
-  };
-  _onWaterGoalClaim = () => {
-    this.setState({waterGoalClaimed: true});
-    this._toggleWaterClaimModalVisible();
   };
   _toggleStepClaimModalVisible = () => {
     this.setState({stepClaimModalVisible: !this.state.stepClaimModalVisible});

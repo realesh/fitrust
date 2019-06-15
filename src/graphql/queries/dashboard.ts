@@ -11,6 +11,9 @@ export type UserDashboardData = {
   workoutValue: number;
   createdAt: string;
   updatedAt: string;
+  waterValue: number;
+  todayStepClaimed: number;
+  todaywaterClaimed: number;
 };
 export type UserDashboardResponse = {
   user?: {
@@ -34,6 +37,10 @@ export const USER_DASHBOARD = gql`
         workoutValue
         createdAt
         updatedAt
+        # NEW
+        waterValue
+        todayStepClaimed
+        todaywaterClaimed
       }
     }
   }

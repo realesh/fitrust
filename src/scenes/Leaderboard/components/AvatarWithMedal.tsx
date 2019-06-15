@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, StyleSheet, Image, ImageSourcePropType} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  ImageSourcePropType,
+  TouchableOpacity,
+  TouchableOpacityProps,
+} from 'react-native';
 import {
   medalGold,
   medalSilver,
@@ -8,7 +15,7 @@ import {
 import {Text} from '../../../generals/core-ui';
 import {DARK_GREY70} from '../../../generals/constants/colors';
 
-type Props = {
+type Props = TouchableOpacityProps & {
   /**
    * Avatar URI to be rendered
    */
@@ -32,7 +39,7 @@ type Props = {
 };
 
 export default function AvatarWithMedal(props: Props) {
-  let {avatarSource, rank, name, points, avatarMinimized} = props;
+  let {avatarSource, rank, name, points, avatarMinimized, onPress} = props;
 
   let containerStyle =
     rank === 'gold' ? styles.winnerContainer : styles.runnerUpContainer;
@@ -44,7 +51,11 @@ export default function AvatarWithMedal(props: Props) {
     rank === 'gold' ? medalGold : rank === 'silver' ? medalSilver : medalBronze;
 
   return (
-    <View style={containerStyle}>
+    <TouchableOpacity
+      activeOpacity={0.6}
+      style={containerStyle}
+      onPress={onPress}
+    >
       <View style={[styles.imageShadow, avatarStyle]}>
         <Image
           source={avatarSource}
@@ -67,7 +78,7 @@ export default function AvatarWithMedal(props: Props) {
           {points}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

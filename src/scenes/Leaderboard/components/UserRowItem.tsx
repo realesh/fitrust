@@ -51,6 +51,7 @@ export default function UserRowItem(props: Props) {
   } = props;
   return (
     <TouchableOpacity
+      activeOpacity={0.6}
       style={[styles.userRowContainer, currentUser && styles.boxShadow, style]}
       onPress={onPress}
     >

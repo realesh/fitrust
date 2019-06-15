@@ -1,8 +1,7 @@
 import gql from 'graphql-tag';
-import {UserLeaderboard} from '../../scenes/Leaderboard/data/LeaderboardDataFixtures';
 
 export type LeaderboardResponse = {
-  profiles: Array<UserLeaderboard>;
+  profiles: Array<UserLeaderboardData>;
 };
 export type LeaderboardVariables = {};
 export const LEADERBOARD_LIST = gql`
@@ -11,14 +10,28 @@ export const LEADERBOARD_LIST = gql`
       name
       points
       avatarUrl
+      badges {
+        imageUrl
+      }
+      titleFirst
+      titleMiddle
+      titleLast
     }
   }
 `;
+
+export type BadgesImage = {
+  imageUrl: 'string';
+};
 
 export type UserLeaderboardData = {
   name: string;
   points: number;
   avatarUrl: string;
+  titleFirst: string;
+  titleMiddle: string;
+  titleLast: string;
+  badges: Array<BadgesImage>;
 };
 export type UserLeaderboardResponse = {
   user?: {
@@ -35,6 +48,12 @@ export const USER_LEADERBOARD_PROFILE = gql`
         name
         points
         avatarUrl
+        badges {
+          imageUrl
+        }
+        titleFirst
+        titleMiddle
+        titleLast
       }
     }
   }

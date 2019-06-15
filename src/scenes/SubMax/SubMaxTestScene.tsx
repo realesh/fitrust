@@ -313,8 +313,8 @@ type TestCountDownProps = {
 function TestCountDown({onFinish, running}: TestCountDownProps) {
   return (
     <CountDown
-      // until={2 * 60}
-      until={10}
+      until={2 * 60}
+      // until={10}
       timeToShow={['M', 'S']}
       onFinish={onFinish}
       size={30}

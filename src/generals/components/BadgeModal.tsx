@@ -28,7 +28,11 @@ export default function BadgeModal(props: Props) {
           {numberFormatter(Math.floor(pointsValue))}
         </Text>
       </View>
-      <Text fontWeight="bold" fontSize={LARGE_FONT_SIZE}>
+      <Text
+        fontWeight="bold"
+        fontSize={LARGE_FONT_SIZE}
+        style={{textAlign: 'center'}}
+      >
         {`Badge unlocked!\n${name}`}
       </Text>
       <Button

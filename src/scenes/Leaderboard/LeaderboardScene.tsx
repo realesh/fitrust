@@ -15,6 +15,7 @@ import {
   Image,
 } from 'react-native';
 import {NavigationScreenProps} from 'react-navigation';
+import {Feather as Icon} from '@expo/vector-icons';
 import {Toolbar, PopupDialog} from '../../generals/components';
 import {
   WHITE,
@@ -22,6 +23,7 @@ import {
   LIGHTER_GREY,
   BLUE,
   BLUE30,
+  BLACK60,
 } from '../../generals/constants/colors';
 import AvatarWithMedal from './components/AvatarWithMedal';
 import {userLoggedIn} from './data/LeaderboardDataFixtures';
@@ -41,7 +43,7 @@ import {
 } from '../../graphql/queries/leaderboard';
 import {imageResolvers} from '../../helpers/imageResolvers';
 import {Avatar, Text} from '../../generals/core-ui';
-import {LARGE_FONT_SIZE} from '../../generals/constants/size';
+import {LARGE_FONT_SIZE, MEDIUM_FONT_SIZE} from '../../generals/constants/size';
 
 type Props = NavigationScreenProps;
 
@@ -50,6 +52,7 @@ type PreviewedProfile = {
   pAvatar: string;
   pTitle: string;
   pBadges: Array<BadgesImage>;
+  pPoints: string;
 };
 
 type State = PreviewedProfile & {
@@ -67,6 +70,7 @@ export default class LeaderboardScene extends Component<Props, State> {
     pAvatar: '',
     pTitle: '',
     pBadges: [],
+    pPoints: '',
   };
 
   offset = 0;
@@ -89,6 +93,7 @@ export default class LeaderboardScene extends Component<Props, State> {
       pBadges,
       pName,
       pTitle,
+      pPoints,
     } = this.state;
 
     let topThreeContainer = [
@@ -117,6 +122,7 @@ export default class LeaderboardScene extends Component<Props, State> {
               pTitle: `${firstPosUser.titleFirst} ${firstPosUser.titleMiddle} ${
                 firstPosUser.titleLast
               }`,
+              pPoints: String(firstPosUser.points),
               previewModalVisible: true,
             });
           };
@@ -128,6 +134,7 @@ export default class LeaderboardScene extends Component<Props, State> {
               pTitle: `${secondPosUser.titleFirst} ${
                 secondPosUser.titleMiddle
               } ${secondPosUser.titleLast}`,
+              pPoints: String(secondPosUser.points),
               previewModalVisible: true,
             });
           };
@@ -139,6 +146,7 @@ export default class LeaderboardScene extends Component<Props, State> {
               pTitle: `${thirdPosUser.titleFirst} ${thirdPosUser.titleMiddle} ${
                 thirdPosUser.titleLast
               }`,
+              pPoints: String(thirdPosUser.points),
               previewModalVisible: true,
             });
           };
@@ -237,6 +245,16 @@ export default class LeaderboardScene extends Component<Props, State> {
                 <View style={styles.titleContainer}>
                   <Text style={{color: BLUE}}>{pTitle}</Text>
                 </View>
+                <View style={{flexDirection: 'row', marginBottom: 10}}>
+                  <View style={styles.levelInfoContainer}>
+                    <Icon name="zap" size={MEDIUM_FONT_SIZE} color={WHITE} />
+                  </View>
+                  <View style={styles.pointsInfoContainer}>
+                    <Text fontWeight="bold" style={{color: BLUE}}>
+                      {pPoints}
+                    </Text>
+                  </View>
+                </View>
                 <View style={styles.badgesContainer}>
                   <FlatList
                     data={pBadges}
@@ -246,6 +264,13 @@ export default class LeaderboardScene extends Component<Props, State> {
                     numColumns={3}
                   />
                 </View>
+                <Icon
+                  name="x"
+                  size={25}
+                  color={BLACK60}
+                  style={styles.closeModalIcon}
+                  onPress={this._toggleModalVisible}
+                />
               </PopupDialog>
             </View>
           );
@@ -265,6 +290,7 @@ export default class LeaderboardScene extends Component<Props, State> {
         pAvatar: item.avatarUrl,
         pBadges: item.badges,
         pTitle: `${item.titleFirst} ${item.titleMiddle} ${item.titleLast}`,
+        pPoints: String(item.points),
         previewModalVisible: true,
       });
     };
@@ -360,8 +386,26 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 20,
     marginTop: 5,
-    marginBottom: 15,
+    marginBottom: 10,
     backgroundColor: BLUE30,
+    alignItems: 'center',
+  },
+  closeModalIcon: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+  },
+  levelInfoContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: BLUE,
+  },
+  pointsInfoContainer: {
+    marginLeft: 8,
+    justifyContent: 'center',
     alignItems: 'center',
   },
 });

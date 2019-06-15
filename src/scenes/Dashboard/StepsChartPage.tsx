@@ -152,7 +152,9 @@ export default class StepsChartPage extends Component<Props, State> {
           value:
             thisWeekTotal === 0
               ? 100
-              : 100 - ((lastWeekTotalUntilToday / thisWeekTotal) * 100 - 100),
+              : ((thisWeekTotal - lastWeekTotalUntilToday) /
+                  lastWeekTotalUntilToday) *
+                100,
           color: RED,
         };
       } else if (lastWeekTotalUntilToday < thisWeekTotal) {
@@ -161,7 +163,9 @@ export default class StepsChartPage extends Component<Props, State> {
           value:
             lastWeekTotalUntilToday === 0
               ? 100
-              : (thisWeekTotal / lastWeekTotalUntilToday) * 100 - 100,
+              : ((thisWeekTotal - lastWeekTotalUntilToday) /
+                  lastWeekTotalUntilToday) *
+                100,
           color: GREEN,
         };
       }

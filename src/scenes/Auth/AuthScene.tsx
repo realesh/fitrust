@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   LayoutAnimation,
   AsyncStorage,
+  ScrollView,
 } from 'react-native';
 import {
   Text,
@@ -164,8 +165,8 @@ class AuthSceneBase extends Component<BaseProps, State> {
     } = this.state;
 
     return (
-      <KeyboardAvoidingView style={styles.root}>
-        <View style={styles.paddedContainer}>
+      <KeyboardAvoidingView behavior="padding" style={styles.root}>
+        <ScrollView style={styles.paddedContainer}>
           {this._renderHeaderText()}
 
           <View style={{marginBottom: 40}}>
@@ -205,7 +206,7 @@ class AuthSceneBase extends Component<BaseProps, State> {
             {!login && (
               <DatePicker onDateChange={this._onChangeDate} value={date} />
             )}
-            {login && (
+            {/* {login && (
               <CheckLabel
                 checked={rememberMe}
                 onPress={this._onToggleRememberMe}
@@ -213,7 +214,7 @@ class AuthSceneBase extends Component<BaseProps, State> {
               >
                 Remember me
               </CheckLabel>
-            )}
+            )} */}
           </View>
 
           {errorMessage && (
@@ -234,7 +235,7 @@ class AuthSceneBase extends Component<BaseProps, State> {
 
           {this._renderButton()}
           {this._renderTextButton()}
-        </View>
+        </ScrollView>
         {this._renderSuccessOverlay()}
       </KeyboardAvoidingView>
     );
@@ -451,7 +452,7 @@ class AuthSceneBase extends Component<BaseProps, State> {
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
+    flexGrow: 1,
   },
   paddedContainer: {
     paddingHorizontal: 20,

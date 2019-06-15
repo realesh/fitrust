@@ -42,7 +42,16 @@ function ProgressBarWithLabel(props: Props) {
     return;
   };
 
-  return percentage < 100 ? (
+  return isClaimed ? (
+    <View style={[styles.root, styles.goalCompleteContainer, containerStyle]}>
+      <Text style={{flex: 1, marginRight: 20}}>{label}</Text>
+      <View style={styles.disabledButton}>
+        <Text fontWeight="bold" style={{color: GREY}}>
+          COMPLETED
+        </Text>
+      </View>
+    </View>
+  ) : percentage < 100 ? (
     <View style={[styles.root, containerStyle]} {...otherProps}>
       <View style={styles.labelContainer}>
         <Text>{label}</Text>
@@ -78,7 +87,7 @@ function ProgressBarWithLabel(props: Props) {
         </View>
       </View>
     </View>
-  ) : !isClaimed ? (
+  ) : (
     <View style={[styles.root, styles.goalCompleteContainer, containerStyle]}>
       <Text style={{flex: 1, marginRight: 20}}>{label}</Text>
       <Button
@@ -88,15 +97,6 @@ function ProgressBarWithLabel(props: Props) {
       >
         CLAIM
       </Button>
-    </View>
-  ) : (
-    <View style={[styles.root, styles.goalCompleteContainer, containerStyle]}>
-      <Text style={{flex: 1, marginRight: 20}}>{label}</Text>
-      <View style={styles.disabledButton}>
-        <Text fontWeight="bold" style={{color: GREY}}>
-          COMPLETED
-        </Text>
-      </View>
     </View>
   );
 }

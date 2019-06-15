@@ -50,3 +50,6 @@ buck-out/
 
 # added by KodeFox
 /coverage
+
+fitbit.ts
+nutritionix.ts
